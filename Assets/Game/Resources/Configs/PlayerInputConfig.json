@@ -1,0 +1,17 @@
+{
+  "PCAccelerationKey": "W",
+  "PCDecelrationKey": "S",
+  "PCShootBulletKey": "Mouse0",
+  "PCShootlaserKey": "Mouse1",
+  "PCPauseKey": "Escape",
+
+  "GamepadHorizontalRotationAxis": "RightStickHorizontal",
+  "GamepadVerticalRotationAxis": "RightStickVertical",
+  "GamepadAccelerationKey": "DPadY",
+  "GamepadDecelrationKey": "DPadY",
+  "GamepadShootBulletKey": "RightTrigger",
+  "GamepadShootlaserKey": "LeftTrigger",
+  "GamepadPauseKey": "JoystickButton6",
+
+  "RotationStickDeadzone": 0.2
+}
