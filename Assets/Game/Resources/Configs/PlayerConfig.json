@@ -1,0 +1,15 @@
+{
+  "AccelerationSpeed": 5,
+  "DecelerationSpeed": 2,
+  "MaxSpeed": 10,
+  "RotationSpeed": 180,
+  "MaxLives": 3,
+  "UncontrollabilityDuration": 2,
+  "InvulnurabilityDuration": 3,
+
+  "BulletFireRateInterval": 0.25,
+  "LaserFireRateInterval": 0.75,
+  "MaxLaserCharges": 3,
+  "LaserCooldown": 3,
+  "LaserDuration": 0.5
+}

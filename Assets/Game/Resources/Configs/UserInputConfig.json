@@ -10,8 +10,8 @@
   "GamepadAccelerationKey": "DPadY",
   "GamepadDecelrationKey": "DPadY",
   "GamepadShootBulletKey": "RightTrigger",
-  "GamepadShootlaserKey": "LeftTrigger",
+  "GamepadShootLaserKey": "LeftTrigger",
   "GamepadPauseKey": "JoystickButton6",
 
-  "RotationStickDeadzone": 0.2
+  "InputDeadzone": 0.2
 }

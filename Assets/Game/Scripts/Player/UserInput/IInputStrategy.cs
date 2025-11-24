@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.UserInput
+namespace Player.UserInput
 {
     public interface IInputStrategy
     {

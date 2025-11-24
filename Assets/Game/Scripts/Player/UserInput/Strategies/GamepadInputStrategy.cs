@@ -4,21 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Core.UserInput.Strategies
+namespace Player.UserInput.Strategies
 {
     public class GamepadInputStrategy : IInputStrategy
     {
         private JsonConfigProvider _configProvider;
-        private PlayerInputSettings _inputSettings;
+        private UserInputSettings _inputSettings;
 
-        private Vector2 _rotation = Vector2.zero;
+        private Vector2 _rotation = new Vector2(1, 0);
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider)
         {
             _configProvider = configProvider;
 
-            _inputSettings = configProvider.LoadPlayerInputSettings();
+            _inputSettings = configProvider.LoadUserInputSettings();
         }
 
         public PlayerMovementState GetPlayerMovementState()
@@ -44,7 +44,7 @@ namespace Core.UserInput.Strategies
 
             Vector2 inputRotation = new Vector2(horizontal, vertical);
 
-            if (inputRotation.magnitude > _inputSettings.RotationStickDeadzone)
+            if (inputRotation.magnitude > _inputSettings.InputDeadzone)
             {
                 _rotation = inputRotation;
             }
@@ -54,17 +54,29 @@ namespace Core.UserInput.Strategies
 
         public bool IsPausePressed()
         {
-            return Input.GetKey(_inputSettings.GamepadPauseKey);
+            return Input.GetKeyDown(_inputSettings.GamepadPauseKey);
         }
 
         public bool IsShootingBullets()
         {
-            return Input.GetKey(_inputSettings.GamepadShootBulletKey);
+            return GetIsTriggerPressed(_inputSettings.GamepadShootBulletKey);
         }
 
         public bool IsShootingLaser()
         {
-            return Input.GetKey(_inputSettings.GamepadShootLaserKey);
+            return GetIsTriggerPressed(_inputSettings.GamepadShootLaserKey);
+        }
+
+        private bool GetIsTriggerPressed(string triggerName)
+        {
+            float triggerValue = Input.GetAxis(triggerName);
+
+            if (triggerValue > _inputSettings.InputDeadzone)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

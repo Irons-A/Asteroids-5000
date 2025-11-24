@@ -7,11 +7,17 @@ namespace Core.Configuration
 {
     public class JsonConfigProvider
     {
-        public const string PlayerInputConfigPath = "Configs/PlayerInputConfig";
+        public const string UserInputConfigPath = "Configs/UserInputConfig";
+        public const string PlayerConfigPath = "Configs/PlayerConfig";
 
-        public PlayerInputSettings LoadPlayerInputSettings()
+        public UserInputSettings LoadUserInputSettings()
         {
-            return LoadConfig<PlayerInputSettings>(PlayerInputConfigPath);
+            return LoadConfig<UserInputSettings>(UserInputConfigPath);
+        }
+
+        public PlayerSettings LoadPlayerSettings()
+        {
+            return LoadConfig<PlayerSettings>(PlayerConfigPath);
         }
 
         private T LoadConfig<T>(string configPath) where T : class

@@ -16,7 +16,8 @@ namespace Core.Physics
         private float _friction;
         private float _objectMass;
 
-        public CustomPhysics(IMovable movableObject, float friction = BaseFriction, float objectMass = BaseObjectMass)
+        public void SetMovableObject(IMovable movableObject, float friction = BaseFriction,
+            float objectMass = BaseObjectMass)
         {
             _movableObject = movableObject;
             _friction = friction;
@@ -25,21 +26,29 @@ namespace Core.Physics
 
         public void ApplyAcceleration()
         {
+            if (_movableObject == null) return;
+
 
         }
 
         public void ApplyDeceleration()
         {
+            if (_movableObject == null) return;
+
 
         }
 
         public void UpdatePosition()
         {
+            if (_movableObject == null) return;
+
 
         }
 
         public void SetInstantVelocity()
         {
+            if (_movableObject == null) return;
+
 
         }
     }

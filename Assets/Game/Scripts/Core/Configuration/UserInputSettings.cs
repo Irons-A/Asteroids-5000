@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Configuration
 {
-    public class PlayerInputSettings
+    public class UserInputSettings
     {
         public KeyCode PCAccelerationKey;
         public KeyCode PCDecelrationKey;
@@ -16,10 +16,10 @@ namespace Core.Configuration
         public string GamepadVerticalRotationAxis;
         public KeyCode GamepadAccelerationKey;
         public KeyCode GamepadDecelrationKey;
-        public KeyCode GamepadShootBulletKey;
-        public KeyCode GamepadShootLaserKey;
+        public string GamepadShootBulletKey;
+        public string GamepadShootLaserKey;
         public KeyCode GamepadPauseKey;
 
-        public float RotationStickDeadzone;
+        public float InputDeadzone;
     }
 }

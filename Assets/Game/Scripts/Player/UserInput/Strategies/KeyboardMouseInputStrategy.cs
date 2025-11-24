@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Core.UserInput.Strategies
+namespace Player.UserInput.Strategies
 {
     public class KeyboardMouseInputStrategy : IInputStrategy
     {
         private JsonConfigProvider _configProvider;
-        private PlayerInputSettings _inputSettings;
+        private UserInputSettings _inputSettings;
         private Camera _mainCamera;
 
         [Inject]
@@ -18,7 +18,7 @@ namespace Core.UserInput.Strategies
             _configProvider = configProvider;
             _mainCamera = Camera.main;
 
-            _inputSettings = configProvider.LoadPlayerInputSettings();
+            _inputSettings = configProvider.LoadUserInputSettings();
         }
 
         public PlayerMovementState GetPlayerMovementState()
@@ -40,14 +40,14 @@ namespace Core.UserInput.Strategies
         public Vector2 GetRotationInput()
         {
             Vector3 mouseWorldPosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 direction = mouseWorldPosition.normalized;
+            Vector2 direction = mouseWorldPosition;
 
             return direction;
         }
 
         public bool IsPausePressed()
         {
-            return Input.GetKey(_inputSettings.PCPauseKey);
+            return Input.GetKeyDown(_inputSettings.PCPauseKey);
         }
 
         public bool IsShootingBullets()

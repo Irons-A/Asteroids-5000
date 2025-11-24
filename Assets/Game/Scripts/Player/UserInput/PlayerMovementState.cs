@@ -1,4 +1,4 @@
-namespace Core.UserInput
+namespace Player.UserInput
 {
     public enum PlayerMovementState
     {

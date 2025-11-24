@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.UserInput
+namespace Player.View
 {
-    public class InputDetector : MonoBehaviour
+    public class PlayerView : MonoBehaviour
     {
 
     }
