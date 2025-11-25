@@ -1,4 +1,5 @@
 using Core.Configuration;
+using Core.Physics;
 using Player.UserInput;
 using Player.View;
 using System.Collections;
@@ -9,22 +10,31 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerModel
+    public class PlayerModel : IFixedTickable
     {
         private PlayerView _playerView;
         private Transform _playerTransform;
         private PlayerSettings _playerSettings;
+        private CustomPhysics _playerPhysics;
 
         private JsonConfigProvider _configProvider;
 
         [Inject]
-        private void Construct(PlayerView playerView, JsonConfigProvider configProvider)
+        private void Construct(PlayerView playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
         {
             _configProvider = configProvider;
             _playerSettings = configProvider.LoadPlayerSettings();
 
             _playerView = playerView;
             _playerTransform = playerView.transform;
+
+            _playerPhysics = playerPhysics;
+            _playerPhysics.SetMovableObject(playerView);
+        }
+
+        public void FixedTick()
+        {
+            _playerPhysics.ProcessPhysics();
         }
 
         public void RotatePlayerWithMouse(Vector2 mouseWorldPosition)
@@ -43,7 +53,14 @@ namespace Player.Logic
 
         public void MovePlayer(PlayerMovementState movementState)
         {
-
+            if (movementState == PlayerMovementState.Accelerating)
+            {
+                _playerPhysics.ApplyAcceleration(_playerSettings.AccelerationSpeed, _playerSettings.MaxSpeed);
+            }
+            else if (movementState == PlayerMovementState.Decelerating)
+            {
+                _playerPhysics.ApplyDeceleration(_playerSettings.DecelerationSpeed);
+            }
         }
 
         public void ShootBullets()

@@ -20,8 +20,8 @@ namespace Player.UserInput
         private UserInputSettings _inputSettings;
 
         [Inject]
-        private void Construct(KeyboardMouseInputStrategy pcStrategy, GamepadInputStrategy gamepadStrategy,
-            PlayerModel playermodel, JsonConfigProvider configProvider)
+        private void Construct(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
+            GamepadInputStrategy gamepadStrategy, PlayerModel playermodel)
         {
             _configProvider = configProvider;
             _inputSettings = configProvider.LoadUserInputSettings();
