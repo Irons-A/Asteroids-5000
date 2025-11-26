@@ -7,8 +7,9 @@
 
   "GamepadHorizontalRotationAxis": "RightStickHorizontal",
   "GamepadVerticalRotationAxis": "RightStickVertical",
-  "GamepadAccelerationKey": "DPadY",
-  "GamepadDecelrationKey": "DPadY",
+  "GamepadMovementAxisName": "DPadY",
+  "GamepadAccelerationAxisValue": 0.2,
+  "GamepadDecelrationAxisValue": -0.2,
   "GamepadShootBulletKey": "RightTrigger",
   "GamepadShootLaserKey": "LeftTrigger",
   "GamepadPauseKey": "JoystickButton6",

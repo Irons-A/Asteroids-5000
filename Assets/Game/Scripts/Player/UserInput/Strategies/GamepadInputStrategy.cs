@@ -18,16 +18,18 @@ namespace Player.UserInput.Strategies
         {
             _configProvider = configProvider;
 
-            _inputSettings = configProvider.LoadUserInputSettings();
+            _inputSettings = configProvider.InputSettingsRef;
         }
 
         public PlayerMovementState GetPlayerMovementState()
         {
-            if (Input.GetKey(_inputSettings.GamepadAccelerationKey))
+            float movementInput = Input.GetAxis(_inputSettings.GamepadMovementAxisName);
+
+            if (movementInput >= _inputSettings.GamepadAccelerationAxisValue)
             {
                 return PlayerMovementState.Accelerating;
             }
-            else if (Input.GetKey(_inputSettings.GamepadDecelrationKey))
+            else if (movementInput <= _inputSettings.GamepadDecelrationAxisValue)
             {
                 return PlayerMovementState.Decelerating;
             }

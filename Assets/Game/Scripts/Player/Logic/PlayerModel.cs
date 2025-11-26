@@ -23,7 +23,7 @@ namespace Player.Logic
         private void Construct(PlayerView playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
         {
             _configProvider = configProvider;
-            _playerSettings = configProvider.LoadPlayerSettings();
+            _playerSettings = configProvider.PlayerSettingsRef;
 
             _playerView = playerView;
             _playerTransform = playerView.transform;

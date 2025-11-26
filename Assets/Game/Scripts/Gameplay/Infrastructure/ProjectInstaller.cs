@@ -6,11 +6,11 @@ using Zenject;
 
 namespace Gameplay.Infrastructure
 {
-    public class BootstrapInstaller : MonoInstaller
+    public class ProjectInstaller : MonoInstaller
     {
         public override void InstallBindings()
         {
-            Container.Bind<IInitializable>().To<BootstrapLoader>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
         }
     }
 }

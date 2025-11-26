@@ -24,7 +24,7 @@ namespace Player.UserInput
             GamepadInputStrategy gamepadStrategy, PlayerModel playermodel)
         {
             _configProvider = configProvider;
-            _inputSettings = configProvider.LoadUserInputSettings();
+            _inputSettings = _configProvider.InputSettingsRef;
 
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;
@@ -38,21 +38,26 @@ namespace Player.UserInput
             DefineInputStrategy();
 
             ProcessUserInput();
+
+            Debug.Log(_currentStrategy);
         }
 
         private void DefineInputStrategy()
         {
+            bool gamepadInput = CheckIfGamepadConnected() && CheckIfGamepadInput();
+            bool pcInput = CheckIfPCInput();
+
             if (CheckIfMobileInput())
             {
 
             }
-            else if (CheckIfGamepadInput())
-            {
-                _currentStrategy = _gamepadStrategy;
-            }
-            else
+            else if (pcInput)
             {
                 _currentStrategy = _pcStrategy;
+            }
+            else if (gamepadInput)
+            {
+                _currentStrategy = _gamepadStrategy;
             }
         }
 
@@ -67,17 +72,48 @@ namespace Player.UserInput
             #endif
         }
 
+        private bool CheckIfPCInput()
+        {
+            bool hasKeyInput = Input.anyKeyDown;
+
+            bool hasMouseMovement = Mathf.Abs(Input.GetAxis("Mouse X")) > 0.1f ||
+                                   Mathf.Abs(Input.GetAxis("Mouse Y")) > 0.1f;
+
+            bool hasMouseClick = Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2);
+
+            return hasKeyInput || hasMouseMovement || hasMouseClick;
+        }
+
         private bool CheckIfGamepadInput()
         {
-            return Input.GetKey(KeyCode.JoystickButton0) || 
-                Input.GetKey(KeyCode.JoystickButton1) ||
-                Mathf.Abs(Input.GetAxis(_inputSettings.GamepadHorizontalRotationAxis)) > _inputSettings.InputDeadzone || 
-                Mathf.Abs(Input.GetAxis(_inputSettings.GamepadShootBulletKey)) > _inputSettings.InputDeadzone ||
-                Mathf.Abs(Input.GetAxis(_inputSettings.GamepadShootLaserKey)) > _inputSettings.InputDeadzone;
+            return Input.GetKey(KeyCode.JoystickButton0) ||
+                   Input.GetKey(KeyCode.JoystickButton1) ||
+                   Input.GetKey(KeyCode.JoystickButton2) ||
+                   Input.GetKey(KeyCode.JoystickButton3) ||
+                   Input.GetKey(KeyCode.JoystickButton4) ||
+                   Input.GetKey(KeyCode.JoystickButton5) ||
+                   Input.GetKey(KeyCode.JoystickButton6) ||
+                   Input.GetKey(KeyCode.JoystickButton7);
+        }
+
+        private bool CheckIfGamepadConnected()
+        {
+            string[] joystickNames = Input.GetJoystickNames();
+
+            foreach (string joystickName in joystickNames)
+            {
+                if (!string.IsNullOrEmpty(joystickName) && joystickName.Length > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void ProcessUserInput()
         {
+            if (_playerModel == null) return;
+
             if (_currentStrategy is KeyboardMouseInputStrategy)
             {
                 _playerModel.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());

@@ -18,7 +18,7 @@ namespace Player.UserInput.Strategies
             _configProvider = configProvider;
             _mainCamera = Camera.main;
 
-            _inputSettings = configProvider.LoadUserInputSettings();
+            _inputSettings = configProvider.InputSettingsRef;
         }
 
         public PlayerMovementState GetPlayerMovementState()

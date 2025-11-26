@@ -14,8 +14,9 @@ namespace Core.Configuration
 
         public string GamepadHorizontalRotationAxis;
         public string GamepadVerticalRotationAxis;
-        public KeyCode GamepadAccelerationKey;
-        public KeyCode GamepadDecelrationKey;
+        public string GamepadMovementAxisName;
+        public float GamepadAccelerationAxisValue;
+        public float GamepadDecelrationAxisValue;
         public string GamepadShootBulletKey;
         public string GamepadShootLaserKey;
         public KeyCode GamepadPauseKey;

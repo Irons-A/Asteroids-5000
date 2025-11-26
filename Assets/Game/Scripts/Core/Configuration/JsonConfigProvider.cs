@@ -2,22 +2,32 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Configuration
 {
-    public class JsonConfigProvider
+    public class JsonConfigProvider : IInitializable
     {
         public const string UserInputConfigPath = "Configs/UserInputConfig";
         public const string PlayerConfigPath = "Configs/PlayerConfig";
 
-        public UserInputSettings LoadUserInputSettings()
+        public UserInputSettings InputSettingsRef { get; private set; }
+        public PlayerSettings PlayerSettingsRef { get; private set; }
+
+        public void Initialize()
         {
-            return LoadConfig<UserInputSettings>(UserInputConfigPath);
+            LoadUserInputSettings();
+            LoadPlayerSettings();
         }
 
-        public PlayerSettings LoadPlayerSettings()
+        public void LoadUserInputSettings()
         {
-            return LoadConfig<PlayerSettings>(PlayerConfigPath);
+            InputSettingsRef = LoadConfig<UserInputSettings>(UserInputConfigPath);
+        }
+
+        public void LoadPlayerSettings()
+        {
+            PlayerSettingsRef = LoadConfig<PlayerSettings>(PlayerConfigPath);
         }
 
         private T LoadConfig<T>(string configPath) where T : class
