@@ -38,8 +38,6 @@ namespace Player.UserInput
             DefineInputStrategy();
 
             ProcessUserInput();
-
-            Debug.Log(_currentStrategy);
         }
 
         private void DefineInputStrategy()
@@ -57,6 +55,7 @@ namespace Player.UserInput
             }
             else if (gamepadInput)
             {
+                //May not work due to Unity bug: always gets input from axis, even when there is none.
                 _currentStrategy = _gamepadStrategy;
             }
         }
@@ -94,6 +93,31 @@ namespace Player.UserInput
                    Input.GetKey(KeyCode.JoystickButton5) ||
                    Input.GetKey(KeyCode.JoystickButton6) ||
                    Input.GetKey(KeyCode.JoystickButton7);
+        }
+
+        private void CheckIfGamepadInputWithAxis()
+        {
+            //Debug.Log(_currentStrategy);
+
+            //float axisX = Input.GetAxis("RightStickHorizontal");
+            //float axisY = Input.GetAxis("RightStickVertical");
+            //Debug.Log($"Raw Axis Values: X={axisX}, Y={axisY}");
+
+            //string[] joysticks = Input.GetJoystickNames();
+            //for (int i = 0; i < joysticks.Length; i++)
+            //{
+            //    Debug.Log($"Joystick {i}: {joysticks[i]}");
+            //}
+
+            //float axis1 = Input.GetAxis(_inputSettings.GamepadHorizontalRotationAxis);
+            //float axis2 = Input.GetAxis(_inputSettings.GamepadVerticalRotationAxis);
+            //float axis3 = Input.GetAxis(_inputSettings.GamepadShootLaserKey);
+
+            //bool hasInput = Mathf.Abs(axis1) > _inputSettings.InputDeadzone ||
+            //               Mathf.Abs(axis2) > _inputSettings.InputDeadzone ||
+            //               Mathf.Abs(axis3) > _inputSettings.InputDeadzone;
+
+            //return hasInput;
         }
 
         private bool CheckIfGamepadConnected()

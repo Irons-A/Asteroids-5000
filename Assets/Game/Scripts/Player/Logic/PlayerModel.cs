@@ -82,14 +82,10 @@ namespace Player.Logic
         {
             targetDirection = targetDirection.normalized;
 
-            float targetAngle = Mathf.Atan2(targetDirection.x, targetDirection.y) * Mathf.Rad2Deg;
+            float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
 
-            float currentAngle = _playerTransform.eulerAngles.z;
-
-            float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle,
-                _playerSettings.RotationSpeed * Time.deltaTime);
-
-            _playerTransform.rotation = Quaternion.Euler(0, 0, newAngle);
+            _playerTransform.rotation = Quaternion.RotateTowards(_playerTransform.rotation,
+                Quaternion.Euler(0, 0, targetAngle), _playerSettings.RotationSpeed * Time.deltaTime);
         }
     }
 }
