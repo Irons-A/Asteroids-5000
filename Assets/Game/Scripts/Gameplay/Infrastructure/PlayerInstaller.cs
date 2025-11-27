@@ -12,30 +12,34 @@ namespace Gameplay.Insfrastructure
 {
     public class PlayerInstaller : MonoInstaller
     {
-        [SerializeField] private PlayerView _playerPrefab;
+        [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private Transform _playerSpawnPoint;
 
         public override void InstallBindings()
         {
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
-
-            BindPlayer();
+            Container.Bind<PlayerView>().FromMethod(CreatePlayerView).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle();
+            Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
+            Container.Bind<GamepadInputStrategy>().AsSingle();
         }
 
-        private void BindPlayer()
+        private PlayerView CreatePlayerView(InjectContext context)
         {
-            GameObject playerInstance = Container.InstantiatePrefab(_playerPrefab,
-                _playerSpawnPoint?.position ?? Vector3.zero, Quaternion.identity, null);
+            GameObject playerInstance = Instantiate(_playerPrefab,
+                _playerSpawnPoint?.position ?? Vector3.zero, Quaternion.identity);
 
-            Container.Bind<PlayerView>().FromComponentOn(playerInstance).AsSingle();
+            PlayerView playerView = playerInstance.GetComponent<PlayerView>();
 
-            Container.BindInterfacesAndSelfTo<PlayerModel>().FromNew().AsSingle();
-
-            Container.Bind<KeyboardMouseInputStrategy>().FromNew().AsSingle();
-            Container.Bind<GamepadInputStrategy>().FromNew().AsSingle();
+            if (playerView == null)
+            {
+                playerView = playerInstance.AddComponent<PlayerView>();
+            }    
 
             InputDetector inputDetector = playerInstance.AddComponent<InputDetector>();
             Container.Inject(inputDetector);
+
+            return playerView;
         }
     }
 }
