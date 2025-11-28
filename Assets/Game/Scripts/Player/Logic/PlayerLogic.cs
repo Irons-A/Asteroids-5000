@@ -17,12 +17,9 @@ namespace Player.Logic
         private PlayerSettings _playerSettings;
         private CustomPhysics _playerPhysics;
 
-        private JsonConfigProvider _configProvider;
-
         [Inject]
         private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
         {
-            _configProvider = configProvider;
             _playerSettings = configProvider.PlayerSettingsRef;
 
             _playerView = playerView;

@@ -1,99 +1,114 @@
 using Gameplay.Environment;
+using Player.Presentation;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Gameplay.CameraControl
 {
     public class BoundedCameraController : MonoBehaviour
     {
-        [SerializeField] private Transform _target;
         [SerializeField] private float _followSharpness = 5f;
-        [SerializeField] private EnvironmentController _gameFieldBounds;
         [SerializeField] private Vector2 _cameraOffset = Vector2.zero;
 
         private Camera _camera;
         private Vector3 _currentPosition;
-        private Vector3 _targetPosition;
-        private bool _positionUpdatedThisFrame = false;
+        private Transform _targetTransform;
+        private Bounds _gameFieldBounds;
 
-        void Start()
+        private Vector2 _cameraExtents;
+        private Vector2 _gameFieldSize;
+        private float _cameraMinX;
+        private float _cameraMaxX;
+        private float _cameraMinY;
+        private float _cameraMaxY;
+        private bool _boundsInitialized = false;
+
+        [Inject]
+        private void Construct(PlayerPresentation target, EnvironmentController environmentController)
+        {
+            _targetTransform = target.transform;
+            _gameFieldBounds = environmentController.Bounds;
+            _gameFieldSize = new Vector2(_gameFieldBounds.size.x, _gameFieldBounds.size.y);
+        }
+
+        private void Start()
         {
             _camera = Camera.main;
             _currentPosition = transform.position;
 
-            if (_target != null)
+            InitializeCameraBounds();
+
+            if (_targetTransform != null)
             {
                 _currentPosition = GetTargetCameraPosition();
                 transform.position = _currentPosition;
             }
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            if (_target == null) return;
+            if (_targetTransform == null || !_boundsInitialized) return;
 
-            _targetPosition = GetTargetCameraPosition();
-            _positionUpdatedThisFrame = true;
+            Vector3 targetPosition = GetTargetCameraPosition();
 
-            _currentPosition = Vector3.Lerp(
-                _currentPosition,
-                _targetPosition,
-                _followSharpness * Time.fixedDeltaTime
-            );
+            _currentPosition = Vector3.Lerp(_currentPosition, targetPosition, _followSharpness * Time.fixedDeltaTime);
+
+            transform.position = _currentPosition;
         }
 
-        void LateUpdate()
+        private void InitializeCameraBounds()
         {
-            if (_positionUpdatedThisFrame)
-            {
-                transform.position = _currentPosition;
-                _positionUpdatedThisFrame = false;
-            }
-            else
-            {
-                transform.position = _currentPosition;
-            }
+            if (_gameFieldBounds == null) return;
+
+            _cameraExtents = CalculateCameraExtents();
+
+            _cameraMinX = _gameFieldBounds.min.x + _cameraExtents.x;
+            _cameraMaxX = _gameFieldBounds.max.x - _cameraExtents.x;
+            _cameraMinY = _gameFieldBounds.min.y + _cameraExtents.y;
+            _cameraMaxY = _gameFieldBounds.max.y - _cameraExtents.y;
+
+            // if game field is less than camera viewport
+            if (_cameraMaxX < _cameraMinX)
+                _cameraMinX = _cameraMaxX = _gameFieldBounds.center.x;
+            if (_cameraMaxY < _cameraMinY)
+                _cameraMinY = _cameraMaxY = _gameFieldBounds.center.y;
+
+            _boundsInitialized = true;
         }
 
-        private Vector3 GetTargetCameraPosition()
-        {
-            Vector3 targetPos = _target.position + (Vector3)_cameraOffset;
-            targetPos.z = transform.position.z;
-            return ApplyCameraBounds(targetPos);
-        }
-
-        private Vector3 ApplyCameraBounds(Vector3 desiredPosition)
-        {
-            if (_gameFieldBounds == null) return desiredPosition;
-
-            Vector2 cameraExtents = GetCameraExtents();
-            Bounds fieldBounds = _gameFieldBounds.Bounds;
-
-            float minX = fieldBounds.min.x + cameraExtents.x;
-            float maxX = fieldBounds.max.x - cameraExtents.x;
-            float minY = fieldBounds.min.y + cameraExtents.y;
-            float maxY = fieldBounds.max.y - cameraExtents.y;
-
-            if (maxX < minX) minX = maxX = fieldBounds.center.x;
-            if (maxY < minY) minY = maxY = fieldBounds.center.y;
-
-            return new Vector3(
-                Mathf.Clamp(desiredPosition.x, minX, maxX),
-                Mathf.Clamp(desiredPosition.y, minY, maxY),
-                desiredPosition.z
-            );
-        }
-
-        private Vector2 GetCameraExtents()
+        private Vector2 CalculateCameraExtents()
         {
             if (_camera.orthographic)
             {
                 float height = _camera.orthographicSize;
                 float width = height * _camera.aspect;
+
                 return new Vector2(width, height);
             }
+
             return Vector2.zero;
+        }
+
+        private Vector3 GetTargetCameraPosition()
+        {
+            Vector3 targetPos = _targetTransform.position + (Vector3)_cameraOffset;
+            targetPos.z = transform.position.z;
+
+            return ApplyCameraBounds(targetPos);
+        }
+
+        private Vector3 ApplyCameraBounds(Vector3 desiredPosition)
+        {
+            return new Vector3(Mathf.Clamp(desiredPosition.x, _cameraMinX, _cameraMaxX),
+                Mathf.Clamp(desiredPosition.y, _cameraMinY, _cameraMaxY), desiredPosition.z);
+        }
+
+        public void OnDrawGizmos()
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(Vector2.zero, _gameFieldSize);
         }
     }
 }

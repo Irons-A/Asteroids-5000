@@ -10,24 +10,22 @@ namespace Core.Configuration
     {
         public const string UserInputConfigPath = "Configs/UserInputConfig";
         public const string PlayerConfigPath = "Configs/PlayerConfig";
+        public const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
 
         public UserInputSettings InputSettingsRef { get; private set; }
         public PlayerSettings PlayerSettingsRef { get; private set; }
+        public EnvironmentSettings EnvironmentSettingsRef { get; private set; }
 
         public void Initialize()
         {
-            LoadUserInputSettings();
-            LoadPlayerSettings();
+            LoadSettings();
         }
 
-        public void LoadUserInputSettings()
+        private void LoadSettings()
         {
             InputSettingsRef = LoadConfig<UserInputSettings>(UserInputConfigPath);
-        }
-
-        public void LoadPlayerSettings()
-        {
             PlayerSettingsRef = LoadConfig<PlayerSettings>(PlayerConfigPath);
+            EnvironmentSettingsRef = LoadConfig<EnvironmentSettings>(EnvironmentConfigPath);
         }
 
         private T LoadConfig<T>(string configPath) where T : class
