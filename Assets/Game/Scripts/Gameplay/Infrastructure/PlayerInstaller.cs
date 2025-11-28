@@ -1,14 +1,14 @@
 using Core.Physics;
 using Player.Logic;
+using Player.Presentation;
 using Player.UserInput;
 using Player.UserInput.Strategies;
-using Player.View;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Gameplay.Insfrastructure
+namespace Gameplay.Infrastructure
 {
     public class PlayerInstaller : MonoInstaller
     {
@@ -18,22 +18,22 @@ namespace Gameplay.Insfrastructure
         public override void InstallBindings()
         {
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
-            Container.Bind<PlayerView>().FromMethod(CreatePlayerView).AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle();
+            Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerLogic>().AsSingle();
             Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
             Container.Bind<GamepadInputStrategy>().AsSingle();
         }
 
-        private PlayerView CreatePlayerView(InjectContext context)
+        private PlayerPresentation CreatePlayerPresentation(InjectContext context)
         {
             GameObject playerInstance = Instantiate(_playerPrefab,
                 _playerSpawnPoint?.position ?? Vector3.zero, Quaternion.identity);
 
-            PlayerView playerView = playerInstance.GetComponent<PlayerView>();
+            PlayerPresentation playerView = playerInstance.GetComponent<PlayerPresentation>();
 
             if (playerView == null)
             {
-                playerView = playerInstance.AddComponent<PlayerView>();
+                playerView = playerInstance.AddComponent<PlayerPresentation>();
             }    
 
             InputDetector inputDetector = playerInstance.AddComponent<InputDetector>();

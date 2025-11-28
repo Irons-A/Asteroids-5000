@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.View
+namespace Player.Presentation
 {
-    public class PlayerView : MovableObject
+    public class PlayerPresentation : MovableObject
     {
 
     }

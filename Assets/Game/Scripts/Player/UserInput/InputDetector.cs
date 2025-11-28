@@ -14,14 +14,14 @@ namespace Player.UserInput
         private KeyboardMouseInputStrategy _pcStrategy;
         private GamepadInputStrategy _gamepadStrategy;
 
-        private PlayerModel _playerModel;
+        private PlayerLogic _playerModel;
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
-            GamepadInputStrategy gamepadStrategy, PlayerModel playermodel)
+            GamepadInputStrategy gamepadStrategy, PlayerLogic playermodel)
         {
             _configProvider = configProvider;
             _inputSettings = _configProvider.InputSettingsRef;

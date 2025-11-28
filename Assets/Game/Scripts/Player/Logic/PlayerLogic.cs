@@ -1,7 +1,7 @@
 using Core.Configuration;
 using Core.Physics;
+using Player.Presentation;
 using Player.UserInput;
-using Player.View;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
@@ -10,9 +10,9 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerModel : IFixedTickable
+    public class PlayerLogic : IFixedTickable
     {
-        private PlayerView _playerView;
+        private PlayerPresentation _playerView;
         private Transform _playerTransform;
         private PlayerSettings _playerSettings;
         private CustomPhysics _playerPhysics;
@@ -20,7 +20,7 @@ namespace Player.Logic
         private JsonConfigProvider _configProvider;
 
         [Inject]
-        private void Construct(PlayerView playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
+        private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
         {
             _configProvider = configProvider;
             _playerSettings = configProvider.PlayerSettingsRef;
