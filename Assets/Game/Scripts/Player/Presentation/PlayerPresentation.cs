@@ -7,6 +7,10 @@ namespace Player.Presentation
 {
     public class PlayerPresentation : MovableObject
     {
-
+        protected override void Awake()
+        {
+            base.Awake();
+            _shouldTeleport = true;
+        }
     }
 }

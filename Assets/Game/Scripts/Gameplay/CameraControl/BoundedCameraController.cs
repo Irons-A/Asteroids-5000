@@ -26,7 +26,7 @@ namespace Gameplay.CameraControl
         private bool _boundsInitialized = false;
 
         [Inject]
-        private void Construct(PlayerPresentation target, EnvironmentController environmentController)
+        private void Construct(PlayerPresentation target, EnvironmentLogic environmentController)
         {
             _targetTransform = target.transform;
             _gameFieldBounds = environmentController.Bounds;

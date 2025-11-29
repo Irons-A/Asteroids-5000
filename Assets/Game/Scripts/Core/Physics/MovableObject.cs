@@ -7,16 +7,22 @@ namespace Core.Physics
     [RequireComponent(typeof(Rigidbody2D))]
     public class MovableObject : MonoBehaviour
     {
-        [SerializeField] private Rigidbody2D _rigidbody2D;
+        // false if the object is meant to ignore first attempt to teleport it
+        protected bool _shouldTeleport = false;
 
+        private Rigidbody2D _rigidbody2D;
+
+        public bool ShouldTeleport => _shouldTeleport;
         public Rigidbody2D Rigidbody2D => _rigidbody2D;
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            if (_rigidbody2D == null)
-            {
-                _rigidbody2D = GetComponent<Rigidbody2D>();
-            }
+            _rigidbody2D = GetComponent<Rigidbody2D>();
+        }
+
+        public void EnableTeleportation()
+        {
+            _shouldTeleport = true;
         }
     }
 }

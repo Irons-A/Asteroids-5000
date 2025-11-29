@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scrollSpeed: {x: 0.1, y: 0.1}
-  _cameraParallaxEffect: 1
+  _cameraRelatedParallaxEffect: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,7 +616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scrollSpeed: {x: 0.5, y: 0.5}
-  _cameraParallaxEffect: 1
+  _cameraRelatedParallaxEffect: 1
 --- !u!212 &1667542205
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -715,7 +715,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scrollSpeed: {x: 0.3, y: 0.3}
-  _cameraParallaxEffect: 1
+  _cameraRelatedParallaxEffect: 1
 --- !u!212 &1726344294
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -861,6 +861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: accb7343f7d2f37489f2c64bcb808418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sceneBorderPrefab: {fileID: 5678266124997472248, guid: e8a5e5301e6d390439cec8519ac530bf, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
