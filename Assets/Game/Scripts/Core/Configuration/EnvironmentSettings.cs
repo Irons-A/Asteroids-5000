@@ -8,5 +8,12 @@ namespace Core.Configuration
     {
         public float GameFieldWidth;
         public float GameFieldHeight;
+        public float MinimalFieldWidth;
+        public float MinimalFieldHeight;
+
+        public int MaxEnemiesOnMap;
+        public float EnemySpawnRate;
+        public float EnemySpawnOffset;
+        public float UFOSpawnChance;
     }
 }

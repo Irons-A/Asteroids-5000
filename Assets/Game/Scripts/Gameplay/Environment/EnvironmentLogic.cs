@@ -1,4 +1,5 @@
 using Core.Configuration;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +21,10 @@ namespace Gameplay.Environment
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;
 
-            _fieldSize = new Vector2(_environmentSettings.GameFieldWidth, _environmentSettings.GameFieldHeight);
+            float fieldWidth = Math.Max(_environmentSettings.GameFieldWidth, _environmentSettings.MinimalFieldWidth);
+            float fieldHeight = Math.Max(_environmentSettings.GameFieldHeight, _environmentSettings.MinimalFieldHeight);
+
+            _fieldSize = new Vector2(fieldWidth, fieldHeight);
 
             _sceneBorderFactory = sceneBorderFactory;
 
