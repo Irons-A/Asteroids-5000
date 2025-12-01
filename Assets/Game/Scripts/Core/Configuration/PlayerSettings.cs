@@ -15,9 +15,12 @@ namespace Core.Configuration
         public float InvulnurabilityDuration;
 
         public float BulletFireRateInterval;
+        public float BulletSpeed;
+        public float BulletDamage;
         public float LaserFireRateInterval;
         public int MaxLaserCharges;
         public float LaserCooldown;
         public float LaserDuration;
+        public float LaserDamage;
     }
 }
