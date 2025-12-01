@@ -1,4 +1,5 @@
 using Core.Configuration;
+using Gameplay.Environment.Systems;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,14 +11,17 @@ namespace Gameplay.Environment
     public class EnvironmentLogic
     {
         private EnvironmentSettings _environmentSettings;
+        private SceneBorderFactory _sceneBorderFactory;
+        private EnemySpawner _enemySpawner;
+
         private Vector2 _fieldCenter = Vector2.zero;
         private Vector2 _fieldSize;
-        private SceneBorderFactory _sceneBorderFactory;
 
         public Bounds Bounds => new Bounds(_fieldCenter, _fieldSize);
 
         [Inject]
-        public void Construct(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory)
+        private void Construct(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory,
+            EnemySpawner enemySpawner)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;
 
@@ -26,9 +30,11 @@ namespace Gameplay.Environment
 
             _fieldSize = new Vector2(fieldWidth, fieldHeight);
 
+            _enemySpawner = enemySpawner;
             _sceneBorderFactory = sceneBorderFactory;
 
             CreateSceneBorders();
+            _enemySpawner.StartEnemySpawning(Bounds);
         }
 
         private void CreateSceneBorders()

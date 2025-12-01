@@ -1,7 +1,7 @@
 {
   "GameFieldWidth": 42,
   "GameFieldHeight": 24,
-  "MinimalFieldWidth": 20,
+  "MinimalFieldWidth": 23,
   "MinimalFieldHeight": 12,
 
   "MaxEnemiesOnMap": 10,

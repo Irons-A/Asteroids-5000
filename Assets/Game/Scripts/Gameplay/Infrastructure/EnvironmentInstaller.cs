@@ -1,4 +1,5 @@
 using Gameplay.Environment;
+using Gameplay.Environment.Systems;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,7 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<SceneBorder>().FromInstance(_sceneBorderPrefab).AsTransient();
             Container.Bind<SceneBorderFactory>().FromNew().AsSingle();
+            Container.Bind<EnemySpawner>().FromNew().AsSingle();
             Container.Bind<EnvironmentLogic>().FromNew().AsSingle();
         }
     }

@@ -11,7 +11,6 @@ namespace Gameplay.Environment
         [Header("Border Settings")]
         [SerializeField] private float _offsetFromGameFieldBorder = 4f;
         [SerializeField] private float _borderThickness = 2f;
-        [SerializeField] private float _borderLengthMultiplier = 1.3f;
         [SerializeField] private float _teleportOffset = 1f;
 
         [SerializeField] private BorderSide _borderSide;
@@ -54,23 +53,29 @@ namespace Gameplay.Environment
             Vector2 position = Vector2.zero;
             Vector2 size = Vector2.zero;
 
+            float horizontalBorderLength = _sceneWidth + (_borderThickness * 2f) + (_offsetFromGameFieldBorder * 2f);
+            float verticalBorderLength = _sceneHeight + (_borderThickness * 2f) + (_offsetFromGameFieldBorder * 2f);
+
             switch (_borderSide)
             {
                 case BorderSide.Left:
-                    position = new Vector2(-_sceneWidth / 2 - _offsetFromGameFieldBorder, 0); 
-                    size = new Vector2(_borderThickness, _sceneHeight * _borderLengthMultiplier);
+                    position = new Vector2(-_sceneWidth / 2 - _offsetFromGameFieldBorder - _borderThickness / 2, 0);
+                    size = new Vector2(_borderThickness, verticalBorderLength);
                     break;
+
                 case BorderSide.Right:
-                    position = new Vector2(_sceneWidth / 2 + _offsetFromGameFieldBorder, 0);
-                    size = new Vector2(_borderThickness, _sceneHeight * _borderLengthMultiplier);
+                    position = new Vector2(_sceneWidth / 2 + _offsetFromGameFieldBorder + _borderThickness / 2, 0);
+                    size = new Vector2(_borderThickness, verticalBorderLength);
                     break;
+
                 case BorderSide.Top:
-                    position = new Vector2(0, _sceneHeight / 2 + _offsetFromGameFieldBorder);
-                    size = new Vector2(_sceneWidth * _borderLengthMultiplier, _borderThickness);
+                    position = new Vector2(0, _sceneHeight / 2 + _offsetFromGameFieldBorder + _borderThickness / 2);
+                    size = new Vector2(horizontalBorderLength, _borderThickness);
                     break;
+
                 case BorderSide.Bottom:
-                    position = new Vector2(0, -_sceneHeight / 2 - _offsetFromGameFieldBorder);
-                    size = new Vector2(_sceneWidth * _borderLengthMultiplier, _borderThickness);
+                    position = new Vector2(0, -_sceneHeight / 2 - _offsetFromGameFieldBorder - _borderThickness / 2);
+                    size = new Vector2(horizontalBorderLength, _borderThickness);
                     break;
             }
 
