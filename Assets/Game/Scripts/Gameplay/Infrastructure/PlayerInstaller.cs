@@ -12,7 +12,7 @@ namespace Gameplay.Infrastructure
 {
     public class PlayerInstaller : MonoInstaller
     {
-        [SerializeField] private GameObject _playerPrefab;
+        [SerializeField] private PlayerPresentation _playerPrefab;
         [SerializeField] private Transform _playerSpawnPoint;
 
         public override void InstallBindings()
@@ -24,22 +24,15 @@ namespace Gameplay.Infrastructure
             Container.Bind<GamepadInputStrategy>().AsSingle();
         }
 
-        private PlayerPresentation CreatePlayerPresentation(InjectContext context)
+        private PlayerPresentation CreatePlayerPresentation()
         {
-            GameObject playerInstance = Instantiate(_playerPrefab,
+            PlayerPresentation playerInstance = Instantiate(_playerPrefab,
                 _playerSpawnPoint?.position ?? Vector3.zero, Quaternion.identity);
 
-            PlayerPresentation playerView = playerInstance.GetComponent<PlayerPresentation>();
-
-            if (playerView == null)
-            {
-                playerView = playerInstance.AddComponent<PlayerPresentation>();
-            }    
-
-            InputDetector inputDetector = playerInstance.AddComponent<InputDetector>();
+            InputDetector inputDetector = playerInstance.gameObject.AddComponent<InputDetector>();
             Container.Inject(inputDetector);
 
-            return playerView;
+            return playerInstance;
         }
     }
 }
