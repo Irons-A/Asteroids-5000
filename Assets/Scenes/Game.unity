@@ -517,10 +517,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolConfigs:
-  - key: 0
-    prefab: {fileID: 9084124597112203638, guid: 74b2b20198992ec468899dfd297bd9a7, type: 3}
-    initialSize: 50
-    maxSize: 100
+  - Key: 0
+    Prefab: {fileID: 9084124597112203638, guid: 74b2b20198992ec468899dfd297bd9a7, type: 3}
+    InitialSize: 20
+    MaxSize: 50
 --- !u!4 &1205200749
 Transform:
   m_ObjectHideFlags: 0

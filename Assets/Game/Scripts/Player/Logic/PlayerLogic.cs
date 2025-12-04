@@ -1,5 +1,6 @@
 using Core.Configuration;
 using Core.Physics;
+using Core.Systems.ObjectPools;
 using Player.Presentation;
 using Player.UserInput;
 using System.Collections;
@@ -12,21 +13,25 @@ namespace Player.Logic
 {
     public class PlayerLogic : IFixedTickable
     {
-        private PlayerPresentation _playerView;
+        private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
-        private PlayerSettings _playerSettings;
+        private PlayerSettings _playerSettings; 
         private CustomPhysics _playerPhysics;
+        private UniversalObjectPool _objectPool;
 
         [Inject]
-        private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider, CustomPhysics playerPhysics)
+        private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
+            CustomPhysics playerPhysics, UniversalObjectPool objectPool)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
-            _playerView = playerView;
+            _playerPresentation = playerView;
             _playerTransform = playerView.transform;
 
             _playerPhysics = playerPhysics;
             _playerPhysics.SetMovableObject(playerView);
+
+            _objectPool = objectPool;
         }
 
         public void FixedTick()
@@ -62,7 +67,10 @@ namespace Player.Logic
 
         public void ShootBullets()
         {
+            if (_playerPresentation.BulletFirepoints.Length > 0)
+            {
 
+            }
         }
 
         public void ShootLaser()

@@ -12,9 +12,9 @@ namespace Core.Systems.ObjectPools
         public PoolableObjectType PoolKey => _poolKey;
         public DespawnCondition DespawnCondition => _despawnCondition;
 
-        private GenericObjectPool _parentPool;
+        private UniversalObjectPool _parentPool;
 
-        public void Initialize(GenericObjectPool pool)
+        public void Initialize(UniversalObjectPool pool)
         {
             _parentPool = pool;
         }
@@ -28,7 +28,8 @@ namespace Core.Systems.ObjectPools
             else
             {
                 Debug.LogWarning($"PoolableObject {name} has no parent pool reference");
-                gameObject.SetActive(false);
+
+                Destroy(this);
             }
         }
     }

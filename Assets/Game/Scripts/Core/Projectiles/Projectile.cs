@@ -9,14 +9,20 @@ namespace Core.Projectiles
     public class Projectile : MonoBehaviour
     {
         private Transform _transform;
-        private float _speed = 0;
+        private PoolableObject _poolableObject;
 
+        private float _speed = 0;
         private bool _delayedDestruction = false;
         private float _destroyAfter = 1f;
 
         private void Awake()
         {
             _transform = GetComponent<Transform>();
+            
+            if (TryGetComponent(out PoolableObject poolableObject))
+            {
+                _poolableObject = poolableObject;
+            }
         }
 
         public void Initialize(float speed, bool delayedDestruction = false, float destroyAfter = 1)
@@ -28,17 +34,9 @@ namespace Core.Projectiles
 
         private void Update()
         {
-            transform.Translate(transform.right * 10f * Time.deltaTime);
+            _transform.Translate(transform.right * _speed * Time.deltaTime);
         }
 
-        public void OnSpawn()
-        {
-            gameObject.SetActive(true);
-        }
 
-        public void Despawn()
-        {
-            gameObject.SetActive(false);
-        }
     }
 }

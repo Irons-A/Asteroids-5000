@@ -8,11 +8,11 @@
   "InvulnurabilityDuration": 3,
 
   "BulletFireRateInterval": 0.25,
-  "BulletSpeed": 5,
+  "BulletSpeed": 15,
   "BulletDamage": 1,
   "LaserFireRateInterval": 0.75,
   "MaxLaserCharges": 3,
-  "LaserCooldown": 3,
+  "LaserCooldown": 4,
   "LaserDuration": 0.5,
   "LaserDamage": 5
 }
