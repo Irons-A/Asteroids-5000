@@ -7,21 +7,19 @@ namespace Core.Systems.ObjectPools
     public class GenericObjectPool : MonoBehaviour
     {
         [Header("Pool Configuration")]
-        [SerializeField] protected List<PoolConfig> _poolConfigs = new List<PoolConfig>();
+        [SerializeField] private List<PoolConfig> _poolConfigs = new List<PoolConfig>();
 
-        protected Dictionary<PoolableObjectType, Queue<GameObject>> _pools = 
-            new Dictionary<PoolableObjectType, Queue<GameObject>>();
-        protected Dictionary<PoolableObjectType, Transform> _poolContainers = 
-            new Dictionary<PoolableObjectType, Transform>();
-        protected Dictionary<PoolableObjectType, PoolConfig> _configs = 
-            new Dictionary<PoolableObjectType, PoolConfig>();
+        private Dictionary<PoolableObjectType, Queue<PoolableObject>> _pools = 
+            new Dictionary<PoolableObjectType, Queue<PoolableObject>>();
+        private Dictionary<PoolableObjectType, Transform> _poolContainers = new Dictionary<PoolableObjectType, Transform>();
+        private Dictionary<PoolableObjectType, PoolConfig> _configs = new Dictionary<PoolableObjectType, PoolConfig>();
 
-        protected virtual void Awake()
+        private void Awake()
         {
             InitializeAllPools();
         }
 
-        protected virtual void InitializeAllPools()
+        private void InitializeAllPools()
         {
             foreach (var config in _poolConfigs)
             {
@@ -29,46 +27,40 @@ namespace Core.Systems.ObjectPools
             }
         }
 
-        protected virtual void InitializePool(PoolConfig config)
+        private void InitializePool(PoolConfig config)
         {
-            if (config.prefab == null)
+            if (config.Prefab == null)
             {
-                Debug.LogWarning($"Prefab for {config.key} is null");
-                return;
-            }
-
-            // Проверяем, что префаб реализует IPoolable
-            if (config.prefab is IPoolable == false)
-            {
-                Debug.LogError($"Prefab for {config.key} doesn't implement IPoolable interface");
+                Debug.LogWarning($"Prefab for {config.Key} is null");
                 return;
             }
 
             // Создаем контейнер
-            GameObject container = new GameObject($"Pool_{config.key}");
+            GameObject container = new GameObject($"Pool_{config.Key}");
             container.transform.SetParent(transform);
-            _poolContainers[config.key] = container.transform;
+            _poolContainers[config.Key] = container.transform;
 
             // Инициализируем очередь
-            _pools[config.key] = new Queue<GameObject>();
-            _configs[config.key] = config;
+            _pools[config.Key] = new Queue<PoolableObject>();
+            _configs[config.Key] = config;
 
             // Наполняем пул
-            WarmUpPool(config.key, config.initialSize);
+            WarmUpPool(config.Key, config.InitialSize);
         }
 
-        protected virtual void WarmUpPool(PoolableObjectType key, int count)
+        private void WarmUpPool(PoolableObjectType key, int count)
         {
             if (!_configs.ContainsKey(key)) return;
 
             for (int i = 0; i < count; i++)
             {
-                GameObject obj = CreateNewObject(key);
+                PoolableObject obj = CreateNewObject(key);
                 ReturnToPool(obj);
+                //ReturnToPool(obj.GetComponent<PoolableObject>());
             }
         }
 
-        protected virtual GameObject CreateNewObject(PoolableObjectType key)
+        private PoolableObject CreateNewObject(PoolableObjectType key)
         {
             if (!_configs.ContainsKey(key))
             {
@@ -76,28 +68,26 @@ namespace Core.Systems.ObjectPools
                 return null;
             }
 
-            GameObject prefab = _configs[key].prefab;
+            PoolableObject prefab = _configs[key].Prefab;
             Transform container = _poolContainers[key];
 
-            GameObject newObj = Instantiate(prefab, container);
+            PoolableObject newObj = Instantiate(prefab, container);
 
-            // Получаем IPoolable компонент и вызываем Despawn
-            if (newObj.TryGetComponent<IPoolable>(out var poolable))
+            // Инициализируем PoolableObject ссылкой на этот пул
+            PoolableObject poolable = newObj.GetComponent<PoolableObject>();
+            if (poolable == null)
             {
-                poolable.Despawn();
-            }
-            else
-            {
-                Debug.LogError($"Instantiated object doesn't implement IPoolable");
+                Debug.LogError($"Instantiated object doesn't have PoolableObject component");
                 Destroy(newObj);
                 return null;
             }
 
+            poolable.Initialize(this);
             return newObj;
         }
 
         // Основной метод получения объекта
-        public virtual GameObject GetFromPool(PoolableObjectType key, Vector3 position, Quaternion rotation)
+        public PoolableObject GetFromPool(PoolableObjectType key, Vector3 position, Quaternion rotation)
         {
             if (!_pools.ContainsKey(key))
             {
@@ -105,7 +95,7 @@ namespace Core.Systems.ObjectPools
                 return null;
             }
 
-            GameObject obj;
+            PoolableObject obj;
 
             if (_pools[key].Count > 0)
             {
@@ -115,69 +105,66 @@ namespace Core.Systems.ObjectPools
             {
                 // Проверяем лимит перед созданием нового
                 int activeCount = CountActiveObjects(key);
-                if (activeCount >= _configs[key].maxSize)
+
+                if (activeCount >= _configs[key].MaxSize)
                 {
-                    Debug.LogWarning($"Pool {key} reached max size ({_configs[key].maxSize})");
+                    Debug.LogWarning($"Pool {key} reached max size ({_configs[key].MaxSize})");
                     return null;
                 }
 
                 obj = CreateNewObject(key);
+
                 if (obj == null) return null;
             }
 
-            // Устанавливаем позицию, поворот
+            // Устанавливаем позицию, поворот и активируем
             obj.transform.SetPositionAndRotation(position, rotation);
-
-            // Вызываем OnSpawn через интерфейс
-            if (obj.TryGetComponent<IPoolable>(out var poolable))
-            {
-                poolable.OnSpawn();
-            }
+            obj.gameObject.SetActive(true);
 
             return obj;
         }
 
-        // Упрощенные методы
-        public virtual GameObject GetFromPool(PoolableObjectType key)
+        // Возврат объекта в пул (вызывается из PoolableObject.Despawn())
+        public void ReturnToPool(PoolableObject poolableObject)
         {
-            return GetFromPool(key, Vector3.zero, Quaternion.identity);
-        }
+            if (poolableObject == null) return;
 
-        public virtual GameObject GetFromPool(PoolableObjectType key, Vector3 position)
-        {
-            return GetFromPool(key, position, Quaternion.identity);
-        }
-
-        // Возврат объекта в пул
-        public virtual void ReturnToPool(GameObject obj)
-        {
-            if (obj == null) return;
-
-            // Получаем тип через интерфейс
-            if (!obj.TryGetComponent<IPoolable>(out var poolable))
-            {
-                Debug.LogError($"Object doesn't implement IPoolable interface");
-                Destroy(obj);
-                return;
-            }
-
-            PoolableObjectType key = poolable.PoolKey;
+            PoolableObjectType key = poolableObject.PoolKey;
 
             if (!_pools.ContainsKey(key))
             {
                 Debug.LogError($"Trying to return object with unknown key: {key}");
-                Destroy(obj);
+                Destroy(poolableObject.gameObject);
                 return;
             }
 
-            // Вызываем Despawn и возвращаем в контейнер
-            poolable.Despawn();
-            obj.transform.SetParent(_poolContainers[key]);
-            _pools[key].Enqueue(obj);
+            //GameObject obj = poolableObject.gameObject;
+
+            // Деактивируем и возвращаем в контейнер
+            poolableObject.gameObject.SetActive(false);
+            poolableObject.transform.SetParent(_poolContainers[key]);
+            _pools[key].Enqueue(poolableObject);
         }
 
-        // Вспомогательные методы
-        public virtual int CountActiveObjects(PoolableObjectType key)
+        // Альтернативный метод возврата по GameObject REMOVE
+        public void ReturnToPool(GameObject obj)
+        {
+            if (obj == null) return;
+
+            PoolableObject poolable = obj.GetComponent<PoolableObject>();
+            if (poolable != null)
+            {
+                ReturnToPool(poolable);
+            }
+            else
+            {
+                Debug.LogError($"GameObject {obj.name} doesn't have PoolableObject component");
+                Destroy(obj);
+            }
+        }
+
+        // Вспомогательные методы REMOVE
+        public int CountActiveObjects(PoolableObjectType key)
         {
             if (!_poolContainers.ContainsKey(key)) return 0;
 
@@ -189,39 +176,9 @@ namespace Core.Systems.ObjectPools
             return activeCount;
         }
 
-        public virtual int GetPoolSize(PoolableObjectType key)
-        {
-            return _pools.ContainsKey(key) ? _pools[key].Count : 0;
-        }
-
-        public virtual bool HasPoolFor(PoolableObjectType key)
+        public bool HasPoolFor(PoolableObjectType key)
         {
             return _pools.ContainsKey(key);
-        }
-
-        // Получение компонента по типу
-        public virtual T GetFromPool<T>(PoolableObjectType key, Vector3 position, Quaternion rotation) where T : class, IPoolable
-        {
-            GameObject obj = GetFromPool(key, position, rotation);
-            if (obj != null && obj.TryGetComponent<T>(out var component))
-            {
-                return component;
-            }
-            return null;
-        }
-
-        // Метод для динамического добавления конфигураций
-        public virtual bool AddPoolConfig(PoolConfig config)
-        {
-            if (_pools.ContainsKey(config.key))
-            {
-                Debug.LogWarning($"Pool for {config.key} already exists");
-                return false;
-            }
-
-            _poolConfigs.Add(config);
-            InitializePool(config);
-            return true;
         }
     }
 }

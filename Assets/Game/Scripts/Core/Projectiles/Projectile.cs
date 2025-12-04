@@ -6,18 +6,13 @@ using UnityEngine;
 namespace Core.Projectiles
 {
     [RequireComponent(typeof(Collider2D))]
-    public class Projectile : MonoBehaviour, IPoolable
+    public class Projectile : MonoBehaviour
     {
-        [SerializeField] private PoolableObjectType _poolableObjectType;
-
         private Transform _transform;
-        //pool reference.
         private float _speed = 0;
 
         private bool _delayedDestruction = false;
         private float _destroyAfter = 1f;
-
-        public PoolableObjectType PoolKey => _poolableObjectType;
 
         private void Awake()
         {
@@ -33,7 +28,7 @@ namespace Core.Projectiles
 
         private void Update()
         {
-            //move
+            transform.Translate(transform.right * 10f * Time.deltaTime);
         }
 
         public void OnSpawn()

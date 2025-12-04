@@ -7,9 +7,9 @@ namespace Core.Systems.ObjectPools
     [System.Serializable]
     public class PoolConfig
     {
-        public PoolableObjectType key;
-        public GameObject prefab;
-        public int initialSize = 20;
-        public int maxSize = 50;
+        public PoolableObjectType Key;
+        public PoolableObject Prefab; 
+        public int InitialSize = 20;
+        public int MaxSize = 50;
     }
 }

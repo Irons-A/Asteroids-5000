@@ -1,4 +1,5 @@
 using Core.Physics;
+using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine;
 namespace Gameplay.Environment
 {
     [RequireComponent(typeof(BoxCollider2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
     public class SceneBorder : MonoBehaviour
     {
         [Header("Border Settings")]
@@ -16,13 +18,6 @@ namespace Gameplay.Environment
         [SerializeField] private BorderSide _borderSide;
         private float _sceneWidth;
         private float _sceneHeight;
-
-        private BoxCollider2D _collider;
-
-        private void Awake()
-        {
-            _collider = GetComponent<BoxCollider2D>();
-        }
 
         public void Initialize(BorderSide borderType, float sceneWidth, float sceneHeight)
         {
@@ -44,6 +39,13 @@ namespace Gameplay.Environment
                 else
                 {
                     movableObject.EnableTeleportation();
+                }
+            }
+            else if(other.TryGetComponent(out PoolableObject poolableObject))
+            {
+                if(poolableObject.DespawnCondition == DespawnCondition.OutsideOfScene)
+                {
+                    poolableObject.Despawn();
                 }
             }
         }

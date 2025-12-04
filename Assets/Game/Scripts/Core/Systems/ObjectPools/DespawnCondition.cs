@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Core.Systems.ObjectPools
 {
-    public interface IPoolable
+    public enum DespawnCondition
     {
-        PoolableObjectType PoolKey { get; }
-        void OnSpawn();
-        void Despawn();
+        None,
+        OutsideOfScene,
+        OutsideOfViewport
     }
 }
