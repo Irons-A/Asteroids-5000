@@ -156,7 +156,7 @@ namespace Player.UserInput
 
             if (_currentStrategy.IsShootingLaser())
             {
-                _playerModel.ShootBullets();
+                _playerModel.ShootLaser();
             }
 
             if (_currentStrategy.IsPausePressed())
