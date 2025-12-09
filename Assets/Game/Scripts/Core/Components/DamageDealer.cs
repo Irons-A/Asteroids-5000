@@ -11,7 +11,7 @@ namespace Core.Components
         [field: SerializeField] public DamagerAffiliation Affiliation { get; private set; }
         [field: SerializeField] public DamagerDurability Durability { get; private set; }
 
-        public void Initialize(int damage, DamagerAffiliation affiliation, DamagerDurability durability)
+        public void Configure(int damage, DamagerAffiliation affiliation, DamagerDurability durability)
         {
             Damage = damage;
             Affiliation = affiliation;

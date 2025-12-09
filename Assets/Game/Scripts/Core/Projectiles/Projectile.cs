@@ -25,7 +25,7 @@ namespace Core.Projectiles
             }
         }
 
-        public void Initialize(float speed, bool delayedDestruction = false, float destroyAfter = 1)
+        public void Configure(float speed, bool delayedDestruction = false, float destroyAfter = 1)
         {
             _speed = speed;
             _delayedDestruction = delayedDestruction;

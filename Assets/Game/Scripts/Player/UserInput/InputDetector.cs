@@ -14,7 +14,7 @@ namespace Player.UserInput
         private KeyboardMouseInputStrategy _pcStrategy;
         private GamepadInputStrategy _gamepadStrategy;
 
-        private PlayerLogic _playerModel;
+        private PlayerLogic _playerLogic;
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
@@ -30,7 +30,7 @@ namespace Player.UserInput
             _gamepadStrategy = gamepadStrategy;
             _currentStrategy = pcStrategy;
 
-            _playerModel = playermodel;
+            _playerLogic = playermodel;
         }
 
         private void Update()
@@ -136,32 +136,26 @@ namespace Player.UserInput
 
         private void ProcessUserInput()
         {
-            if (_playerModel == null) return;
+            if (_playerLogic == null) return;
 
             if (_currentStrategy is KeyboardMouseInputStrategy)
             {
-                _playerModel.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());
+                _playerLogic.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());
             }
             else
             {
-                _playerModel.RotatePlayerTowardsStick(_currentStrategy.GetRotationInput());
+                _playerLogic.RotatePlayerTowardsStick(_currentStrategy.GetRotationInput());
             }
 
-            _playerModel.MovePlayer(_currentStrategy.GetPlayerMovementState());
+            _playerLogic.MovePlayer(_currentStrategy.GetPlayerMovementState());
 
-            if (_currentStrategy.IsShootingBullets())
-            {
-                _playerModel.ShootBullets();
-            }
+            _playerLogic.ShootBullets(_currentStrategy.IsShootingBullets());
 
-            if (_currentStrategy.IsShootingLaser())
-            {
-                _playerModel.ShootLaser();
-            }
+            _playerLogic.ShootLaser(_currentStrategy.IsShootingLaser());
 
             if (_currentStrategy.IsPausePressed())
             {
-                _playerModel.TogglePause();
+                _playerLogic.TogglePause();
             }
         }
     }

@@ -18,6 +18,8 @@ namespace Player.Logic
         private PlayerSettings _playerSettings; 
         private CustomPhysics _playerPhysics;
         private UniversalObjectPool _objectPool;
+        private PlayerWeaponSystem _bulletWeaponSystem;
+        private PlayerWeaponSystem _laserWeaponSystem;
 
         [Inject]
         private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
@@ -65,17 +67,14 @@ namespace Player.Logic
             }
         }
 
-        public void ShootBullets()
+        public void ShootBullets(bool value)
         {
-            if (_playerPresentation.BulletFirepoints.Length > 0)
-            {
-
-            }
+            _bulletWeaponSystem.SetShouldShoot(value);
         }
 
-        public void ShootLaser()
+        public void ShootLaser(bool value)
         {
-
+            _laserWeaponSystem.SetShouldShoot(value);
         }
 
         public void TogglePause()
@@ -91,6 +90,16 @@ namespace Player.Logic
 
             _playerTransform.rotation = Quaternion.RotateTowards(_playerTransform.rotation,
                 Quaternion.Euler(0, 0, targetAngle), _playerSettings.RotationSpeed * Time.deltaTime);
+        }
+
+        private void ConfigureBulletWeaponSystem()
+        {
+
+        }
+
+        private void ConfigureLaserWeaponSystem()
+        {
+
         }
     }
 }
