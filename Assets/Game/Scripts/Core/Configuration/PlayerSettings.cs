@@ -16,7 +16,7 @@ namespace Core.Configuration
 
         public float BulletFireRateInterval;
         public float BulletSpeed;
-        public float BulletDamage;
+        public int BulletDamage;
         public float LaserFireRateInterval;
         public int MaxLaserCharges;
         public float LaserCooldown;

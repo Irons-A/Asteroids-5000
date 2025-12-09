@@ -11,7 +11,7 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerLogic : IFixedTickable
+    public class PlayerLogic : IFixedTickable, IInitializable
     {
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
@@ -23,7 +23,8 @@ namespace Player.Logic
 
         [Inject]
         private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
-            CustomPhysics playerPhysics, UniversalObjectPool objectPool)
+            CustomPhysics playerPhysics, UniversalObjectPool objectPool, PlayerWeaponSystem bulletWeapon,
+            PlayerWeaponSystem laserWeapon)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -34,6 +35,16 @@ namespace Player.Logic
             _playerPhysics.SetMovableObject(playerView);
 
             _objectPool = objectPool;
+
+            _bulletWeaponSystem = bulletWeapon;
+
+            _laserWeaponSystem = laserWeapon;
+        }
+
+        public void Initialize()
+        {
+            ConfigureBulletWeaponSystem();
+            ConfigureLaserWeaponSystem();
         }
 
         public void FixedTick()
@@ -70,6 +81,8 @@ namespace Player.Logic
         public void ShootBullets(bool value)
         {
             _bulletWeaponSystem.SetShouldShoot(value);
+
+            _bulletWeaponSystem.DebugInfo();
         }
 
         public void ShootLaser(bool value)
@@ -94,7 +107,12 @@ namespace Player.Logic
 
         private void ConfigureBulletWeaponSystem()
         {
+            _bulletWeaponSystem.Configure(PoolableObjectType.PlayerBullet, _playerPresentation.BulletFirepoints,
+                _playerSettings.BulletSpeed, false, 0, _playerSettings.BulletDamage, Core.Projectiles.DamagerAffiliation.Ally,
+                Core.Projectiles.DamagerDurability.Fragile, false, _playerSettings.BulletFireRateInterval, 0, 0, true, 0, 0,
+                false, false, false, false);
 
+            Debug.Log($"bullet system configured");
         }
 
         private void ConfigureLaserWeaponSystem()

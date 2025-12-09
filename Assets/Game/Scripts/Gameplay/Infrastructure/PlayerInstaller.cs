@@ -19,6 +19,7 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerWeaponSystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<PlayerLogic>().AsSingle();
             Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
             Container.Bind<GamepadInputStrategy>().AsSingle();

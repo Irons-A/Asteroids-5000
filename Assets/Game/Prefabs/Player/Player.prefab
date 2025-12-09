@@ -229,6 +229,8 @@ MonoBehaviour:
   BulletFirepoints:
   - {fileID: 6913295436723000650}
   - {fileID: 6394831848732044998}
+  LaserFirepoints:
+  - {fileID: 8964495639824136935}
 --- !u!1 &7512897743088913637
 GameObject:
   m_ObjectHideFlags: 0

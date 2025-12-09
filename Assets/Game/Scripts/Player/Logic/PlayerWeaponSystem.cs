@@ -30,6 +30,7 @@ namespace Player.Logic
         private int _projectileDamage;
         private DamagerAffiliation _projectileAffiliation;
         private DamagerDurability _projectileDurability;
+        private bool _shouldSetFirepointAsProjectileParent;
 
         private float _fireRateInterval;
         private int _maxAmmo;
@@ -49,11 +50,12 @@ namespace Player.Logic
             _objectPool = objectPool;
         }
 
-        public void Configure(PoolableObjectType projectileType, Transform[] firepoints, float projectileSpeed, bool projectileDelayedDestruction, float destroyProjectileAfter,
-            int projectileDamage, DamagerAffiliation projectileAffiliation, DamagerDurability projectileDurability,
-            float fireRateInterval, int maxAmmo, int ammoCostPerShot, bool hasInfiniteAmmo, float reloadLength,
-            int ammoPerReload, bool shouldAutoReloadOnLessThanMaxAmmo, bool shouldAutoReloadOnNoAmmo,
-            bool shouldDepleteAmmoOnReload, bool shouldBlockFireWhileReaload)
+        public void Configure(PoolableObjectType projectileType, Transform[] firepoints, float projectileSpeed, 
+            bool projectileDelayedDestruction, float destroyProjectileAfter, int projectileDamage, 
+            DamagerAffiliation projectileAffiliation, DamagerDurability projectileDurability,
+            bool shouldSetFirepointAsProjectileParent, float fireRateInterval, int maxAmmo, int ammoCostPerShot, 
+            bool hasInfiniteAmmo, float reloadLength, int ammoPerReload, bool shouldAutoReloadOnLessThanMaxAmmo, 
+            bool shouldAutoReloadOnNoAmmo, bool shouldDepleteAmmoOnReload, bool shouldBlockFireWhileReaload)
         {
             _projectileType = projectileType;
             _firePoints = firepoints;
@@ -63,6 +65,7 @@ namespace Player.Logic
             _projectileDamage = projectileDamage;
             _projectileAffiliation = projectileAffiliation;
             _projectileDurability = projectileDurability;
+            _shouldSetFirepointAsProjectileParent = shouldSetFirepointAsProjectileParent;
             _fireRateInterval = fireRateInterval;
             _maxAmmo = maxAmmo;
             _currentAmmo = maxAmmo;
@@ -83,6 +86,18 @@ namespace Player.Logic
             ProcessWillToShoot();
 
             ProcessAutoReloading();
+        }
+
+        public void DebugInfo()
+        {
+            Debug.Log($"should shoot: {_shouldShoot}, can shoot {_canShoot}, is shooting {_isShooting}");
+
+            bool notEnoughAmmo = _currentAmmo < _ammoCostPerShot && _hasInfiniteAmmo == false;
+            bool reloadBlockingFire = _isReloading && _shouldBlockFireWhileReload;
+
+            _canShoot = !(notEnoughAmmo || reloadBlockingFire);
+
+            Debug.Log($"not enough ammo {notEnoughAmmo}, reloadBlockingFire {reloadBlockingFire}, _canShoot {_canShoot}");
         }
 
         public void SetShouldShoot(bool value)
@@ -114,18 +129,10 @@ namespace Player.Logic
 
         private void ProcessAbilityToSHoot()
         {
-            if (_currentAmmo < _ammoCostPerShot && _hasInfiniteAmmo == false)
-            {
-                _canShoot = false;
-            }
-            else if (_isReloading && _shouldBlockFireWhileReload)
-            {
-                _canShoot = false;
-            }
-            else
-            {
-                _canShoot = true;
-            }
+            bool notEnoughAmmo = _currentAmmo < _ammoCostPerShot && _hasInfiniteAmmo == false;
+            bool reloadBlockingFire = _isReloading && _shouldBlockFireWhileReload;
+
+            _canShoot = !(notEnoughAmmo || reloadBlockingFire);
 
             if (_isShooting)
             {
@@ -171,9 +178,9 @@ namespace Player.Logic
             _shootingCTS = null;
         }
 
-        private async UniTaskVoid ShootingLoop(CancellationToken cancellationToken)
+        private async UniTaskVoid ShootingLoop(CancellationToken token)
         {
-            while (!cancellationToken.IsCancellationRequested && _isShooting)
+            while (!token.IsCancellationRequested && _isShooting)
             {
                 if (_canShoot)
                 {
@@ -185,8 +192,7 @@ namespace Player.Logic
                     }
                 }
 
-                await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval),ignoreTimeScale: false,
-                    cancellationToken: cancellationToken);
+                await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval), cancellationToken: token);
 
                 if (_currentAmmo <= _ammoCostPerShot)
                 {
@@ -234,10 +240,15 @@ namespace Player.Logic
                 {
                     damageDealer.Configure(_projectileDamage, _projectileAffiliation, _projectileDurability);
                 }
+
+                if (_shouldSetFirepointAsProjectileParent)
+                {
+                    poolableObject.transform.SetParent(firepoint);
+                }
             }
         }
 
-        private async UniTaskVoid ReloadLoop(CancellationToken cancellationToken)
+        private async UniTaskVoid ReloadLoop(CancellationToken token)
         {
             try
             {
@@ -250,8 +261,7 @@ namespace Player.Logic
 
                 Debug.Log("reloading");
 
-                await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength), ignoreTimeScale: false,
-                    cancellationToken: cancellationToken);
+                await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength), cancellationToken: token);
 
                 _currentAmmo += _ammoPerReload;
                 _currentAmmo = Math.Min(_currentAmmo, _maxAmmo);
