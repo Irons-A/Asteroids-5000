@@ -24,6 +24,8 @@ namespace Player.Logic
         private CancellationTokenSource _shootingCTS;
         private CancellationTokenSource _reloadCTS;
 
+        private bool _isProcessingShoot = false;
+
         private float _projectileSpeed;
         private bool _projectileDelayedDestruction;
         private float _destroyProjectileAfter;
@@ -90,19 +92,25 @@ namespace Player.Logic
 
         public void DebugInfo()
         {
-            Debug.Log($"should shoot: {_shouldShoot}, can shoot {_canShoot}, is shooting {_isShooting}");
+            Debug.Log($"should: {_shouldShoot}, can: {_canShoot}, is: {_isShooting}");
 
-            bool notEnoughAmmo = _currentAmmo < _ammoCostPerShot && _hasInfiniteAmmo == false;
+            bool notEnoughAmmo = _currentAmmo < _ammoCostPerShot && !_hasInfiniteAmmo;
             bool reloadBlockingFire = _isReloading && _shouldBlockFireWhileReload;
 
             _canShoot = !(notEnoughAmmo || reloadBlockingFire);
 
-            Debug.Log($"not enough ammo {notEnoughAmmo}, reloadBlockingFire {reloadBlockingFire}, _canShoot {_canShoot}");
+            Debug.Log($"noAmmo: {notEnoughAmmo}, reloadBlock: {reloadBlockingFire}, canShoot: {_canShoot}");
         }
 
         public void SetShouldShoot(bool value)
         {
             _shouldShoot = value;
+            Debug.Log($"SetShouldShoot: {value}");
+
+            if (!value && _isShooting)
+            {
+                StopShooting();
+            }
         }
 
         public void StartReload()
@@ -134,20 +142,32 @@ namespace Player.Logic
 
             _canShoot = !(notEnoughAmmo || reloadBlockingFire);
 
-            if (_isShooting)
+            if (_isShooting && !_canShoot)
             {
-                if (_shouldShoot == false || _canShoot == false)
-                {
-                    StopShooting();
-                }
+                StopShooting();
             }
         }
 
         private void ProcessWillToShoot()
         {
-            if (_shouldShoot && _canShoot && _isShooting == false)
+            if (_isProcessingShoot) return;
+
+            _isProcessingShoot = true;
+
+            try
             {
-                StartShooting();
+                if (_shouldShoot && _canShoot && !_isShooting)
+                {
+                    StartShooting();
+                }
+                else if (_isShooting && (!_shouldShoot || !_canShoot))
+                {
+                    StopShooting();
+                }
+            }
+            finally
+            {
+                _isProcessingShoot = false;
             }
         }
 
@@ -163,7 +183,11 @@ namespace Player.Logic
         {
             if (_isShooting) return;
 
+            Debug.Log("Начинаем стрельбу");
             _isShooting = true;
+
+            _shootingCTS?.Cancel();
+            _shootingCTS?.Dispose();
 
             _shootingCTS = new CancellationTokenSource();
 
@@ -172,7 +196,11 @@ namespace Player.Logic
 
         private void StopShooting()
         {
+            if (!_isShooting) return;
+
+            Debug.Log("Останавливаем стрельбу");
             _isShooting = false;
+
             _shootingCTS?.Cancel();
             _shootingCTS?.Dispose();
             _shootingCTS = null;
@@ -180,29 +208,56 @@ namespace Player.Logic
 
         private async UniTaskVoid ShootingLoop(CancellationToken token)
         {
-            while (!token.IsCancellationRequested && _isShooting)
+            Debug.Log("Запущен ShootingLoop");
+
+            try
             {
-                if (_canShoot)
+                while (!token.IsCancellationRequested && _isShooting)
                 {
+                    if (!_canShoot || !_shouldShoot)
+                    {
+                        Debug.Log("Условия стрельбы изменились, останавливаемся");
+                        StopShooting();
+                        break;
+                    }
+
+                    if (_currentAmmo < _ammoCostPerShot && !_hasInfiniteAmmo)
+                    {
+                        Debug.Log("Закончились патроны");
+                        if (_shouldAutoReloadOnNoAmmo)
+                        {
+                            StartReload();
+                        }
+                        StopShooting();
+                        break;
+                    }
+
                     ShootProjectile();
 
-                    if (_hasInfiniteAmmo == false)
+                    if (!_hasInfiniteAmmo)
                     {
                         _currentAmmo -= _ammoCostPerShot;
-                    }
-                }
-
-                await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval), cancellationToken: token);
-
-                if (_currentAmmo <= _ammoCostPerShot)
-                {
-                    if (_shouldAutoReloadOnNoAmmo)
-                    {
-                        StartReload();
+                        Debug.Log($"Осталось патронов: {_currentAmmo}");
                     }
 
-                    break;
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(_fireRateInterval),
+                        cancellationToken: token
+                    );
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("ShootingLoop отменен");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Ошибка в ShootingLoop: {e.Message}");
+            }
+            finally
+            {
+                Debug.Log("ShootingLoop завершен");
+                _isShooting = false;
             }
         }
 
