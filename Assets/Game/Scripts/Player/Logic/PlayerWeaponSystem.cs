@@ -20,12 +20,15 @@ namespace Player.Logic
 
         private bool _shouldShoot = false;
         private bool _wasShootingLastFrame = false;
+        private bool _isReadyToShoot = true;
+        private float _shotCooldownRemaining = 0f;
+        private bool _isReloadingInProgress = false;
         private WeaponState _weaponState = WeaponState.Idle;
         private CancellationTokenSource _shootingCTS;
         private CancellationTokenSource _reloadCTS;
 
         private bool _wantsToShootButNoAmmo = false;
-        private bool _isReloadingInProgress = false;
+        private float _lastShotTime = 0f;
 
         private float _projectileSpeed;
         private bool _projectileDelayedDestruction;
@@ -84,6 +87,7 @@ namespace Player.Logic
 
         public void Tick()
         {
+            // Обработка начала/остановки стрельбы при изменении состояния кнопки
             if (_shouldShoot != _wasShootingLastFrame)
             {
                 if (_shouldShoot)
@@ -98,28 +102,24 @@ namespace Player.Logic
                 _wasShootingLastFrame = _shouldShoot;
             }
 
-            if (_shouldShoot && !CheckCanShoot() && !_hasInfiniteAmmo && _currentAmmo < _ammoCostPerShot)
-            {
-                _wantsToShootButNoAmmo = true;
-            }
-            else
-            {
-                _wantsToShootButNoAmmo = false;
-            }
-
-            ProcessAutoReloading();
-
-            if (_wantsToShootButNoAmmo && CheckCanShoot() && _weaponState != WeaponState.Shooting)
+            // Если кнопка стрельбы зажата, но мы не стреляем - попытаться начать стрельбу
+            // Это сработает, если появились патроны после перезарядки
+            if (_shouldShoot && _weaponState != WeaponState.Shooting && CheckCanShoot())
             {
                 TryStartShooting();
             }
+
+            ProcessAutoReloading();
         }
 
         private bool CheckCanShoot()
         {
+            // Проверяем наличие патронов
             bool hasEnoughAmmo = _hasInfiniteAmmo || _currentAmmo >= _ammoCostPerShot;
 
-            bool notBlockedByReload = !(_weaponState == WeaponState.Reloading && _shouldBlockFireWhileReload);
+            // Проверяем, блокирует ли перезарядка стрельбу
+            // Если shouldBlockFireWhileReload == false, то перезарядка не блокирует
+            bool notBlockedByReload = !(_isReloadingInProgress && _shouldBlockFireWhileReload);
 
             bool hasFirepoints = _firePoints != null && _firePoints.Length > 0;
 
@@ -235,7 +235,11 @@ namespace Player.Logic
 
         private void StartShooting()
         {
+            // Если уже стреляем - выходим
             if (_weaponState == WeaponState.Shooting) return;
+
+            // Если идет перезарядка, которая блокирует стрельбу - выходим
+            if (_isReloadingInProgress && _shouldBlockFireWhileReload) return;
 
             _weaponState = WeaponState.Shooting;
 
@@ -253,6 +257,9 @@ namespace Player.Logic
             Debug.Log("StopShooting");
             _weaponState = WeaponState.Idle;
 
+            // Если хотим сбросить кулдаун при полной остановке стрельбы:
+            // _lastShotTime = 0f;
+
             _shootingCTS?.Cancel();
             _shootingCTS?.Dispose();
             _shootingCTS = null;
@@ -264,21 +271,38 @@ namespace Player.Logic
             {
                 while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
                 {
+                    if (token.IsCancellationRequested) break;
+
                     if (!_shouldShoot || !CheckCanShoot())
                     {
                         break;
                     }
 
+                    // Проверяем, прошло ли достаточно времени с последнего выстрела
+                    float timeSinceLastShot = Time.time - _lastShotTime;
+                    if (timeSinceLastShot < _fireRateInterval)
+                    {
+                        // Ждем оставшееся время
+                        float waitTime = _fireRateInterval - timeSinceLastShot;
+                        await UniTask.Delay(TimeSpan.FromSeconds(waitTime),
+                            cancellationToken: token);
+
+                        if (token.IsCancellationRequested) break;
+                        if (!_shouldShoot || !CheckCanShoot()) break;
+                    }
+
+                    // Обновляем время последнего выстрела и стреляем
+                    _lastShotTime = Time.time;
                     ShootProjectile();
 
                     if (!_hasInfiniteAmmo)
                     {
                         _currentAmmo -= _ammoCostPerShot;
-
-                        // Проверяем необходимость перезарядки после выстрела
                         ProcessAutoReloading();
                     }
 
+                    // Ждем до следующего возможного выстрела
+                    // (это гарантирует минимальную задержку между выстрелами)
                     await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval),
                         cancellationToken: token);
                 }
