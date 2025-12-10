@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 7980334819012729239}
   - component: {fileID: 6532877510741674082}
   - component: {fileID: 9084124597112203638}
+  - component: {fileID: 5301853005672121770}
   m_Layer: 0
   m_Name: PlayerBullet
   m_TagString: Untagged
@@ -180,3 +181,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolKey: 0
   _despawnCondition: 1
+--- !u!114 &5301853005672121770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7325310013820616048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df41425646659c4eb0261f8670b9cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Damage>k__BackingField: 0
+  <Affiliation>k__BackingField: 0
+  <Durability>k__BackingField: 0

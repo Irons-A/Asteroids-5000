@@ -38,7 +38,7 @@ namespace Core.Projectiles
 
         private void Update()
         {
-            _transform.Translate(transform.right * _speed * Time.deltaTime);
+            _transform.Translate(Vector3.right * _speed * Time.deltaTime);
         }
 
         public void Configure(float speed, bool delayedDestruction = false, float destroyAfter = 1)

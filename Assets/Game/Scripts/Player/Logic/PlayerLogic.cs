@@ -81,8 +81,6 @@ namespace Player.Logic
         public void ShootBullets(bool value)
         {
             _bulletWeaponSystem.SetShouldShoot(value);
-
-            _bulletWeaponSystem.DebugInfo();
         }
 
         public void ShootLaser(bool value)
@@ -111,13 +109,14 @@ namespace Player.Logic
                 _playerSettings.BulletSpeed, false, 0, _playerSettings.BulletDamage, Core.Projectiles.DamagerAffiliation.Ally,
                 Core.Projectiles.DamagerDurability.Fragile, false, _playerSettings.BulletFireRateInterval, 0, 0, true, 0, 0,
                 false, false, false, false);
-
-            Debug.Log($"bullet system configured");
         }
 
         private void ConfigureLaserWeaponSystem()
         {
-
+            _laserWeaponSystem.Configure(PoolableObjectType.PlayerLaser, _playerPresentation.LaserFirepoints,
+                0, true, _playerSettings.LaserDuration, _playerSettings.LaserDamage, Core.Projectiles.DamagerAffiliation.Ally,
+                Core.Projectiles.DamagerDurability.Undestructable, true, _playerSettings.LaserFireRateInterval,
+                _playerSettings.MaxLaserCharges, 1, false, _playerSettings.LaserCooldown, 1, true, true, false, false);
         }
     }
 }

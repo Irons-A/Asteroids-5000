@@ -62,7 +62,7 @@ namespace Gameplay.Environment.Systems
 
                         _livingEnemyCount++;
 
-                        Debug.Log($"Enemy spawned at: {spawnPosition}");
+                        //Debug.Log($"Enemy spawned at: {spawnPosition}");
                     }
                 }
             }

@@ -12,7 +12,7 @@
   "BulletDamage": 1,
   "LaserFireRateInterval": 0.75,
   "MaxLaserCharges": 3,
-  "LaserCooldown": 4,
+  "LaserCooldown": 2,
   "LaserDuration": 0.5,
   "LaserDamage": 5
 }

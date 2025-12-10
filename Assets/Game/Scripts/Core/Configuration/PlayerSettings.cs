@@ -21,6 +21,6 @@ namespace Core.Configuration
         public int MaxLaserCharges;
         public float LaserCooldown;
         public float LaserDuration;
-        public float LaserDamage;
+        public int LaserDamage;
     }
 }
