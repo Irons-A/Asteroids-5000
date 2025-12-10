@@ -50,6 +50,8 @@ namespace Player.Logic
         public void FixedTick()
         {
             _playerPhysics.ProcessPhysics();
+
+            _laserWeaponSystem.DebugInfo();
         }
 
         public void RotatePlayerWithMouse(Vector2 mouseWorldPosition)
