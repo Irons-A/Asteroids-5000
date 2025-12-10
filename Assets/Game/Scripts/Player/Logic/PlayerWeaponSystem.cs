@@ -24,8 +24,8 @@ namespace Player.Logic
         private CancellationTokenSource _shootingCTS;
         private CancellationTokenSource _reloadCTS;
 
-        // Добавляем флаг для отслеживания желания стрелять при пустом магазине
         private bool _wantsToShootButNoAmmo = false;
+        private bool _isReloadingInProgress = false;
 
         private float _projectileSpeed;
         private bool _projectileDelayedDestruction;
@@ -80,13 +80,10 @@ namespace Player.Logic
             _shouldAutoReloadOnNoAmmo = shouldAutoReloadOnNoAmmo;
             _shouldDepleteAmmoOnReload = shouldDepleteAmmoOnReload;
             _shouldBlockFireWhileReload = shouldBlockFireWhileReaload;
-
-            Debug.Log($"Configured: maxAmmo={_maxAmmo}, autoReloadOnLess={_shouldAutoReloadOnLessThanMaxAmmo}, autoReloadOnNoAmmo={_shouldAutoReloadOnNoAmmo}");
         }
 
         public void Tick()
         {
-            // Обработка стрельбы
             if (_shouldShoot != _wasShootingLastFrame)
             {
                 if (_shouldShoot)
@@ -101,8 +98,6 @@ namespace Player.Logic
                 _wasShootingLastFrame = _shouldShoot;
             }
 
-            // Если хотим стрелять, но не можем из-за нехватки патронов,
-            // запоминаем это состояние
             if (_shouldShoot && !CheckCanShoot() && !_hasInfiniteAmmo && _currentAmmo < _ammoCostPerShot)
             {
                 _wantsToShootButNoAmmo = true;
@@ -112,10 +107,8 @@ namespace Player.Logic
                 _wantsToShootButNoAmmo = false;
             }
 
-            // Автоматическая перезарядка - работает всегда
             ProcessAutoReloading();
 
-            // Если удерживаем стрельбу и появились патроны, начинаем стрелять
             if (_wantsToShootButNoAmmo && CheckCanShoot() && _weaponState != WeaponState.Shooting)
             {
                 TryStartShooting();
@@ -126,7 +119,6 @@ namespace Player.Logic
         {
             bool hasEnoughAmmo = _hasInfiniteAmmo || _currentAmmo >= _ammoCostPerShot;
 
-            // Если перезарядка не блокирует стрельбу, то мы можем стрелять даже во время перезарядки
             bool notBlockedByReload = !(_weaponState == WeaponState.Reloading && _shouldBlockFireWhileReload);
 
             bool hasFirepoints = _firePoints != null && _firePoints.Length > 0;
@@ -140,7 +132,6 @@ namespace Player.Logic
 
             bool canShoot = CheckCanShoot();
 
-            // Можем начать стрельбу из Idle или даже из Reloading, если перезарядка не блокирует стрельбу
             if (canShoot)
             {
                 StartShooting();
@@ -157,20 +148,14 @@ namespace Player.Logic
 
         public void DebugInfo()
         {
-            bool canShoot = CheckCanShoot();
-            //Debug.Log($"=== Debug Info ===");
-            //Debug.Log($"shouldShoot: {_shouldShoot}, weaponState: {_weaponState}");
-            //Debug.Log($"canShoot: {canShoot}");
-            Debug.Log($"ammo: {_currentAmmo}/{_maxAmmo}, infinite: {_hasInfiniteAmmo} shouldShoot: {_shouldShoot}, weaponState: {_weaponState}");
-            //Debug.Log($"autoReloadOnLess: {_shouldAutoReloadOnLessThanMaxAmmo}, autoReloadOnNoAmmo: {_shouldAutoReloadOnNoAmmo}");
-            //.Log($"=== End Debug ===");
+            Debug.Log($"ammo: {_currentAmmo}/{_maxAmmo}, infinite: {_hasInfiniteAmmo} " +
+                $"shouldShoot: {_shouldShoot}, weaponState: {_weaponState}" +
+                $" IsReloadingInProgress {_isReloadingInProgress}");
         }
 
         public void SetShouldShoot(bool value)
         {
             if (value == _shouldShoot) return;
-
-            //Debug.Log($"SetShouldShoot: {_shouldShoot} -> {value}");
 
             _shouldShoot = value;
 
@@ -181,7 +166,7 @@ namespace Player.Logic
             else
             {
                 TryStopShooting();
-                _wantsToShootButNoAmmo = false; // Сбрасываем флаг, если отпустили кнопку
+                _wantsToShootButNoAmmo = false; 
             }
         }
 
@@ -189,70 +174,52 @@ namespace Player.Logic
         {
             if (_currentAmmo == _maxAmmo || _hasInfiniteAmmo)
             {
-                //Debug.Log($"Cannot reload: already full ({_currentAmmo}/{_maxAmmo}) or infinite ammo");
                 return;
             }
 
-            //Debug.Log($"StartReload called. Current ammo: {_currentAmmo}/{_maxAmmo}, weaponState: {_weaponState}");
-
-            // Если перезарядка блокирует стрельбу и мы стреляем - останавливаем стрельбу
             if (_shouldBlockFireWhileReload && _weaponState == WeaponState.Shooting)
             {
                 StopShooting();
             }
-
-            // Устанавливаем состояние перезарядки
 
             if (_shouldBlockFireWhileReload == true)
             {
                 _weaponState = WeaponState.Reloading;
             }
 
-             //!!!!!!!!!!!!!!!
+            if (_isReloadingInProgress == false)
+            {
+                _reloadCTS?.Cancel();
+                _reloadCTS?.Dispose();
+                _reloadCTS = new CancellationTokenSource();
 
-            _reloadCTS?.Cancel();
-            _reloadCTS?.Dispose();
-            _reloadCTS = new CancellationTokenSource();
-
-            ReloadLoop(_reloadCTS.Token).Forget();
+                ReloadLoop(_reloadCTS.Token).Forget();
+            }
         }
 
         private void ProcessAutoReloading()
         {
             if (_hasInfiniteAmmo)
             {
-                //Debug.Log("Auto-reload skipped: infinite ammo");
                 return;
             }
 
-            // Автоперезарядка должна работать, даже если мы сейчас стреляем (если не блокирует)
-            // Проверяем условия для автоматической перезарядки
             bool shouldReload = false;
 
             if (_shouldAutoReloadOnNoAmmo && _currentAmmo <= 0)
             {
                 shouldReload = true;
-                Debug.Log("Auto-reload condition: No ammo");
             }
             else if (_shouldAutoReloadOnLessThanMaxAmmo && _currentAmmo < _maxAmmo)
             {
-                // Автоперезарядка при неполном магазине
                 shouldReload = true;
-                //Debug.Log($"Auto-reload condition: Less than max ({_currentAmmo}/{_maxAmmo})");
-                Debug.Log("Автоперезарядка при неполном магазине");
             }
 
             if (shouldReload) 
             {
-                // Начинаем перезарядку, если еще не перезаряжаемся
-                if (_weaponState != WeaponState.Reloading)
+                if (_weaponState != WeaponState.Reloading && _isReloadingInProgress == false)
                 {
-                    Debug.Log("Starting auto-reload..."); //!!!!!!!!!!!!!!!!!!!!!!!!!!
                     StartReload();
-                }
-                else
-                {
-                    Debug.Log("Already reloading, skipping auto-reload");
                 }
             }
         }
@@ -260,8 +227,6 @@ namespace Player.Logic
         private void StartShooting()
         {
             if (_weaponState == WeaponState.Shooting) return;
-
-            //Debug.Log($"StartShooting. Current ammo: {_currentAmmo}");
 
             _weaponState = WeaponState.Shooting;
 
@@ -284,67 +249,30 @@ namespace Player.Logic
             _shootingCTS = null;
         }
 
-        private async UniTaskVoid ShootingLoop(CancellationToken token) //дубляж кода
+        private async UniTaskVoid ShootingLoop(CancellationToken token)
         {
-            //Debug.Log("ShootingLoop started");
-
             try
             {
-                // Первый выстрел делаем немедленно
-                if (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
-                {
-                    if (CheckCanShoot())
-                    {
-                        //Debug.Log($"First shot. Ammo before: {_currentAmmo}");
-                        ShootProjectile();
-
-                        if (!_hasInfiniteAmmo)
-                        {
-                            _currentAmmo -= _ammoCostPerShot;
-                            _currentAmmo = Mathf.Max(0, _currentAmmo);
-                            //Debug.Log($"Ammo after first shot: {_currentAmmo}");
-
-                            // Проверяем автоперезарядку после выстрела
-                            await UniTask.NextFrame(token); // Даем кадр на обработку
-                            ProcessAutoReloading();
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("Cannot shoot first shot, stopping");
-                        StopShooting();
-                        return;
-                    }
-                }
-
-                // Цикл для последующих выстрелов
                 while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
                 {
-                    // Ждем перед следующим выстрелом
-                    await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval),
-                        cancellationToken: token);
-
                     if (token.IsCancellationRequested) break;
 
-                    // Проверяем условия перед каждым выстрелом
                     if (!_shouldShoot || !CheckCanShoot())
                     {
-                        //Debug.Log($"Stopping shooting: shouldShoot={_shouldShoot}, canShoot={CheckCanShoot()}");
                         break;
                     }
 
-                    //Debug.Log($"Next shot. Ammo before: {_currentAmmo}");
                     ShootProjectile();
 
                     if (!_hasInfiniteAmmo)
                     {
                         _currentAmmo -= _ammoCostPerShot;
-                        //_currentAmmo = Mathf.Max(0, _currentAmmo);
-                        //Debug.Log($"Ammo after: {_currentAmmo}");
 
-                        // Проверяем автоперезарядку после каждого выстрела
                         ProcessAutoReloading();
                     }
+
+                    await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval),
+                        cancellationToken: token);
                 }
             }
             catch (OperationCanceledException)
@@ -412,28 +340,21 @@ namespace Player.Logic
                 {
                     poolableObject.transform.SetParent(firepoint);
                 }
-
-                // Активация объекта
-                if (!poolableObject.gameObject.activeSelf)
-                {
-                    poolableObject.gameObject.SetActive(true);
-                }
             }
         }
 
         private async UniTaskVoid ReloadLoop(CancellationToken token)
         {
-            Debug.Log("ReloadLoop started");
+            _isReloadingInProgress = true;
 
             try
             {
+
                 if (_shouldDepleteAmmoOnReload)
                 {
-                    //Debug.Log($"Depleting ammo on reload. Was: {_currentAmmo}");
                     _currentAmmo = 0;
                 }
 
-                //Debug.Log($"Waiting {_reloadLength} seconds for reload...");
                 await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength), cancellationToken: token);
 
                 if (token.IsCancellationRequested)
@@ -443,9 +364,6 @@ namespace Player.Logic
                 }
 
                 _currentAmmo += _ammoPerReload;
-                _currentAmmo = Mathf.Min(_currentAmmo, _maxAmmo);
-
-                //Debug.Log($"Reload completed. Ammo: {_currentAmmo}/{_maxAmmo}");
             }
             catch (OperationCanceledException)
             {
@@ -453,23 +371,18 @@ namespace Player.Logic
             }
             finally
             {
-                // После завершения перезарядки возвращаемся в Idle
-                // Но если мы стреляли во время перезарядки (и она не блокировала стрельбу),
-                // то остаемся в состоянии Shooting
                 if (_weaponState == WeaponState.Reloading)
                 {
                     _weaponState = WeaponState.Idle;
-
-                    // Проверяем, не нужно ли начать стрельбу после перезарядки
                 }
+
+                _isReloadingInProgress = false;
 
                 if (_shouldShoot && CheckCanShoot())
                 {
                     Debug.Log("Auto-starting shooting after reload");
                     TryStartShooting();
                 }
-
-                //Debug.Log("ReloadLoop ended");
             }
         }
 
@@ -489,7 +402,6 @@ namespace Player.Logic
             Debug.Log("CancelReload");
             _reloadCTS?.Cancel();
 
-            // После отмены перезарядки проверяем, не нужно ли начать стрельбу
             if (_shouldShoot && CheckCanShoot())
             {
                 _weaponState = WeaponState.Shooting;
