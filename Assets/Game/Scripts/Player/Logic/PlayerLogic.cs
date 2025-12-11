@@ -18,13 +18,13 @@ namespace Player.Logic
         private PlayerSettings _playerSettings; 
         private CustomPhysics _playerPhysics;
         private UniversalObjectPool _objectPool;
-        private PlayerWeaponSystem _bulletWeaponSystem;
-        private PlayerWeaponSystem _laserWeaponSystem;
+        private UniveralPlayerWeaponSystem _bulletWeaponSystem;
+        private UniveralPlayerWeaponSystem _laserWeaponSystem;
 
         [Inject]
         private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
-            CustomPhysics playerPhysics, UniversalObjectPool objectPool, PlayerWeaponSystem bulletWeapon,
-            PlayerWeaponSystem laserWeapon)
+            CustomPhysics playerPhysics, UniversalObjectPool objectPool, UniveralPlayerWeaponSystem bulletWeapon,
+            UniveralPlayerWeaponSystem laserWeapon)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -107,18 +107,50 @@ namespace Player.Logic
 
         private void ConfigureBulletWeaponSystem()
         {
-            _bulletWeaponSystem.Configure(PoolableObjectType.PlayerBullet, _playerPresentation.BulletFirepoints,
-                _playerSettings.BulletSpeed, false, 0, _playerSettings.BulletDamage, Core.Projectiles.DamagerAffiliation.Ally,
-                Core.Projectiles.DamagerDurability.Fragile, false, _playerSettings.BulletFireRateInterval, 0, 0, true, 0, 0,
-                false, false, false, false);
+            _bulletWeaponSystem.Configure(
+                projectileType: PoolableObjectType.PlayerBullet, 
+                firepoints: _playerPresentation.BulletFirepoints,
+                projectileSpeed: _playerSettings.BulletSpeed,
+                projectileDelayedDestruction: false,
+                destroyProjectileAfter: 0,
+                projectileDamage: _playerSettings.BulletDamage,
+                projectileAffiliation: Core.Projectiles.DamagerAffiliation.Ally,
+                projectileDurability: Core.Projectiles.DamagerDurability.Fragile,
+                shouldSetFirepointAsProjectileParent: false,
+                fireRateInterval: _playerSettings.BulletFireRateInterval,
+                maxAmmo: 0,
+                ammoCostPerShot: 0,
+                hasInfiniteAmmo: true,
+                reloadLength: 0,
+                ammoPerReload: 0,
+                shouldAutoReloadOnLessThanMaxAmmo: false,
+                shouldAutoReloadOnNoAmmo: false,
+                shouldDepleteAmmoOnReload: false,
+                shouldBlockFireWhileReaload: false);
         }
 
         private void ConfigureLaserWeaponSystem()
         {
-            _laserWeaponSystem.Configure(PoolableObjectType.PlayerLaser, _playerPresentation.LaserFirepoints,
-                0, true, _playerSettings.LaserDuration, _playerSettings.LaserDamage, Core.Projectiles.DamagerAffiliation.Ally,
-                Core.Projectiles.DamagerDurability.Undestructable, true, _playerSettings.LaserFireRateInterval,
-                _playerSettings.MaxLaserCharges, 1, false, _playerSettings.LaserCooldown, 1, true, true, false, false);
+            _laserWeaponSystem.Configure(
+                projectileType: PoolableObjectType.PlayerLaser,
+                firepoints: _playerPresentation.LaserFirepoints,
+                projectileSpeed:0,
+                projectileDelayedDestruction: true,
+                destroyProjectileAfter: _playerSettings.LaserDuration,
+                projectileDamage: _playerSettings.LaserDamage,
+                projectileAffiliation: Core.Projectiles.DamagerAffiliation.Ally,
+                projectileDurability: Core.Projectiles.DamagerDurability.Undestructable,
+                shouldSetFirepointAsProjectileParent: true,
+                fireRateInterval: _playerSettings.LaserFireRateInterval,
+                maxAmmo: _playerSettings.MaxLaserCharges,
+                ammoCostPerShot: 1,
+                hasInfiniteAmmo: false,
+                reloadLength: _playerSettings.LaserCooldown,
+                ammoPerReload: 1,
+                shouldAutoReloadOnLessThanMaxAmmo: true,
+                shouldAutoReloadOnNoAmmo: true,
+                shouldDepleteAmmoOnReload: false,
+                shouldBlockFireWhileReaload: false);
         }
     }
 }

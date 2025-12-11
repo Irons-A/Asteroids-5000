@@ -12,23 +12,18 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerWeaponSystem : ITickable
+    public class UniveralPlayerWeaponSystem : ITickable, IDisposable
     {
         private PoolableObjectType _projectileType;
         private Transform[] _firePoints;
         private UniversalObjectPool _objectPool;
 
         private bool _shouldShoot = false;
-        private bool _wasShootingLastFrame = false;
-        private bool _isReadyToShoot = true;
-        private float _shotCooldownRemaining = 0f;
         private bool _isReloadingInProgress = false;
+        private float _lastShotTime = 0f;
         private WeaponState _weaponState = WeaponState.Idle;
         private CancellationTokenSource _shootingCTS;
         private CancellationTokenSource _reloadCTS;
-
-        private bool _wantsToShootButNoAmmo = false;
-        private float _lastShotTime = 0f;
 
         private float _projectileSpeed;
         private bool _projectileDelayedDestruction;
@@ -87,49 +82,103 @@ namespace Player.Logic
 
         public void Tick()
         {
-            // Обработка начала/остановки стрельбы при изменении состояния кнопки
-            if (_shouldShoot != _wasShootingLastFrame)
-            {
-                if (_shouldShoot)
-                {
-                    TryStartShooting();
-                }
-                else
-                {
-                    TryStopShooting();
-                }
+            ProcessAutoReloading();
+        }
 
-                _wasShootingLastFrame = _shouldShoot;
-            }
+        public void Dispose()
+        {
+            StopShooting();
+            CancelReload();
+        }
 
-            // Если кнопка стрельбы зажата, но мы не стреляем - попытаться начать стрельбу
-            // Это сработает, если появились патроны после перезарядки
+        public void DebugInfo()
+        {
+            Debug.Log($"ammo: {_currentAmmo}/{_maxAmmo}, infinite: {_hasInfiniteAmmo} " +
+                $"shouldShoot: {_shouldShoot}, weaponState: {_weaponState}" +
+                $" IsReloadingInProgress {_isReloadingInProgress} canShoot {CheckCanShoot()}");
+        }
+
+        public void SetShouldShoot(bool value)
+        {
+            if (value == _shouldShoot) return;
+
+            _shouldShoot = value;
+
             if (_shouldShoot && _weaponState != WeaponState.Shooting && CheckCanShoot())
             {
                 TryStartShooting();
             }
+            else
+            {
+                TryStopShooting();
+            }
+        }
 
-            ProcessAutoReloading();
+        public void StartReload()
+        {
+            if (_currentAmmo == _maxAmmo || _hasInfiniteAmmo)
+            {
+                return;
+            }
+
+            if (_shouldBlockFireWhileReload && _weaponState == WeaponState.Shooting)
+            {
+                StopShooting();
+            }
+
+            if (_shouldBlockFireWhileReload)
+            {
+                _weaponState = WeaponState.Reloading;
+            }
+
+            if (_isReloadingInProgress)
+            {
+                return;
+            }
+
+            DisposeReloadingCancellationToken();
+
+            _reloadCTS = new CancellationTokenSource();
+
+            ReloadLoop(_reloadCTS.Token).Forget();
+        }
+
+        public void CancelReload()
+        {
+            if (_isReloadingInProgress == false && _weaponState != WeaponState.Reloading)
+                return;
+
+            DisposeReloadingCancellationToken();
+
+            if (_shouldBlockFireWhileReload)
+            {
+                _weaponState = WeaponState.Idle;
+            }
+
+            _isReloadingInProgress = false;
+
+            if (_shouldShoot)
+            {
+                TryStartShooting();
+            }
         }
 
         private bool CheckCanShoot()
         {
-            // Проверяем наличие патронов
             bool hasEnoughAmmo = _hasInfiniteAmmo || _currentAmmo >= _ammoCostPerShot;
 
-            // Проверяем, блокирует ли перезарядка стрельбу
-            // Если shouldBlockFireWhileReload == false, то перезарядка не блокирует
-            bool notBlockedByReload = !(_isReloadingInProgress && _shouldBlockFireWhileReload);
+            if (hasEnoughAmmo == false) return false;
 
-            bool hasFirepoints = _firePoints != null && _firePoints.Length > 0;
+            if (_isReloadingInProgress && _shouldBlockFireWhileReload)
+            {
+                return false;
+            }
 
-            return hasEnoughAmmo && notBlockedByReload && hasFirepoints;
+            return true;
         }
 
         private void TryStartShooting()
         {
-            if (_weaponState == WeaponState.Shooting) return;
-
             bool canShoot = CheckCanShoot();
 
             if (canShoot)
@@ -146,105 +195,16 @@ namespace Player.Logic
             }
         }
 
-        public void DebugInfo()
-        {
-            Debug.Log($"ammo: {_currentAmmo}/{_maxAmmo}, infinite: {_hasInfiniteAmmo} " +
-                $"shouldShoot: {_shouldShoot}, weaponState: {_weaponState}" +
-                $" IsReloadingInProgress {_isReloadingInProgress} canSHoot {CheckCanShoot()}");
-        }
-
-        public void SetShouldShoot(bool value)
-        {
-            if (value == _shouldShoot) return;
-
-            _shouldShoot = value;
-
-            if (_shouldShoot)
-            {
-                TryStartShooting();
-            }
-            else
-            {
-                TryStopShooting();
-                _wantsToShootButNoAmmo = false; 
-            }
-        }
-
-        public void StartReload()
-        {
-            if (_currentAmmo == _maxAmmo || _hasInfiniteAmmo)
-            {
-                return;
-            }
-
-            // Останавливаем стрельбу только если перезарядка блокирует стрельбу
-            if (_shouldBlockFireWhileReload && _weaponState == WeaponState.Shooting)
-            {
-                StopShooting();
-            }
-
-            // Устанавливаем состояние только если перезарядка блокирует стрельбу
-            if (_shouldBlockFireWhileReload)
-            {
-                _weaponState = WeaponState.Reloading;
-            }
-
-            // Если перезарядка уже идет, не запускаем новую
-            if (_isReloadingInProgress)
-            {
-                return;
-            }
-
-            _reloadCTS?.Cancel();
-            _reloadCTS?.Dispose();
-            _reloadCTS = new CancellationTokenSource();
-
-            ReloadLoop(_reloadCTS.Token).Forget();
-        }
-
-        private void ProcessAutoReloading()
-        {
-            if (_hasInfiniteAmmo)
-            {
-                return;
-            }
-
-            // Проверяем, нужно ли начинать перезарядку
-            bool shouldStartReload = false;
-
-            if (_shouldAutoReloadOnNoAmmo && _currentAmmo <= 0)
-            {
-                shouldStartReload = true;
-            }
-            else if (_shouldAutoReloadOnLessThanMaxAmmo && _currentAmmo < _maxAmmo)
-            {
-                shouldStartReload = true;
-            }
-
-            // Если перезарядка не блокирует стрельбу, используем _isReloadingInProgress
-            // Если блокирует - используем WeaponState.Reloading
-            bool isCurrentlyReloading = _shouldBlockFireWhileReload
-                ? _weaponState == WeaponState.Reloading
-                : _isReloadingInProgress;
-
-            if (shouldStartReload && !isCurrentlyReloading)
-            {
-                StartReload();
-            }
-        }
-
         private void StartShooting()
         {
-            // Если уже стреляем - выходим
             if (_weaponState == WeaponState.Shooting) return;
 
-            // Если идет перезарядка, которая блокирует стрельбу - выходим
             if (_isReloadingInProgress && _shouldBlockFireWhileReload) return;
 
             _weaponState = WeaponState.Shooting;
 
-            _shootingCTS?.Cancel();
-            _shootingCTS?.Dispose();
+            DisposeShootingCancellationToken();
+
             _shootingCTS = new CancellationTokenSource();
 
             ShootingLoop(_shootingCTS.Token).Forget();
@@ -254,57 +214,46 @@ namespace Player.Logic
         {
             if (_weaponState != WeaponState.Shooting) return;
 
-            Debug.Log("StopShooting");
             _weaponState = WeaponState.Idle;
 
-            // Если хотим сбросить кулдаун при полной остановке стрельбы:
-            // _lastShotTime = 0f;
-
-            _shootingCTS?.Cancel();
-            _shootingCTS?.Dispose();
-            _shootingCTS = null;
+            DisposeShootingCancellationToken();
         }
 
         private async UniTaskVoid ShootingLoop(CancellationToken token)
         {
             try
             {
-                while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
+                while (token.IsCancellationRequested == false && _weaponState == WeaponState.Shooting)
                 {
                     if (token.IsCancellationRequested) break;
 
-                    if (!_shouldShoot || !CheckCanShoot())
-                    {
-                        break;
-                    }
+                    if (_shouldShoot == false || CheckCanShoot() == false) break;
 
-                    // Проверяем, прошло ли достаточно времени с последнего выстрела
                     float timeSinceLastShot = Time.time - _lastShotTime;
+
                     if (timeSinceLastShot < _fireRateInterval)
                     {
-                        // Ждем оставшееся время
                         float waitTime = _fireRateInterval - timeSinceLastShot;
-                        await UniTask.Delay(TimeSpan.FromSeconds(waitTime),
-                            cancellationToken: token);
+
+                        await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
 
                         if (token.IsCancellationRequested) break;
-                        if (!_shouldShoot || !CheckCanShoot()) break;
+
+                        if (_shouldShoot == false || CheckCanShoot() == false) break;
                     }
 
-                    // Обновляем время последнего выстрела и стреляем
                     _lastShotTime = Time.time;
+
                     ShootProjectile();
 
-                    if (!_hasInfiniteAmmo)
+                    if (_hasInfiniteAmmo == false)
                     {
                         _currentAmmo -= _ammoCostPerShot;
+
                         ProcessAutoReloading();
                     }
 
-                    // Ждем до следующего возможного выстрела
-                    // (это гарантирует минимальную задержку между выстрелами)
-                    await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval),
-                        cancellationToken: token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(_fireRateInterval), cancellationToken: token);
                 }
             }
             catch (OperationCanceledException)
@@ -325,6 +274,7 @@ namespace Player.Logic
             if (_firePoints == null || _firePoints.Length == 0)
             {
                 Debug.LogError("No firepoints attached!");
+
                 return;
             }
 
@@ -333,6 +283,7 @@ namespace Player.Logic
                 if (firepoint == null)
                 {
                     Debug.LogError("Null firepoint found!");
+
                     continue;
                 }
 
@@ -341,6 +292,7 @@ namespace Player.Logic
                 if (poolableObject == null)
                 {
                     Debug.LogError($"Failed to get projectile from pool: {_projectileType}");
+
                     continue;
                 }
 
@@ -350,7 +302,8 @@ namespace Player.Logic
                 }
                 else
                 {
-                    Debug.LogError($"Selected _projectileType {_projectileType} does not have Projectile Component");
+                    Debug.LogError($"Selected _projectileType {_projectileType} does not have Projectile component");
+
                     continue;
                 }
 
@@ -360,17 +313,44 @@ namespace Player.Logic
                 }
                 else
                 {
-                    Debug.LogError($"Selected _projectileType {_projectileType} does not have DamageDealer Component");
+                    Debug.LogError($"Selected _projectileType {_projectileType} does not have DamageDealer component");
+
                     continue;
                 }
 
-                poolableObject.transform.position = firepoint.position;
-                poolableObject.transform.rotation = firepoint.rotation;
+                poolableObject.transform.SetPositionAndRotation(firepoint.position, firepoint.rotation);
 
                 if (_shouldSetFirepointAsProjectileParent)
                 {
                     poolableObject.transform.SetParent(firepoint);
                 }
+            }
+        }
+
+        private void ProcessAutoReloading()
+        {
+            if (_hasInfiniteAmmo)
+            {
+                return;
+            }
+
+            bool shouldStartReload = false;
+
+            if (_shouldAutoReloadOnNoAmmo && _currentAmmo <= 0)
+            {
+                shouldStartReload = true;
+            }
+            else if (_shouldAutoReloadOnLessThanMaxAmmo && _currentAmmo < _maxAmmo)
+            {
+                shouldStartReload = true;
+            }
+
+            bool isCurrentlyReloading = _shouldBlockFireWhileReload ? _weaponState == WeaponState.Reloading
+                : _isReloadingInProgress;
+
+            if (shouldStartReload && !isCurrentlyReloading)
+            {
+                StartReload();
             }
         }
 
@@ -385,10 +365,9 @@ namespace Player.Logic
                     _currentAmmo = 0;
                 }
 
-                while (!token.IsCancellationRequested && _currentAmmo < _maxAmmo)
+                while (token.IsCancellationRequested == false && _currentAmmo < _maxAmmo)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength),
-                        cancellationToken: token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength), cancellationToken: token);
 
                     if (token.IsCancellationRequested)
                     {
@@ -396,18 +375,14 @@ namespace Player.Logic
                     }
 
                     _currentAmmo += _ammoPerReload;
+
                     if (_currentAmmo > _maxAmmo)
                     {
                         _currentAmmo = _maxAmmo;
                     }
 
-                    Debug.Log($"Reloaded: {_currentAmmo}/{_maxAmmo}");
-
-                    // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ**: Проверяем после каждого добавления патронов
-                    // Если кнопка стрельбы зажата и теперь можно стрелять
                     if (_shouldShoot && CheckCanShoot() && _weaponState != WeaponState.Shooting)
                     {
-                        Debug.Log("Ammo available, auto-starting shooting");
                         TryStartShooting();
                     }
                 }
@@ -427,34 +402,18 @@ namespace Player.Logic
             }
         }
 
-        public void Dispose()
+        private void DisposeShootingCancellationToken()
         {
-            StopShooting();
-            CancelReload();
-
+            _shootingCTS?.Cancel();
             _shootingCTS?.Dispose();
-            _reloadCTS?.Dispose();
+            _shootingCTS = null;
         }
 
-        public void CancelReload()
+        private void DisposeReloadingCancellationToken()
         {
-            if (!_isReloadingInProgress && _weaponState != WeaponState.Reloading)
-                return;
-
-            Debug.Log("CancelReload");
             _reloadCTS?.Cancel();
-
-            if (_shouldBlockFireWhileReload)
-            {
-                _weaponState = WeaponState.Idle;
-            }
-
-            _isReloadingInProgress = false;
-
-            if (_shouldShoot && CheckCanShoot())
-            {
-                TryStartShooting();
-            }
+            _reloadCTS?.Dispose();
+            _reloadCTS = null;
         }
     }
 }
