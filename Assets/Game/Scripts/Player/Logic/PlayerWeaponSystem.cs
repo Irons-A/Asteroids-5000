@@ -150,7 +150,7 @@ namespace Player.Logic
         {
             Debug.Log($"ammo: {_currentAmmo}/{_maxAmmo}, infinite: {_hasInfiniteAmmo} " +
                 $"shouldShoot: {_shouldShoot}, weaponState: {_weaponState}" +
-                $" IsReloadingInProgress {_isReloadingInProgress}");
+                $" IsReloadingInProgress {_isReloadingInProgress} canSHoot {CheckCanShoot()}");
         }
 
         public void SetShouldShoot(bool value)
@@ -385,8 +385,6 @@ namespace Player.Logic
                     _currentAmmo = 0;
                 }
 
-                // Цикл перезарядки - продолжаем пока есть патроны для перезарядки
-                // и не достигли максимума
                 while (!token.IsCancellationRequested && _currentAmmo < _maxAmmo)
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(_reloadLength),
@@ -397,10 +395,7 @@ namespace Player.Logic
                         return;
                     }
 
-                    // Добавляем патроны
                     _currentAmmo += _ammoPerReload;
-
-                    // Не превышаем максимум
                     if (_currentAmmo > _maxAmmo)
                     {
                         _currentAmmo = _maxAmmo;
@@ -408,8 +403,13 @@ namespace Player.Logic
 
                     Debug.Log($"Reloaded: {_currentAmmo}/{_maxAmmo}");
 
-                    // Если патроны еще не полные, продолжаем перезарядку
-                    // (цикл продолжится автоматически)
+                    // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ**: Проверяем после каждого добавления патронов
+                    // Если кнопка стрельбы зажата и теперь можно стрелять
+                    if (_shouldShoot && CheckCanShoot() && _weaponState != WeaponState.Shooting)
+                    {
+                        Debug.Log("Ammo available, auto-starting shooting");
+                        TryStartShooting();
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -424,25 +424,6 @@ namespace Player.Logic
                 }
 
                 _isReloadingInProgress = false;
-
-                // После завершения перезарядки проверяем, нужно ли возобновить стрельбу
-                if (_shouldShoot && CheckCanShoot())
-                {
-                    Debug.Log("Auto-starting shooting after reload");
-                    TryStartShooting();
-                }
-
-                // Если после перезарядки все еще не достигли максимума и есть условия
-                // для автоперезарядки, запускаем новую перезарядку
-                if (!token.IsCancellationRequested &&
-                    _currentAmmo < _maxAmmo &&
-                    (_shouldAutoReloadOnLessThanMaxAmmo ||
-                     (_shouldAutoReloadOnNoAmmo && _currentAmmo <= 0)))
-                {
-                    // Небольшая задержка перед следующей проверкой
-                    await UniTask.Yield();
-                    ProcessAutoReloading();
-                }
             }
         }
 
