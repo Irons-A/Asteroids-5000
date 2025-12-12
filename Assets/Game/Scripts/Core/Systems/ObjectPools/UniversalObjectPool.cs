@@ -8,13 +8,10 @@ namespace Core.Systems.ObjectPools
 {
     public class UniversalObjectPool : MonoBehaviour
     {
-        [Header("Pool Configuration")]
-        [SerializeField] private List<PoolConfig> _poolConfigs = new List<PoolConfig>();
-
         private Dictionary<PoolableObjectType, Queue<PoolableObject>> _pools = 
             new Dictionary<PoolableObjectType, Queue<PoolableObject>>();
-        private Dictionary<PoolableObjectType, Transform> _poolContainers = new Dictionary<PoolableObjectType, Transform>();
-        private Dictionary<PoolableObjectType, PoolConfig> _configs = new Dictionary<PoolableObjectType, PoolConfig>();
+        private Dictionary<PoolableObjectType, Transform> _poolContainers = 
+            new Dictionary<PoolableObjectType, Transform>();
 
         private PoolableObjectFactory _factory;
         private PoolableObjectRegistry _registry;
@@ -31,37 +28,40 @@ namespace Core.Systems.ObjectPools
             InitializeAllPools();
         }
 
-        public PoolableObject GetFromPool(PoolableObjectType key)
+        public PoolableObject GetFromPool(PoolableObjectType type)
         {
-            if (!_pools.ContainsKey(key))
+            if (!_pools.ContainsKey(type))
             {
-                Debug.LogError($"Pool for {key} doesn't exist");
+                Debug.LogError($"Pool for {type} doesn't exist");
                 return null;
             }
 
             PoolableObject obj;
 
-            if (_pools[key].Count > 0)
+            if (_pools[type].Count > 0)
             {
-                obj = _pools[key].Dequeue();
+                obj = _pools[type].Dequeue();
             }
             else
             {
                 // Проверяем лимит перед созданием нового
-                int activeCount = CountActiveObjects(key);
-                if (activeCount >= _configs[key].MaxSize)
+                int activeCount = CountActiveObjects(type);
+                int maxSize = _registry.GetMaxSize(type);
+
+                if (activeCount >= maxSize)
                 {
-                    Debug.LogWarning($"Pool {key} reached max size ({_configs[key].MaxSize})");
+                    Debug.LogWarning($"Pool {type} reached max size ({maxSize})");
                     return null;
                 }
 
                 // Создаем новый объект через фабрику
-                PoolableObject newObj = CreateNewObject(key);
+                PoolableObject newObj = CreateNewObject(type);
                 if (newObj == null) return null;
                 obj = newObj;
             }
 
             obj.gameObject.SetActive(true);
+
             return obj;
         }
 
@@ -69,21 +69,20 @@ namespace Core.Systems.ObjectPools
         {
             if (poolableObject == null) return;
 
-            PoolableObjectType key = poolableObject.PoolKey;
+            PoolableObjectType type = poolableObject.PoolKey;
 
-            if (!_pools.ContainsKey(key))
+            if (!_pools.ContainsKey(type))
             {
-                Debug.LogError($"Trying to return object with unknown key: {key}");
-
-                Destroy(poolableObject.gameObject);
-
+                Debug.LogError($"Trying to return object with unknown type: {type}");
                 return;
             }
 
-            poolableObject.gameObject.SetActive(false);
-            poolableObject.transform.SetParent(_poolContainers[key]);
+            PoolableObject obj = poolableObject;
 
-            _pools[key].Enqueue(poolableObject);
+            // Деактивируем и возвращаем в контейнер
+            obj.gameObject.SetActive(false);
+            obj.transform.SetParent(_poolContainers[type]);
+            _pools[type].Enqueue(obj);
         }
 
         public bool HasPoolFor(PoolableObjectType key)
@@ -93,40 +92,42 @@ namespace Core.Systems.ObjectPools
 
         private void InitializeAllPools()
         {
-            foreach (var config in _poolConfigs)
+            var allTypes = _registry.GetAllRegisteredTypes();
+
+            foreach (var type in allTypes)
             {
-                InitializePool(config);
+                InitializePool(type);
             }
         }
 
-        private void InitializePool(PoolConfig config)
+        private void InitializePool(PoolableObjectType type)
         {
-            if (_registry.GetPrefab(config.Key) == null)
+            var entry = _registry.GetEntry(type);
+            if (entry == null || entry.prefab == null)
             {
-                Debug.LogError($"Prefab for {config.Key} not found in registry");
+                Debug.LogError($"Cannot initialize pool for {type}: entry not found");
                 return;
             }
 
-            GameObject container = new GameObject($"Pool_{config.Key}");
+            // Создаем контейнер
+            GameObject container = new GameObject($"Pool_{type}");
             container.transform.SetParent(transform);
-            _poolContainers[config.Key] = container.transform;
+            _poolContainers[type] = container.transform;
 
             // Инициализируем очередь
-            _pools[config.Key] = new Queue<PoolableObject>();
-            _configs[config.Key] = config;
+            _pools[type] = new Queue<PoolableObject>();
 
-            // Наполняем пул через фабрику
-            WarmUpPool(config.Key, config.InitialSize);
+            // Наполняем пул
+            WarmUpPool(type, entry.InitialSize);
         }
 
-        private void WarmUpPool(PoolableObjectType key, int count)
+        private void WarmUpPool(PoolableObjectType type, int count)
         {
-            if (!_configs.ContainsKey(key)) return;
+            if (!_poolContainers.ContainsKey(type)) return;
 
             for (int i = 0; i < count; i++)
             {
-                // Создаем объект через фабрику
-                PoolableObject obj = CreateNewObject(key);
+                PoolableObject obj = CreateNewObject(type);
                 if (obj != null)
                 {
                     ReturnToPool(obj);

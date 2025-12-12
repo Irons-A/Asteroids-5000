@@ -9,34 +9,66 @@ namespace Core.Systems.ObjectPools
     {
         [SerializeField] private List<PoolableObjectRegistryEntry> _registry = new List<PoolableObjectRegistryEntry>();
 
-        private Dictionary<PoolableObjectType, PoolableObject> _cache;
+        private Dictionary<PoolableObjectType, PoolableObjectRegistryEntry> _cache;
 
-        public PoolableObject GetPrefab(PoolableObjectType type)
+        public PoolableObjectRegistryEntry GetEntry(PoolableObjectType type)
         {
-            if (_cache == null)
+            BuildCacheIfNeeded();
+
+            if (_cache.TryGetValue(type, out var entry))
             {
-                GenerateCashe();
+                return entry;
             }
 
-            if (_cache.TryGetValue(type, out var prefab))
-            {
-                return prefab;
-            }
-
-            Debug.LogError($"Prefab for type {type} not found in registry");
-
+            Debug.LogError($"Entry for type {type} not found in registry");
             return null;
         }
 
-        private void GenerateCashe()
+        public PoolableObject GetPrefab(PoolableObjectType type)
         {
-            _cache = new Dictionary<PoolableObjectType, PoolableObject>();
+            var entry = GetEntry(type);
+            return entry?.prefab;
+        }
 
-            foreach (var entry in _registry)
+        public int GetInitialSize(PoolableObjectType type)
+        {
+            var entry = GetEntry(type);
+            return entry?.InitialSize ?? 20;
+        }
+
+        public int GetMaxSize(PoolableObjectType type)
+        {
+            var entry = GetEntry(type);
+            return entry?.MaxSize ?? 50;
+        }
+
+        public bool HasEntry(PoolableObjectType type)
+        {
+            BuildCacheIfNeeded();
+            return _cache.ContainsKey(type);
+        }
+
+        public PoolableObjectType[] GetAllRegisteredTypes()
+        {
+            BuildCacheIfNeeded();
+
+            var types = new PoolableObjectType[_cache.Count];
+            _cache.Keys.CopyTo(types, 0);
+            return types;
+        }
+
+        private void BuildCacheIfNeeded()
+        {
+            if (_cache == null)
             {
-                if (entry.prefab != null)
+                _cache = new Dictionary<PoolableObjectType, PoolableObjectRegistryEntry>();
+
+                foreach (var entry in _registry)
                 {
-                    _cache[entry.type] = entry.prefab;
+                    if (entry.prefab != null)
+                    {
+                        _cache[entry.type] = entry;
+                    }
                 }
             }
         }
