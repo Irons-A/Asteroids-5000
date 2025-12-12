@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Core.Weapons
 {
-    [Flags]
     public enum WeaponState
     {
         Idle,

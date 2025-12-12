@@ -19,7 +19,7 @@ namespace Gameplay.Environment
         private float _sceneWidth;
         private float _sceneHeight;
 
-        public void Initialize(BorderSide borderType, float sceneWidth, float sceneHeight)
+        public void Configure(BorderSide borderType, float sceneWidth, float sceneHeight)
         {
             _borderSide = borderType;
             _sceneWidth = sceneWidth;

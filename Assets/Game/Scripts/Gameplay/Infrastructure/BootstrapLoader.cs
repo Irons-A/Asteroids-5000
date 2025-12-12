@@ -31,6 +31,7 @@ namespace Gameplay.Infrastructure
 
         private IEnumerator LoadSceneWithDelay()
         {
+            //Change to UniTask?
             yield return new WaitForSeconds(0.5f);
 
             yield return SceneManager.LoadSceneAsync(GameSceneName, LoadSceneMode.Single);

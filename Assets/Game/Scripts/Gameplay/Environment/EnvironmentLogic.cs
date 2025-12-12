@@ -8,7 +8,7 @@ using Zenject;
 
 namespace Gameplay.Environment
 {
-    public class EnvironmentLogic
+    public class EnvironmentLogic : IInitializable
     {
         private EnvironmentSettings _environmentSettings;
         private SceneBorderFactory _sceneBorderFactory;
@@ -27,13 +27,16 @@ namespace Gameplay.Environment
 
             float fieldWidth = Math.Max(_environmentSettings.GameFieldWidth, _environmentSettings.MinimalFieldWidth);
             float fieldHeight = Math.Max(_environmentSettings.GameFieldHeight, _environmentSettings.MinimalFieldHeight);
-
             _fieldSize = new Vector2(fieldWidth, fieldHeight);
 
             _enemySpawner = enemySpawner;
             _sceneBorderFactory = sceneBorderFactory;
+        }
 
+        public void Initialize()
+        {
             CreateSceneBorders();
+
             _enemySpawner.StartEnemySpawning(Bounds);
         }
 
@@ -49,7 +52,7 @@ namespace Gameplay.Environment
         {
             SceneBorder border = _sceneBorderFactory.CreateBorder();
 
-            border.Initialize(borderSide, _fieldSize.x, _fieldSize.y);
+            border.Configure(borderSide, _fieldSize.x, _fieldSize.y);
         }
     }
 }

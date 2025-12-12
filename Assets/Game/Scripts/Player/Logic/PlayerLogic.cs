@@ -37,7 +37,6 @@ namespace Player.Logic
             _objectPool = objectPool;
 
             _bulletWeaponSystem = bulletWeapon;
-
             _laserWeaponSystem = laserWeapon;
         }
 

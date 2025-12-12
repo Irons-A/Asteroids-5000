@@ -19,6 +19,7 @@ namespace Gameplay.Environment
             _container = container;
 
             GameObject parent = new GameObject("SceneBorders");
+
             _borderParent = parent.transform;
         }
 

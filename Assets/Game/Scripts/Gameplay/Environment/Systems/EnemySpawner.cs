@@ -15,7 +15,6 @@ namespace Gameplay.Environment.Systems
     {
         private EnvironmentSettings _environmentSettings;
         //enemy settings
-        //enemy factory
 
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;
