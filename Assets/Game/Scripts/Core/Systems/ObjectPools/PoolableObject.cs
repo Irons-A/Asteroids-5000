@@ -14,7 +14,7 @@ namespace Core.Systems.ObjectPools
 
         private UniversalObjectPool _parentPool;
 
-        public void Initialize(UniversalObjectPool pool)
+        public void SetParentPool(UniversalObjectPool pool)
         {
             _parentPool = pool;
         }

@@ -75,3 +75,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objectPool: {fileID: 4940643210221103319, guid: c3a9c0bc5a0d23744809b9bd0dceda04, type: 3}
+  _poolableObjectRegistry: {fileID: 11400000, guid: 6488d9eb097d23948ae27d1da91860c2, type: 2}

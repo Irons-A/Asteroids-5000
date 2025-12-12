@@ -46,10 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolConfigs:
   - Key: 0
-    Prefab: {fileID: 9084124597112203638, guid: 74b2b20198992ec468899dfd297bd9a7, type: 3}
-    InitialSize: 20
-    MaxSize: 50
+    InitialSize: 50
+    MaxSize: 300
   - Key: 1
-    Prefab: {fileID: 1350767124494073880, guid: c09d58f5470904f48838e5a40b61605f, type: 3}
-    InitialSize: 3
+    InitialSize: 5
     MaxSize: 50
+  _registry: {fileID: 0}

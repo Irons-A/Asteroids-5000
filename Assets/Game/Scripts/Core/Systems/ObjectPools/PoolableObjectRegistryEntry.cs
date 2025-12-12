@@ -5,10 +5,9 @@ using UnityEngine;
 namespace Core.Systems.ObjectPools
 {
     [System.Serializable]
-    public class PoolConfig
+    public class PoolableObjectRegistryEntry
     {
-        public PoolableObjectType Key;
-        public int InitialSize = 20;
-        public int MaxSize = 50;
+        public PoolableObjectType type;
+        public PoolableObject prefab;
     }
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Zenject;
 
 namespace Core.Systems.ObjectPools
 {
@@ -14,6 +16,16 @@ namespace Core.Systems.ObjectPools
         private Dictionary<PoolableObjectType, Transform> _poolContainers = new Dictionary<PoolableObjectType, Transform>();
         private Dictionary<PoolableObjectType, PoolConfig> _configs = new Dictionary<PoolableObjectType, PoolConfig>();
 
+        private PoolableObjectFactory _factory;
+        private PoolableObjectRegistry _registry;
+
+        [Inject]
+        public void Construct(PoolableObjectFactory factory, PoolableObjectRegistry registry)
+        {
+            _factory = factory;
+            _registry = registry;
+        }
+
         private void Awake()
         {
             InitializeAllPools();
@@ -24,35 +36,33 @@ namespace Core.Systems.ObjectPools
             if (!_pools.ContainsKey(key))
             {
                 Debug.LogError($"Pool for {key} doesn't exist");
-
                 return null;
             }
 
-            PoolableObject objectToGet;
+            PoolableObject obj;
 
             if (_pools[key].Count > 0)
             {
-                objectToGet = _pools[key].Dequeue();
+                obj = _pools[key].Dequeue();
             }
             else
             {
+                // Проверяем лимит перед созданием нового
                 int activeCount = CountActiveObjects(key);
-
                 if (activeCount >= _configs[key].MaxSize)
                 {
                     Debug.LogWarning($"Pool {key} reached max size ({_configs[key].MaxSize})");
-
                     return null;
                 }
 
-                objectToGet = CreateNewObject(key);
-
-                if (objectToGet == null) return null;
+                // Создаем новый объект через фабрику
+                PoolableObject newObj = CreateNewObject(key);
+                if (newObj == null) return null;
+                obj = newObj;
             }
 
-            objectToGet.gameObject.SetActive(true);
-
-            return objectToGet;
+            obj.gameObject.SetActive(true);
+            return obj;
         }
 
         public void ReturnToPool(PoolableObject poolableObject)
@@ -91,21 +101,21 @@ namespace Core.Systems.ObjectPools
 
         private void InitializePool(PoolConfig config)
         {
-            if (config.Prefab == null)
+            if (_registry.GetPrefab(config.Key) == null)
             {
-                Debug.LogWarning($"Prefab for {config.Key} is null");
+                Debug.LogError($"Prefab for {config.Key} not found in registry");
                 return;
             }
 
             GameObject container = new GameObject($"Pool_{config.Key}");
-
             container.transform.SetParent(transform);
             _poolContainers[config.Key] = container.transform;
 
+            // Инициализируем очередь
             _pools[config.Key] = new Queue<PoolableObject>();
-
             _configs[config.Key] = config;
 
+            // Наполняем пул через фабрику
             WarmUpPool(config.Key, config.InitialSize);
         }
 
@@ -115,28 +125,22 @@ namespace Core.Systems.ObjectPools
 
             for (int i = 0; i < count; i++)
             {
-                PoolableObject poolableObject = CreateNewObject(key);
-
-                ReturnToPool(poolableObject);
+                // Создаем объект через фабрику
+                PoolableObject obj = CreateNewObject(key);
+                if (obj != null)
+                {
+                    ReturnToPool(obj);
+                }
             }
         }
 
         private PoolableObject CreateNewObject(PoolableObjectType key)
         {
-            if (!_configs.ContainsKey(key))
-            {
-                Debug.LogError($"Pool config not found for: {key}");
+            PoolableObject obj = _factory.Create(key, _poolContainers[key]);
 
-                return null;
-            }
+            obj.SetParentPool(this);
 
-            PoolableObject prefab = _configs[key].Prefab;
-            Transform container = _poolContainers[key];
-            PoolableObject newObject = Instantiate(prefab, container);
-
-            newObject.Initialize(this);
-
-            return newObject;
+            return obj;
         }
 
         private int CountActiveObjects(PoolableObjectType key)
