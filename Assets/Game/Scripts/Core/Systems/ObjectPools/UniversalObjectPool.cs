@@ -30,39 +30,41 @@ namespace Core.Systems.ObjectPools
 
         public PoolableObject GetFromPool(PoolableObjectType type)
         {
-            if (!_pools.ContainsKey(type))
+            if (_pools.ContainsKey(type) == false)
             {
                 Debug.LogError($"Pool for {type} doesn't exist");
+
                 return null;
             }
 
-            PoolableObject obj;
+            PoolableObject poolableObject;
 
             if (_pools[type].Count > 0)
             {
-                obj = _pools[type].Dequeue();
+                poolableObject = _pools[type].Dequeue();
             }
             else
             {
-                // Проверяем лимит перед созданием нового
                 int activeCount = CountActiveObjects(type);
                 int maxSize = _registry.GetMaxSize(type);
 
                 if (activeCount >= maxSize)
                 {
                     Debug.LogWarning($"Pool {type} reached max size ({maxSize})");
+
                     return null;
                 }
 
-                // Создаем новый объект через фабрику
-                PoolableObject newObj = CreateNewObject(type);
-                if (newObj == null) return null;
-                obj = newObj;
+                PoolableObject newObject = CreateNewObject(type);
+
+                if (newObject == null) return null;
+
+                poolableObject = newObject;
             }
 
-            obj.gameObject.SetActive(true);
+            poolableObject.gameObject.SetActive(true);
 
-            return obj;
+            return poolableObject;
         }
 
         public void ReturnToPool(PoolableObject poolableObject)
@@ -71,30 +73,24 @@ namespace Core.Systems.ObjectPools
 
             PoolableObjectType type = poolableObject.PoolKey;
 
-            if (!_pools.ContainsKey(type))
+            if (_pools.ContainsKey(type) == false)
             {
                 Debug.LogError($"Trying to return object with unknown type: {type}");
+
                 return;
             }
 
-            PoolableObject obj = poolableObject;
+            poolableObject.gameObject.SetActive(false);
+            poolableObject.transform.SetParent(_poolContainers[type]);
 
-            // Деактивируем и возвращаем в контейнер
-            obj.gameObject.SetActive(false);
-            obj.transform.SetParent(_poolContainers[type]);
-            _pools[type].Enqueue(obj);
-        }
-
-        public bool HasPoolFor(PoolableObjectType key)
-        {
-            return _pools.ContainsKey(key);
+            _pools[type].Enqueue(poolableObject);
         }
 
         private void InitializeAllPools()
         {
-            var allTypes = _registry.GetAllRegisteredTypes();
+            PoolableObjectType[] allTypes = _registry.GetAllRegisteredTypes();
 
-            foreach (var type in allTypes)
+            foreach (PoolableObjectType type in allTypes)
             {
                 InitializePool(type);
             }
@@ -102,51 +98,52 @@ namespace Core.Systems.ObjectPools
 
         private void InitializePool(PoolableObjectType type)
         {
-            var entry = _registry.GetEntry(type);
-            if (entry == null || entry.prefab == null)
+            PoolableObjectRegistryEntry entry = _registry.GetEntry(type);
+
+            if (entry == null || entry.Prefab == null)
             {
                 Debug.LogError($"Cannot initialize pool for {type}: entry not found");
+
                 return;
             }
 
-            // Создаем контейнер
             GameObject container = new GameObject($"Pool_{type}");
+
             container.transform.SetParent(transform);
             _poolContainers[type] = container.transform;
 
-            // Инициализируем очередь
             _pools[type] = new Queue<PoolableObject>();
 
-            // Наполняем пул
             WarmUpPool(type, entry.InitialSize);
         }
 
         private void WarmUpPool(PoolableObjectType type, int count)
         {
-            if (!_poolContainers.ContainsKey(type)) return;
+            if (_poolContainers.ContainsKey(type) == false) return;
 
             for (int i = 0; i < count; i++)
             {
-                PoolableObject obj = CreateNewObject(type);
-                if (obj != null)
+                PoolableObject poolableObject = CreateNewObject(type);
+
+                if (poolableObject != null)
                 {
-                    ReturnToPool(obj);
+                    ReturnToPool(poolableObject);
                 }
             }
         }
 
         private PoolableObject CreateNewObject(PoolableObjectType key)
         {
-            PoolableObject obj = _factory.Create(key, _poolContainers[key]);
+            PoolableObject poolableObject = _factory.Create(key, _poolContainers[key]);
 
-            obj.SetParentPool(this);
+            poolableObject.SetParentPool(this);
 
-            return obj;
+            return poolableObject;
         }
 
         private int CountActiveObjects(PoolableObjectType key)
         {
-            if (!_poolContainers.ContainsKey(key)) return 0;
+            if (_poolContainers.ContainsKey(key) == false) return 0;
 
             int activeCount = 0;
 

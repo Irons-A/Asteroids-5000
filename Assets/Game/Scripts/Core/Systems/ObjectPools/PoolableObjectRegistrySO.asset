@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: PoolableObjectRegistrySO
   m_EditorClassIdentifier: 
   _registry:
-  - type: 0
-    prefab: {fileID: 9084124597112203638, guid: 74b2b20198992ec468899dfd297bd9a7, type: 3}
-    _initialSize: 50
-    _maxSize: 300
-  - type: 1
-    prefab: {fileID: 1350767124494073880, guid: c09d58f5470904f48838e5a40b61605f, type: 3}
-    _initialSize: 10
-    _maxSize: 50
+  - <Type>k__BackingField: 0
+    <Prefab>k__BackingField: {fileID: 9084124597112203638, guid: 74b2b20198992ec468899dfd297bd9a7, type: 3}
+    <InitialSize>k__BackingField: 50
+    <MaxSize>k__BackingField: 200
+  - <Type>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: 1350767124494073880, guid: c09d58f5470904f48838e5a40b61605f, type: 3}
+    <InitialSize>k__BackingField: 10
+    <MaxSize>k__BackingField: 20

@@ -24,6 +24,7 @@ namespace Core.Systems.ObjectPools
             if (prefab == null)
             {
                 Debug.LogError($"Cannot create object of type {type}: prefab not found");
+
                 return null;
             }
 

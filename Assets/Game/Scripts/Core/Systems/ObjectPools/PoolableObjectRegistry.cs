@@ -21,39 +21,32 @@ namespace Core.Systems.ObjectPools
             }
 
             Debug.LogError($"Entry for type {type} not found in registry");
+
             return null;
         }
 
         public PoolableObject GetPrefab(PoolableObjectType type)
         {
-            var entry = GetEntry(type);
-            return entry?.prefab;
-        }
+            PoolableObjectRegistryEntry entry = GetEntry(type);
 
-        public int GetInitialSize(PoolableObjectType type)
-        {
-            var entry = GetEntry(type);
-            return entry?.InitialSize ?? 20;
+            return entry.Prefab;
         }
 
         public int GetMaxSize(PoolableObjectType type)
         {
-            var entry = GetEntry(type);
-            return entry?.MaxSize ?? 50;
-        }
+            PoolableObjectRegistryEntry entry = GetEntry(type);
 
-        public bool HasEntry(PoolableObjectType type)
-        {
-            BuildCacheIfNeeded();
-            return _cache.ContainsKey(type);
+            return entry.MaxSize;
         }
 
         public PoolableObjectType[] GetAllRegisteredTypes()
         {
             BuildCacheIfNeeded();
 
-            var types = new PoolableObjectType[_cache.Count];
+            PoolableObjectType[] types = new PoolableObjectType[_cache.Count];
+
             _cache.Keys.CopyTo(types, 0);
+
             return types;
         }
 
@@ -65,9 +58,9 @@ namespace Core.Systems.ObjectPools
 
                 foreach (var entry in _registry)
                 {
-                    if (entry.prefab != null)
+                    if (entry.Prefab != null)
                     {
-                        _cache[entry.type] = entry;
+                        _cache[entry.Type] = entry;
                     }
                 }
             }
