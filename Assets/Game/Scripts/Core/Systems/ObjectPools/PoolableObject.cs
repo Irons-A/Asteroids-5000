@@ -5,42 +5,43 @@ using Zenject;
 
 namespace Core.Systems.ObjectPools
 {
+    [RequireComponent(typeof(OutsideOfViewportDestroyer))]
     public class PoolableObject : MonoBehaviour
     {
         [Header("Settings")]
         [SerializeField] private PoolableObjectType _poolKey;
         [SerializeField] private DespawnCondition _despawnCondition;
 
-        [Header("Outside of viewport destruction")]
-        [SerializeField] private float _viewportMargin = 0.2f;
-        [SerializeField] private float _checkInterval = 0.1f;
-
         public PoolableObjectType PoolKey => _poolKey;
         public DespawnCondition DespawnCondition => _despawnCondition;
 
         private UniversalObjectPool _parentPool;
-        private ViewportDestroyer _viewportDestroyer;
+        private OutsideOfViewportDestroyer _viewportDestroyer;
 
-        [Inject]
-        public void Construct(ViewportDestroyer viewportDestroyer)
+        private void Awake()
         {
-            _viewportDestroyer = viewportDestroyer;
-            _viewportDestroyer.Configure(transform, _viewportMargin, _checkInterval);
+            _viewportDestroyer = GetComponent<OutsideOfViewportDestroyer>();
         }
 
         private void OnEnable()
         {
             if (_despawnCondition == DespawnCondition.OutsideOfViewport)
             {
-                _viewportDestroyer.SetIsActive(true);
                 _viewportDestroyer.OnLeftViewport += Despawn;
             }
         }
 
         private void OnDisable()
         {
-            _viewportDestroyer.SetIsActive(false);
             _viewportDestroyer.OnLeftViewport -= Despawn;
+        }
+
+        private void Update()
+        {
+            if (_despawnCondition == DespawnCondition.OutsideOfViewport)
+            {
+                _viewportDestroyer.ProcessChecks();
+            }
         }
 
         public void SetParentPool(UniversalObjectPool pool)

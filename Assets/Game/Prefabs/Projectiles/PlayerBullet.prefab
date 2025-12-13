@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 6532877510741674082}
   - component: {fileID: 9084124597112203638}
   - component: {fileID: 5301853005672121770}
+  - component: {fileID: 2697487717455550475}
   m_Layer: 0
   m_Name: PlayerBullet
   m_TagString: Untagged
@@ -181,8 +182,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolKey: 0
   _despawnCondition: 2
-  _viewportMargin: 0.2
-  _checkInterval: 0.1
 --- !u!114 &5301853005672121770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,3 +197,17 @@ MonoBehaviour:
   <Damage>k__BackingField: 0
   <Affiliation>k__BackingField: 0
   <Durability>k__BackingField: 0
+--- !u!114 &2697487717455550475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7325310013820616048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58354462f8d3e02409c9008fdc241ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _viewportMargin: 0
+  _checkInterval: 0.1

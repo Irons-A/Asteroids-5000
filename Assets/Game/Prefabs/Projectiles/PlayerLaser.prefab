@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3512715585217379410}
   - component: {fileID: 1350767124494073880}
   - component: {fileID: 1755964747856969466}
+  - component: {fileID: 7138366175063528797}
   m_Layer: 0
   m_Name: PlayerLaser
   m_TagString: Untagged
@@ -112,6 +113,20 @@ MonoBehaviour:
   <Damage>k__BackingField: 0
   <Affiliation>k__BackingField: 0
   <Durability>k__BackingField: 2
+--- !u!114 &7138366175063528797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2856673712550000820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58354462f8d3e02409c9008fdc241ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _viewportMargin: 0
+  _checkInterval: 0.1
 --- !u!1 &8039811936155490910
 GameObject:
   m_ObjectHideFlags: 0

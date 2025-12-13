@@ -17,7 +17,6 @@ namespace Gameplay.Infrastructure
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
 
-            Container.BindInterfacesAndSelfTo<ViewportDestroyer>().FromNew().AsTransient();
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
             Container.Bind<UniversalObjectPool>().FromMethod(CreateUniversalObjectPool).AsSingle().NonLazy();
