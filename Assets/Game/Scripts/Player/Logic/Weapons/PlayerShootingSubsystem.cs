@@ -34,7 +34,8 @@ namespace Player.Logic.Weapons
             _objectPool = objectPool;
         }
 
-        public void Configure(PlayerWeaponConfig config, PlayerReloadingSubsystem reloadingSubsystem, PlayerAmmoSubsystem ammoManager)
+        public void Configure(PlayerWeaponConfig config, PlayerReloadingSubsystem reloadingSubsystem, 
+            PlayerAmmoSubsystem ammoManager)
         {
             _config = config;
             _reloadingSubsystem = reloadingSubsystem;

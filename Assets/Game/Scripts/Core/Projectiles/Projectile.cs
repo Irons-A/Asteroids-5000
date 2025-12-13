@@ -68,8 +68,6 @@ namespace Core.Projectiles
         {
             try
             {
-                //await UniTask.Delay(TimeSpan.FromSeconds(_destroyAfter), DelayType.DeltaTime, PlayerLoopTiming.Update, cancellationToken);
-
                 await UniTask.Delay(TimeSpan.FromSeconds(_destroyAfter), cancellationToken: token);
 
                 if (this == null || !_isDelayedDestructionTaskRunning) return;

@@ -180,7 +180,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolKey: 0
-  _despawnCondition: 1
+  _despawnCondition: 2
+  _viewportMargin: 0.2
+  _checkInterval: 0.1
 --- !u!114 &5301853005672121770
 MonoBehaviour:
   m_ObjectHideFlags: 0

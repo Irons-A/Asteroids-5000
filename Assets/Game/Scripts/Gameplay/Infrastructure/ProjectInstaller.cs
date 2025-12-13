@@ -1,4 +1,5 @@
 using Core.Configuration;
+using Core.Systems;
 using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Gameplay.Infrastructure
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
 
+            Container.BindInterfacesAndSelfTo<ViewportDestroyer>().FromNew().AsTransient();
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
             Container.Bind<UniversalObjectPool>().FromMethod(CreateUniversalObjectPool).AsSingle().NonLazy();
