@@ -155,7 +155,7 @@ namespace Player.Logic.Weapons
             }
             catch (OperationCanceledException)
             {
-                Debug.Log("Shooting loop cancelled");
+                //Debug.Log("Shooting loop cancelled");
             }
             finally
             {

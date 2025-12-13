@@ -39,7 +39,10 @@ namespace Player.Logic.Weapons
             _shootingSubsystem.Configure(config, _reloadingSubsystem, _ammoManager);
             _reloadingSubsystem.Configure(config, _ammoManager);
 
-            SetupSubsystemEvents();
+            _shootingSubsystem.OnShotFired += ProcessFiring;
+            _reloadingSubsystem.OnReloadCompleted += ProcessReloadCompletion;
+            _reloadingSubsystem.OnReloadStarted += ProcessReloadStart;
+            _ammoManager.OnAmmoChanged += ProcessAmmoChange;
 
             _isInitialized = true;
         }
@@ -92,47 +95,43 @@ namespace Player.Logic.Weapons
         {
             _shootingSubsystem.Dispose();
             _reloadingSubsystem.Dispose();
+
+            _shootingSubsystem.OnShotFired -= ProcessFiring;
+            _reloadingSubsystem.OnReloadCompleted -= ProcessReloadCompletion;
+            _reloadingSubsystem.OnReloadStarted -= ProcessReloadStart;
+            _ammoManager.OnAmmoChanged -= ProcessAmmoChange;
         }
 
-        private void SetupSubsystemEvents()
+        private void ProcessFiring()
         {
-            if (_shootingSubsystem is PlayerShootingSubsystem shooting)
+            if (_ammoManager.HasInfiniteAmmo == false)
             {
-                shooting.OnShotFired += () =>
-                {
-                    if (_ammoManager.HasInfiniteAmmo == false)
-                    {
-                        _reloadingSubsystem.ProcessAutoReloading();
-                    }
-                };
+                _reloadingSubsystem.ProcessAutoReloading();
             }
+        }
 
-            if (_reloadingSubsystem is PlayerReloadingSubsystem reloading)
+        private void ProcessReloadCompletion()
+        {
+            if (_shouldShoot)
             {
-                reloading.OnReloadCompleted += () =>
-                {
-                    if (_shouldShoot)
-                    {
-                        _shootingSubsystem.TryStartShooting();
-                    }
-                };
-
-                reloading.OnReloadStarted += () =>
-                {
-                    if (reloading.ShouldBlockFire)
-                    {
-                        _shootingSubsystem.TryStopShooting();
-                    }
-                };
+                _shootingSubsystem.TryStartShooting();
             }
+        }
 
-            _ammoManager.OnAmmoChanged += (current, max) =>
+        private void ProcessReloadStart()
+        {
+            if (_reloadingSubsystem.ShouldBlockFire)
             {
-                if (_shouldShoot && _ammoManager.CurrentAmmo >= _config?.AmmoCostPerShot)
-                {
-                    _shootingSubsystem.TryStartShooting();
-                }
-            };
+                _shootingSubsystem.TryStopShooting();
+            }
+        }
+
+        private void ProcessAmmoChange()
+        {
+            if (_shouldShoot && _ammoManager.CurrentAmmo >= _config.AmmoCostPerShot)
+            {
+                _shootingSubsystem.TryStartShooting();
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Player.Logic.Weapons
 {
     public class PlayerAmmoSubsystem
     {
-        public event Action<int, int> OnAmmoChanged;
+        public event Action OnAmmoChanged;
 
         public int CurrentAmmo { get; private set; }
         public int MaxAmmo { get; private set; }
@@ -20,7 +20,7 @@ namespace Player.Logic.Weapons
             MaxAmmo = maxAmmo;
             CurrentAmmo = maxAmmo;
 
-            OnAmmoChanged?.Invoke(CurrentAmmo, MaxAmmo);
+            OnAmmoChanged?.Invoke();
         }
 
         public void SetInfiniteAmmo(bool infinite)
@@ -34,21 +34,21 @@ namespace Player.Logic.Weapons
 
             CurrentAmmo = Mathf.Max(0, CurrentAmmo - amount);
 
-            OnAmmoChanged?.Invoke(CurrentAmmo, MaxAmmo);
+            OnAmmoChanged?.Invoke();
         }
 
         public void AddAmmo(int amount)
         {
             CurrentAmmo = Mathf.Min(MaxAmmo, CurrentAmmo + amount);
 
-            OnAmmoChanged?.Invoke(CurrentAmmo, MaxAmmo);
+            OnAmmoChanged?.Invoke();
         }
 
         public void EmptyAmmo()
         {
             CurrentAmmo = 0;
 
-            OnAmmoChanged?.Invoke(CurrentAmmo, MaxAmmo);
+            OnAmmoChanged?.Invoke();
         }
     }
 }
