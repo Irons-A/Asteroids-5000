@@ -54,8 +54,6 @@ namespace Player.Logic
         public void FixedTick()
         {
             _playerPhysics.ProcessPhysics();
-
-            _bulletWeaponSystem.DebugInfo();
         }
 
         public void RotatePlayerWithMouse(Vector2 mouseWorldPosition)

@@ -14,12 +14,9 @@ namespace Player.Logic
 {
     public class PlayerShootingSubsystem : ITickable
     {
-        public event Action OnShotFired;
-
         private UniversalObjectPool _objectPool;
         private WeaponConfig _config;
 
-        //private bool _shouldShoot = false;
         private WeaponState _weaponState = WeaponState.Idle;
         private CancellationTokenSource _shootingCTS;
         private float _lastShotTime = 0f;
@@ -28,6 +25,8 @@ namespace Player.Logic
         private AmmoManager _ammoManager;
 
         private bool _isInitialized = false;
+
+        public event Action OnShotFired;
 
         [Inject]
         public void Construct(UniversalObjectPool objectPool)
@@ -47,7 +46,6 @@ namespace Player.Logic
 
         public bool CanShoot
         {
-
             get
             {
                 if (_isInitialized == false) return false;
@@ -59,33 +57,16 @@ namespace Player.Logic
                         return false;
                     }
 
-                    return _config.FirePoints != null && _config.FirePoints.Length > 0;
+                    return true;
                 }
+
                 return false;
             }
         }
 
-        //public void SetShouldShoot(bool value) //?????
-        //{
-        //    if (value == _shouldShoot) return;
-
-        //    _shouldShoot = value;
-
-        //    if (_shouldShoot)
-        //    {
-        //        TryStartShooting();
-        //    }
-        //    else
-        //    {
-        //        TryStopShooting();
-        //    }
-        //}
-
         public void TryStartShooting()
         {
             if (_weaponState == WeaponState.Shooting) return;
-
-            Debug.Log("TryStartShooting");
 
             if (CanShoot)
             {
@@ -107,9 +88,22 @@ namespace Player.Logic
 
             _weaponState = WeaponState.Idle;
 
-            _shootingCTS?.Cancel();
-            _shootingCTS?.Dispose();
-            _shootingCTS = null;
+            DisposeShootingCancellationToken();
+        }
+
+        public void Tick()
+        {
+            if (_isInitialized == false) return;
+
+            if (_weaponState != WeaponState.Shooting && CanShoot)
+            {
+                TryStartShooting();
+            }
+        }
+
+        public void Dispose()
+        {
+            StopShooting();
         }
 
         private void StartShooting()
@@ -118,50 +112,44 @@ namespace Player.Logic
 
             _weaponState = WeaponState.Shooting;
 
-            _shootingCTS?.Cancel();
-            _shootingCTS?.Dispose();
+            DisposeShootingCancellationToken();
+
             _shootingCTS = new CancellationTokenSource();
 
             ShootingLoop(_shootingCTS.Token).Forget();
-
-            Debug.Log("StartShooting");
         }
 
         private async UniTaskVoid ShootingLoop(CancellationToken token)
         {
             try
             {
-                while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
+                while (token.IsCancellationRequested == false && _weaponState == WeaponState.Shooting)
                 {
-                    //Debug.Log($"ShootingLoop: _shouldShoot {_shouldShoot} CanShoot {CanShoot}");
-
-                    if (!CanShoot)
+                    if (CanShoot == false)
                     {
                         break;
                     }
 
-                    Debug.Log("ShotFired");
-
-                    // Проверка скорострельности
                     float timeSinceLastShot = Time.time - _lastShotTime;
+
                     if (timeSinceLastShot < _config.FireRateInterval)
                     {
                         float waitTime = _config.FireRateInterval - timeSinceLastShot;
+
                         await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
-                        if (token.IsCancellationRequested || !CanShoot) break;
+
+                        if (token.IsCancellationRequested || CanShoot == false) break;
                     }
 
-                    // Выстрел
                     _lastShotTime = Time.time;
+
                     ShootProjectile();
 
-                    // Списание патронов
-                    if (!_ammoManager.HasInfiniteAmmo)
+                    if (_ammoManager.HasInfiniteAmmo == false)
                     {
                         _ammoManager.ConsumeAmmo(_config.AmmoCostPerShot);
                     }
 
-                    // Ждем до следующего возможного выстрела
                     await UniTask.Delay(TimeSpan.FromSeconds(_config.FireRateInterval), cancellationToken: token);
                 }
             }
@@ -183,6 +171,7 @@ namespace Player.Logic
             if (_config.FirePoints == null || _config.FirePoints.Length == 0)
             {
                 Debug.LogError("No firepoints attached!");
+
                 return;
             }
 
@@ -191,6 +180,7 @@ namespace Player.Logic
                 if (firepoint == null)
                 {
                     Debug.LogError("Null firepoint found!");
+
                     continue;
                 }
 
@@ -199,22 +189,26 @@ namespace Player.Logic
                 if (poolableObject == null)
                 {
                     Debug.LogError($"Failed to get projectile from pool: {_config.ProjectileType}");
+
                     continue;
                 }
 
-                ConfigureProjectile(poolableObject);
-                PositionProjectile(poolableObject, firepoint);
+                ConfigureProjectile(poolableObject, firepoint);
             }
 
             OnShotFired?.Invoke();
         }
 
-        private void ConfigureProjectile(PoolableObject poolableObject)
+        private void ConfigureProjectile(PoolableObject poolableObject, Transform firepoint)
         {
             if (poolableObject.TryGetComponent(out Projectile projectile))
             {
                 projectile.Configure(_config.ProjectileSpeed, _config.ProjectileDelayedDestruction,
                     _config.DestroyProjectileAfter);
+            }
+            else
+            {
+                Debug.LogError("Projectile does not have Projectile component!");
             }
 
             if (poolableObject.TryGetComponent(out DamageDealer damageDealer))
@@ -222,10 +216,11 @@ namespace Player.Logic
                 damageDealer.Configure(_config.ProjectileDamage, _config.ProjectileAffiliation,
                     _config.ProjectileDurability);
             }
-        }
+            else
+            {
+                Debug.LogError("Projectile does not have DamageDealer component!");
+            }
 
-        private void PositionProjectile(PoolableObject projectile, Transform firepoint)
-        {
             projectile.transform.SetPositionAndRotation(firepoint.position, firepoint.rotation);
 
             if (_config.ShouldSetFirepointAsProjectileParent)
@@ -234,19 +229,11 @@ namespace Player.Logic
             }
         }
 
-        public void Tick()
+        private void DisposeShootingCancellationToken()
         {
-            if (_isInitialized == false) return;
-            // Если кнопка зажата, но не стреляем и можем стрелять - начинаем
-            if (_weaponState != WeaponState.Shooting && CanShoot)
-            {
-                TryStartShooting();
-            }
-        }
-
-        public void Dispose()
-        {
-            StopShooting();
+            _shootingCTS?.Cancel();
+            _shootingCTS?.Dispose();
+            _shootingCTS = null;
         }
     }
 }

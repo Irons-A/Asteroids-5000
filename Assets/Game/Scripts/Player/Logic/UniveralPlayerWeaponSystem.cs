@@ -21,10 +21,8 @@ namespace Player.Logic
         private AmmoManager _ammoManager;
 
         private bool _shouldShoot = false;
-        private bool _wasShootingLastFrame = false;
         private bool _isInitialized = false;
 
-        // DI через Zenject
         [Inject]
         public void Construct(PlayerShootingSubsystem shootingSubsystem, PlayerReloadingSubsystem reloadingSubsystem,
             AmmoManager ammoManager)
@@ -32,51 +30,6 @@ namespace Player.Logic
             _shootingSubsystem = shootingSubsystem;
             _reloadingSubsystem = reloadingSubsystem;
             _ammoManager = ammoManager;
-        }
-
-        private void SetupSubsystemEvents()
-        {
-            // При выстреле проверяем автоперезарядку
-            if (_shootingSubsystem is PlayerShootingSubsystem shooting)
-            {
-                shooting.OnShotFired += () =>
-                {
-                    if (!_ammoManager.HasInfiniteAmmo)
-                    {
-                        _reloadingSubsystem.ProcessAutoReloading();
-                    }
-                };
-            }
-
-            // При завершении перезарядки пытаемся возобновить стрельбу
-            if (_reloadingSubsystem is PlayerReloadingSubsystem reloading)
-            {
-                reloading.OnReloadCompleted += () =>
-                {
-                    if (_shouldShoot)
-                    {
-                        _shootingSubsystem.TryStartShooting();
-                    }
-                };
-
-                reloading.OnReloadStarted += () =>
-                {
-                    // Если перезарядка блокирует стрельбу и мы стреляем - останавливаем
-                    if (reloading.ShouldBlockFire)
-                    {
-                        _shootingSubsystem.TryStopShooting();
-                    }
-                };
-            }
-
-            // При изменении количества патронов пытаемся возобновить стрельбу
-            _ammoManager.OnAmmoChanged += (current, max) =>
-            {
-                if (_shouldShoot && _ammoManager.CurrentAmmo >= _config?.AmmoCostPerShot)
-                {
-                    _shootingSubsystem.TryStartShooting();
-                }
-            };
         }
 
         public void Configure(WeaponConfig config)
@@ -94,27 +47,8 @@ namespace Player.Logic
         public void Tick()
         {
             if (_isInitialized == false) return;
-            // Обработка начала/остановки стрельбы при изменении состояния кнопки
-            if (_shouldShoot != _wasShootingLastFrame)
-            {
-                if (_shouldShoot)
-                {
-                    _shootingSubsystem.TryStartShooting();
-                }
-                else
-                {
-                    _shootingSubsystem.TryStopShooting();
-                }
 
-                _wasShootingLastFrame = _shouldShoot;
-            }
-
-            // Проверка автоперезарядки
             _reloadingSubsystem.ProcessAutoReloading();
-
-            // Тик подсистем
-            _shootingSubsystem.Tick();
-            _reloadingSubsystem.Tick();
         }
 
         public void SetShouldShoot(bool value)
@@ -158,6 +92,47 @@ namespace Player.Logic
         {
             _shootingSubsystem.Dispose();
             _reloadingSubsystem.Dispose();
+        }
+
+        private void SetupSubsystemEvents()
+        {
+            if (_shootingSubsystem is PlayerShootingSubsystem shooting)
+            {
+                shooting.OnShotFired += () =>
+                {
+                    if (_ammoManager.HasInfiniteAmmo == false)
+                    {
+                        _reloadingSubsystem.ProcessAutoReloading();
+                    }
+                };
+            }
+
+            if (_reloadingSubsystem is PlayerReloadingSubsystem reloading)
+            {
+                reloading.OnReloadCompleted += () =>
+                {
+                    if (_shouldShoot)
+                    {
+                        _shootingSubsystem.TryStartShooting();
+                    }
+                };
+
+                reloading.OnReloadStarted += () =>
+                {
+                    if (reloading.ShouldBlockFire)
+                    {
+                        _shootingSubsystem.TryStopShooting();
+                    }
+                };
+            }
+
+            _ammoManager.OnAmmoChanged += (current, max) =>
+            {
+                if (_shouldShoot && _ammoManager.CurrentAmmo >= _config?.AmmoCostPerShot)
+                {
+                    _shootingSubsystem.TryStartShooting();
+                }
+            };
         }
     }
 }
