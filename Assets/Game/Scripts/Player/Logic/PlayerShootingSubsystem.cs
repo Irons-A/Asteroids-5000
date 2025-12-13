@@ -19,13 +19,15 @@ namespace Player.Logic
         private UniversalObjectPool _objectPool;
         private WeaponConfig _config;
 
-        private bool _shouldShoot = false;
+        //private bool _shouldShoot = false;
         private WeaponState _weaponState = WeaponState.Idle;
         private CancellationTokenSource _shootingCTS;
         private float _lastShotTime = 0f;
 
         private PlayerReloadingSubsystem _reloadingSubsystem;
         private AmmoManager _ammoManager;
+
+        private bool _isInitialized = false;
 
         [Inject]
         public void Construct(UniversalObjectPool objectPool)
@@ -39,12 +41,17 @@ namespace Player.Logic
             _reloadingSubsystem = reloadingSubsystem;
             _ammoManager = ammoManager;
             _ammoManager.ResetAmmo(config.MaxAmmo);
+
+            _isInitialized = true;
         }
 
         public bool CanShoot
         {
+
             get
             {
+                if (_isInitialized == false) return false;
+
                 if (_ammoManager.HasInfiniteAmmo || _ammoManager.CurrentAmmo >= _config.AmmoCostPerShot)
                 {
                     if (_reloadingSubsystem.IsReloading && _reloadingSubsystem.ShouldBlockFire)
@@ -58,21 +65,21 @@ namespace Player.Logic
             }
         }
 
-        public void SetShouldShoot(bool value) //?????
-        {
-            if (value == _shouldShoot) return;
+        //public void SetShouldShoot(bool value) //?????
+        //{
+        //    if (value == _shouldShoot) return;
 
-            _shouldShoot = value;
+        //    _shouldShoot = value;
 
-            if (_shouldShoot)
-            {
-                TryStartShooting();
-            }
-            else
-            {
-                TryStopShooting();
-            }
-        }
+        //    if (_shouldShoot)
+        //    {
+        //        TryStartShooting();
+        //    }
+        //    else
+        //    {
+        //        TryStopShooting();
+        //    }
+        //}
 
         public void TryStartShooting()
         {
@@ -126,9 +133,9 @@ namespace Player.Logic
             {
                 while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
                 {
-                    Debug.Log($"ShootingLoop: _shouldShoot {_shouldShoot} CanShoot {CanShoot}");
+                    //Debug.Log($"ShootingLoop: _shouldShoot {_shouldShoot} CanShoot {CanShoot}");
 
-                    if (!_shouldShoot || !CanShoot)
+                    if (!CanShoot)
                     {
                         break;
                     }
@@ -141,7 +148,7 @@ namespace Player.Logic
                     {
                         float waitTime = _config.FireRateInterval - timeSinceLastShot;
                         await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
-                        if (token.IsCancellationRequested || !_shouldShoot || !CanShoot) break;
+                        if (token.IsCancellationRequested || !CanShoot) break;
                     }
 
                     // Выстрел
@@ -229,8 +236,9 @@ namespace Player.Logic
 
         public void Tick()
         {
+            if (_isInitialized == false) return;
             // Если кнопка зажата, но не стреляем и можем стрелять - начинаем
-            if (_shouldShoot && _weaponState != WeaponState.Shooting && CanShoot)
+            if (_weaponState != WeaponState.Shooting && CanShoot)
             {
                 TryStartShooting();
             }
