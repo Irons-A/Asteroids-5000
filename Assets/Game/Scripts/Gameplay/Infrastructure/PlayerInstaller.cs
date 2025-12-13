@@ -1,5 +1,6 @@
 using Core.Physics;
 using Player.Logic;
+using Player.Logic.Weapons;
 using Player.Presentation;
 using Player.UserInput;
 using Player.UserInput.Strategies;
@@ -19,8 +20,8 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
-            Container.Bind<WeaponConfig>().FromNew().AsTransient();
-            Container.Bind<AmmoManager>().FromNew().AsTransient();
+            Container.Bind<PlayerWeaponConfig>().FromNew().AsTransient();
+            Container.Bind<PlayerAmmoSubsystem>().FromNew().AsTransient();
             Container.Bind<PlayerReloadingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<PlayerShootingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UniversalPlayerWeaponSystem>().FromNew().AsTransient();

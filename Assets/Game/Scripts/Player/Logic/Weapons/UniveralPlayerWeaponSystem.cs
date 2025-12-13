@@ -10,29 +10,29 @@ using System.Threading;
 using UnityEngine;
 using Zenject;
 
-namespace Player.Logic
+namespace Player.Logic.Weapons
 {
     public class UniversalPlayerWeaponSystem : ITickable, IDisposable
     {
-        private WeaponConfig _config;
+        private PlayerWeaponConfig _config;
 
         private PlayerShootingSubsystem _shootingSubsystem;
         private PlayerReloadingSubsystem _reloadingSubsystem;
-        private AmmoManager _ammoManager;
+        private PlayerAmmoSubsystem _ammoManager;
 
         private bool _shouldShoot = false;
         private bool _isInitialized = false;
 
         [Inject]
         public void Construct(PlayerShootingSubsystem shootingSubsystem, PlayerReloadingSubsystem reloadingSubsystem,
-            AmmoManager ammoManager)
+            PlayerAmmoSubsystem ammoManager)
         {
             _shootingSubsystem = shootingSubsystem;
             _reloadingSubsystem = reloadingSubsystem;
             _ammoManager = ammoManager;
         }
 
-        public void Configure(WeaponConfig config)
+        public void Configure(PlayerWeaponConfig config)
         {
             _config = config;
 

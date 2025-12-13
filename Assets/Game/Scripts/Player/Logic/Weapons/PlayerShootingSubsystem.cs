@@ -10,19 +10,19 @@ using System.Threading;
 using UnityEngine;
 using Zenject;
 
-namespace Player.Logic
+namespace Player.Logic.Weapons
 {
     public class PlayerShootingSubsystem : ITickable
     {
         private UniversalObjectPool _objectPool;
-        private WeaponConfig _config;
+        private PlayerWeaponConfig _config;
 
         private WeaponState _weaponState = WeaponState.Idle;
         private CancellationTokenSource _shootingCTS;
         private float _lastShotTime = 0f;
 
         private PlayerReloadingSubsystem _reloadingSubsystem;
-        private AmmoManager _ammoManager;
+        private PlayerAmmoSubsystem _ammoManager;
 
         private bool _isInitialized = false;
 
@@ -34,7 +34,7 @@ namespace Player.Logic
             _objectPool = objectPool;
         }
 
-        public void Configure(WeaponConfig config, PlayerReloadingSubsystem reloadingSubsystem, AmmoManager ammoManager)
+        public void Configure(PlayerWeaponConfig config, PlayerReloadingSubsystem reloadingSubsystem, PlayerAmmoSubsystem ammoManager)
         {
             _config = config;
             _reloadingSubsystem = reloadingSubsystem;

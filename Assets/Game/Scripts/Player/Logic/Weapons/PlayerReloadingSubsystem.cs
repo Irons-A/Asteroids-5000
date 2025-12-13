@@ -6,13 +6,13 @@ using System.Threading;
 using UnityEngine;
 using Zenject;
 
-namespace Player.Logic
+namespace Player.Logic.Weapons
 {
     public class PlayerReloadingSubsystem
     {
-        private WeaponConfig _config;
+        private PlayerWeaponConfig _config;
         private CancellationTokenSource _reloadCTS;
-        private AmmoManager _ammoManager;
+        private PlayerAmmoSubsystem _ammoManager;
 
         public event Action OnReloadStarted;
         public event Action OnReloadCompleted;
@@ -20,7 +20,7 @@ namespace Player.Logic
         public bool IsReloading { get; private set; }
         public bool ShouldBlockFire => _config.ShouldBlockFireWhileReload;
 
-        public void Configure(WeaponConfig config, AmmoManager ammoManager)
+        public void Configure(PlayerWeaponConfig config, PlayerAmmoSubsystem ammoManager)
         {
             _config = config;
             _ammoManager = ammoManager;

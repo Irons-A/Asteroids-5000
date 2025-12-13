@@ -1,6 +1,7 @@
 using Core.Configuration;
 using Core.Physics;
 using Core.Systems.ObjectPools;
+using Player.Logic.Weapons;
 using Player.Presentation;
 using Player.UserInput;
 using System.Collections;
@@ -19,14 +20,14 @@ namespace Player.Logic
         private CustomPhysics _playerPhysics;
         private UniversalObjectPool _objectPool;
         private UniversalPlayerWeaponSystem _bulletWeaponSystem;
-        private WeaponConfig _bulletWeaponConfig;
+        private PlayerWeaponConfig _bulletWeaponConfig;
         private UniversalPlayerWeaponSystem _laserWeaponSystem;
-        private WeaponConfig _laserWeaponConfig;
+        private PlayerWeaponConfig _laserWeaponConfig;
 
         [Inject]
         private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, UniversalObjectPool objectPool, UniversalPlayerWeaponSystem bulletWeapon,
-            WeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon, WeaponConfig laserWeaponConfig)
+            PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon, PlayerWeaponConfig laserWeaponConfig)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 

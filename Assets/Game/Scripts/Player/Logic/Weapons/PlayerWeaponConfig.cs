@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.Logic
+namespace Player.Logic.Weapons
 {
-    public class WeaponConfig
+    public class PlayerWeaponConfig
     {
         public PoolableObjectType ProjectileType { get; private set; }
         public Transform[] FirePoints { get; private set; }

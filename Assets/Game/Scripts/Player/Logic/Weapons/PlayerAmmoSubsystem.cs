@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.Logic
+namespace Player.Logic.Weapons
 {
-    public class AmmoManager
+    public class PlayerAmmoSubsystem
     {
         public event Action<int, int> OnAmmoChanged;
 
