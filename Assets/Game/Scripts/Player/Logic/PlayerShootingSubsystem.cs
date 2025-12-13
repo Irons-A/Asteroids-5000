@@ -58,7 +58,7 @@ namespace Player.Logic
             }
         }
 
-        public void SetShouldShoot(bool value)
+        public void SetShouldShoot(bool value) //?????
         {
             if (value == _shouldShoot) return;
 
@@ -77,6 +77,8 @@ namespace Player.Logic
         public void TryStartShooting()
         {
             if (_weaponState == WeaponState.Shooting) return;
+
+            Debug.Log("TryStartShooting");
 
             if (CanShoot)
             {
@@ -114,6 +116,8 @@ namespace Player.Logic
             _shootingCTS = new CancellationTokenSource();
 
             ShootingLoop(_shootingCTS.Token).Forget();
+
+            Debug.Log("StartShooting");
         }
 
         private async UniTaskVoid ShootingLoop(CancellationToken token)
@@ -122,10 +126,14 @@ namespace Player.Logic
             {
                 while (!token.IsCancellationRequested && _weaponState == WeaponState.Shooting)
                 {
+                    Debug.Log($"ShootingLoop: _shouldShoot {_shouldShoot} CanShoot {CanShoot}");
+
                     if (!_shouldShoot || !CanShoot)
                     {
                         break;
                     }
+
+                    Debug.Log("ShotFired");
 
                     // Проверка скорострельности
                     float timeSinceLastShot = Time.time - _lastShotTime;
