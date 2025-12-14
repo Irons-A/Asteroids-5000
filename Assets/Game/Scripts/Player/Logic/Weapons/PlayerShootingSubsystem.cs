@@ -1,5 +1,4 @@
 using Core.Components;
-using Core.Projectiles;
 using Core.Systems.ObjectPools;
 using Core.Weapons;
 using Cysharp.Threading.Tasks;

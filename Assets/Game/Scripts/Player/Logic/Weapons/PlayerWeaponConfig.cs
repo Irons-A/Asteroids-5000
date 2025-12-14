@@ -1,7 +1,7 @@
-using Core.Projectiles;
 using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Systems;
 using UnityEngine;
 
 namespace Player.Logic.Weapons
@@ -14,8 +14,8 @@ namespace Player.Logic.Weapons
         public bool ProjectileDelayedDestruction { get; private set; }
         public float DestroyProjectileAfter { get; private set; }
         public int ProjectileDamage { get; private set; }
-        public DamagerAffiliation ProjectileAffiliation { get; private set; }
-        public DamagerDurability ProjectileDurability { get; private set; }
+        public EntityAffiliation ProjectileAffiliation { get; private set; }
+        public EntityDurability ProjectileDurability { get; private set; }
         public bool ShouldSetFirepointAsProjectileParent { get; private set; }
         public float FireRateInterval { get; private set; }
         public int MaxAmmo { get; private set; }
@@ -30,7 +30,7 @@ namespace Player.Logic.Weapons
 
         public void Configure(PoolableObjectType projectileType, Transform[] firepoints, float projectileSpeed,
             bool projectileDelayedDestruction, float destroyProjectileAfter, int projectileDamage,
-            DamagerAffiliation projectileAffiliation, DamagerDurability projectileDurability,
+            EntityAffiliation projectileAffiliation, EntityDurability projectileDurability,
             bool shouldSetFirepointAsProjectileParent, float fireRateInterval, int maxAmmo, int ammoCostPerShot,
             bool hasInfiniteAmmo, float reloadLength, int ammoPerReload, bool shouldAutoReloadOnLessThanMaxAmmo,
             bool shouldAutoReloadOnNoAmmo, bool shouldDepleteAmmoOnReload, bool shouldBlockFireWhileReaload)

@@ -6,6 +6,7 @@ using Player.Presentation;
 using Player.UserInput;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Systems;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Zenject;
@@ -117,8 +118,8 @@ namespace Player.Logic
                 projectileDelayedDestruction: false,
                 destroyProjectileAfter: 0,
                 projectileDamage: _playerSettings.BulletDamage,
-                projectileAffiliation: Core.Projectiles.DamagerAffiliation.Ally,
-                projectileDurability: Core.Projectiles.DamagerDurability.Fragile,
+                projectileAffiliation: EntityAffiliation.Ally,
+                projectileDurability: EntityDurability.Fragile,
                 shouldSetFirepointAsProjectileParent: false,
                 fireRateInterval: _playerSettings.BulletFireRateInterval,
                 maxAmmo: 0,
@@ -143,8 +144,8 @@ namespace Player.Logic
                 projectileDelayedDestruction: true,
                 destroyProjectileAfter: _playerSettings.LaserDuration,
                 projectileDamage: _playerSettings.LaserDamage,
-                projectileAffiliation: Core.Projectiles.DamagerAffiliation.Ally,
-                projectileDurability: Core.Projectiles.DamagerDurability.Undestructable,
+                projectileAffiliation: EntityAffiliation.Ally,
+                projectileDurability: EntityDurability.Undestructable,
                 shouldSetFirepointAsProjectileParent: true,
                 fireRateInterval: _playerSettings.LaserFireRateInterval,
                 maxAmmo: _playerSettings.MaxLaserCharges,

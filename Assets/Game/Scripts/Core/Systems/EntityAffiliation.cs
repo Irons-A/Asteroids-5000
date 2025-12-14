@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.Projectiles
+namespace Core.Systems
 {
-    public enum DamagerAffiliation
+    public enum EntityAffiliation
     {
         Ally,
         Enemy,
