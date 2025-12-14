@@ -1,0 +1,14 @@
+{
+  "BigAsteroidSpeed": 8,
+  "BigAsteroidHealth": 2,
+  "MinSmallAsteroidSpawnAmount": 2,
+  "MaxSmallAsteroidSpawnAmount": 4,
+  
+  "SmallAsteroidSpeed": 6,
+  "SmallAsteroidHealth": 1,
+  
+  "UFOSpeed": 5,
+  "UFOHealth": 2,
+  "UFORotationSpeed": 2,
+  "UFOFireRateInterval": 1.5
+}
