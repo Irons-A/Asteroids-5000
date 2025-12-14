@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Configuration
 {
-    public class EnemySettings : MonoBehaviour
+    public class EnemySettings
     {
         public float BigAsteroidSpeed;
         public float BigAsteroidHealth;

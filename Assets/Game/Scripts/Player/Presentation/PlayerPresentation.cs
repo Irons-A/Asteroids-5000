@@ -9,8 +9,8 @@ namespace Player.Presentation
 {
     public class PlayerPresentation : MovableObject
     {
-        [SerializeField] public Transform[] BulletFirepoints;
-        [SerializeField] public Transform[] LaserFirepoints;
+        [field: SerializeField] public Transform[] BulletFirepoints { get; private set; }
+        [field: SerializeField] public Transform[] LaserFirepoints { get; private set; }
 
         protected override void Awake()
         {

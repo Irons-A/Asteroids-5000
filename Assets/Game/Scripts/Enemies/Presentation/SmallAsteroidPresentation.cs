@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Enemies.Logic
+namespace Enemies.Presentation
 {
-    public class AsteroidEnemyLogic 
+    public class SmallAsteroidPresentation : EnemyPresentation
     {
-        
     }
 }

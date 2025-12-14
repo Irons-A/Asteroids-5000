@@ -26,17 +26,17 @@ namespace Player.Logic
         private PlayerWeaponConfig _laserWeaponConfig;
 
         [Inject]
-        private void Construct(PlayerPresentation playerView, JsonConfigProvider configProvider,
+        private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, UniversalObjectPool objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon, PlayerWeaponConfig laserWeaponConfig)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
-            _playerPresentation = playerView;
-            _playerTransform = playerView.transform;
+            _playerPresentation = playerPresentation;
+            _playerTransform = playerPresentation.transform;
 
             _playerPhysics = playerPhysics;
-            _playerPhysics.SetMovableObject(playerView);
+            _playerPhysics.SetMovableObject(playerPresentation);
 
             _objectPool = objectPool;
 

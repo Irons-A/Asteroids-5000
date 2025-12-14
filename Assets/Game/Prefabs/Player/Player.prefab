@@ -226,10 +226,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea1488cfa9233b48ada0938980dfe8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BulletFirepoints:
+  <BulletFirepoints>k__BackingField:
   - {fileID: 6913295436723000650}
   - {fileID: 6394831848732044998}
-  LaserFirepoints:
+  <LaserFirepoints>k__BackingField:
   - {fileID: 8964495639824136935}
 --- !u!1 &7512897743088913637
 GameObject:

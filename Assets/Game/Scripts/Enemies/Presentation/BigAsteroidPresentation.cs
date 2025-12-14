@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using Core.Physics;
 using UnityEngine;
 
-namespace Enemies
+namespace Enemies.Presentation
 {
-    public class Enemy : MovableObject
+    public class BigAsteroidPresentation : EnemyPresentation
     {
     }
 }
