@@ -89,15 +89,13 @@ namespace Core.Physics
             _movableObject.Rigidbody2D.velocity = _currentVelocity;
         }
 
-        public void SetInstantVelocity(float speed, float maxSpeed)
+        public void SetInstantVelocity(float speed)
         {
             if (_movableObject == null) return;
 
             Vector2 direction = _movableObject.transform.right;
 
-            float targetSpeed = Mathf.Min(speed, maxSpeed);
-
-            _currentVelocity = direction * targetSpeed;
+            _currentVelocity = direction * speed;
         }
 
         private void ApplyFriction()

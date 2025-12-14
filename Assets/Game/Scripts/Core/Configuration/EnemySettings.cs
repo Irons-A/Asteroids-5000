@@ -7,15 +7,15 @@ namespace Core.Configuration
     public class EnemySettings
     {
         public float BigAsteroidSpeed;
-        public float BigAsteroidHealth;
-        public float MinSmallAsteroidSpawnAmount;
-        public float MaxSmallAsteroidSpawnAmount;
+        public int BigAsteroidHealth;
+        public int MinSmallAsteroidSpawnAmount;
+        public int MaxSmallAsteroidSpawnAmount;
         
         public float SmallAsteroidSpeed;
-        public float SmallAsteroidHealth;
+        public int SmallAsteroidHealth;
 
         public float UFOSpeed;
-        public float UFOHealth;
+        public int UFOHealth;
         public float UFORotationSpeed;
         public float UFOFireRateInterval;
     }

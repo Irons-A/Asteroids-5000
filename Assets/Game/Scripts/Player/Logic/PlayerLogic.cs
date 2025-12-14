@@ -36,7 +36,6 @@ namespace Player.Logic
             _playerTransform = playerPresentation.transform;
 
             _playerPhysics = playerPhysics;
-            _playerPhysics.SetMovableObject(playerPresentation);
 
             _objectPool = objectPool;
 
@@ -49,6 +48,8 @@ namespace Player.Logic
 
         public void Initialize()
         {
+            _playerPhysics.SetMovableObject(_playerPresentation);
+            
             ConfigureBulletWeaponSystem();
             ConfigureLaserWeaponSystem();
         }

@@ -6,6 +6,6 @@ namespace Enemies.Presentation
 {
     public class UFOPresentation : EnemyPresentation
     {
-        [field: SerializeField] public Transform[] Firepoints { get; private set; }
+        [field: SerializeField] public Transform Firepoint { get; private set; }
     }
 }
