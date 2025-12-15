@@ -6,29 +6,75 @@ using Zenject;
 
 namespace Core.Configuration
 {
-    public class JsonConfigProvider : IInitializable
+    public class JsonConfigProvider
     {
         public const string UserInputConfigPath = "Configs/UserInputConfig";
         public const string PlayerConfigPath = "Configs/PlayerConfig";
         public const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
         public const string EnemyConfigPath = "Configs/EnemyConfig";
-
-        public UserInputSettings InputSettingsRef { get; private set; }
-        public PlayerSettings PlayerSettingsRef { get; private set; }
-        public EnvironmentSettings EnvironmentSettingsRef { get; private set; }
-        public EnemySettings EnemySettingsRef { get; private set; }
-
-        public void Initialize()
+        
+        private UserInputSettings _userInputSettings;
+        private PlayerSettings _playerSettings;
+        private EnvironmentSettings _environmentSettings;
+        private EnemySettings _enemySettings;
+        private bool _isInitialized = false;
+        
+        [Inject]
+        private void Construct()
         {
+            EnsureInitialized();
+        }
+
+        public UserInputSettings InputSettingsRef
+        { 
+            get
+            {
+                EnsureInitialized();
+                return _userInputSettings;
+            }
+        }
+
+        public PlayerSettings PlayerSettingsRef
+        { 
+            get
+            {
+                EnsureInitialized();
+                return _playerSettings;
+            }
+        }
+        
+        public EnvironmentSettings EnvironmentSettingsRef 
+        { 
+            get 
+            {
+                EnsureInitialized();
+                return _environmentSettings;
+            }
+        }
+
+        public EnemySettings EnemySettingsRef 
+        { 
+            get 
+            {
+                EnsureInitialized();
+                return _enemySettings;
+            }
+        }
+
+        private void EnsureInitialized()
+        {
+            if (_isInitialized) return;
+        
             LoadSettings();
+            _isInitialized = true;
         }
 
         private void LoadSettings()
         {
-            InputSettingsRef = LoadConfig<UserInputSettings>(UserInputConfigPath);
-            PlayerSettingsRef = LoadConfig<PlayerSettings>(PlayerConfigPath);
-            EnvironmentSettingsRef = LoadConfig<EnvironmentSettings>(EnvironmentConfigPath);
-            EnemySettingsRef = LoadConfig<EnemySettings>(EnemyConfigPath);
+            _userInputSettings = LoadConfig<UserInputSettings>(UserInputConfigPath);
+            _playerSettings = LoadConfig<PlayerSettings>(PlayerConfigPath);
+            _environmentSettings = LoadConfig<EnvironmentSettings>(EnvironmentConfigPath);
+            _enemySettings = LoadConfig<EnemySettings>(EnemyConfigPath);
         }
 
         private T LoadConfig<T>(string configPath) where T : class
