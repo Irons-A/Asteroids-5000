@@ -26,10 +26,11 @@ namespace Enemies.Logic
         private bool _isConfigured = false;
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics )
+        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem)
         {
             _settings = configProvider.EnemySettingsRef;
             _physics = physics;
+            _healthSystem = healthSystem;
             //_objectPool = objectPool;
         }
         
@@ -43,6 +44,8 @@ namespace Enemies.Logic
             if (_isConfigured == false) return;
             
             _physics.ProcessPhysics();
+            Debug.Log("big ateroid fixed tick");
+            Debug.Log($"big ateroid settings speed is {_settings.BigAsteroidSpeed}");
         }
 
         public void Dispose()
@@ -52,11 +55,6 @@ namespace Enemies.Logic
 
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject)
         {
-            if (_settings == null)
-            {
-                Debug.Log("Asteroid settings null");
-            }
-            
             _presentation = presentation;
             _physics.SetMovableObject(_presentation);
             _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);

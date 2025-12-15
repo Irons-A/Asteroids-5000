@@ -68,9 +68,10 @@ namespace Gameplay.Environment.Systems
                         
                         enemy.transform.position = spawnPosition;
                         
-                        Vector3 direction = _playerTransform.position - spawnPosition;
+                        Vector3 direction = _playerTransform.position - enemy.transform.position;
                         
-                        enemy.transform.rotation = Quaternion.LookRotation(direction);
+                        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                        enemy.transform.rotation = Quaternion.Euler(0, 0, angle);
 
                         _livingEnemyCount++;
 

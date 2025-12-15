@@ -21,7 +21,7 @@ namespace Gameplay.Infrastructure
 
             Container.Bind<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
-            Container.Bind<BigAsteroidLogic>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
 
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
