@@ -18,7 +18,8 @@ namespace Gameplay.Infrastructure
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
-            
+
+            Container.Bind<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.Bind<BigAsteroidLogic>().FromNew().AsTransient();
 

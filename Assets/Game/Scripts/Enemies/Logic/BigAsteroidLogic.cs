@@ -20,17 +20,17 @@ namespace Enemies.Logic
         private CustomPhysics _physics;
         private UniversalObjectPool _objectPool;
         private PoolableObject _poolableObject;
-        private HealthSystem _healthSystem;
+        private HealthSystem _healthSystem; 
         //collisionHandler
         
         private bool _isConfigured = false;
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, UniversalObjectPool objectPool)
+        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics )
         {
             _settings = configProvider.EnemySettingsRef;
             _physics = physics;
-            _objectPool = objectPool;
+            //_objectPool = objectPool;
         }
         
         public void Initialize()
@@ -52,6 +52,11 @@ namespace Enemies.Logic
 
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject)
         {
+            if (_settings == null)
+            {
+                Debug.Log("Asteroid settings null");
+            }
+            
             _presentation = presentation;
             _physics.SetMovableObject(_presentation);
             _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
