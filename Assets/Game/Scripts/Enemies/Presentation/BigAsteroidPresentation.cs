@@ -26,7 +26,12 @@ namespace Enemies.Presentation
             _poolableObject = GetComponent<PoolableObject>();
             _logic.Configure(this, _poolableObject);
         }
-        
+
+        private void FixedUpdate()
+        {
+            _logic.ProcessFixedUpdate();
+        }
+
         private void OnEnable()
         {
             _logic.OnPresentationEnabled();

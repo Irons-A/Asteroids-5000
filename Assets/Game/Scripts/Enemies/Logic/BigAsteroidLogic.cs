@@ -11,7 +11,7 @@ using Zenject;
 
 namespace Enemies.Logic
 {
-    public class BigAsteroidLogic : IFixedTickable, IInitializable, IDisposable
+    public class BigAsteroidLogic : IInitializable, IDisposable
     {
         private EnemyType _type;
         private BigAsteroidPresentation _presentation;
@@ -39,13 +39,10 @@ namespace Enemies.Logic
 
         }
 
-        public void FixedTick()
+        public void ProcessFixedUpdate()
         {
-            if (_isConfigured == false) return;
-            
+            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
             _physics.ProcessPhysics();
-            Debug.Log("big ateroid fixed tick");
-            Debug.Log($"big ateroid settings speed is {_settings.BigAsteroidSpeed}");
         }
 
         public void Dispose()
@@ -57,7 +54,6 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             _physics.SetMovableObject(_presentation);
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
             
             _poolableObject = presentationPoolableObject;
             

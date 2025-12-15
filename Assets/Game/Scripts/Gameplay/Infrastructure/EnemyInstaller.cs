@@ -10,7 +10,7 @@ namespace Gameplay.Infrastructure
     {
         public override void InstallBindings()
         {
-            //Container.Bind<BigAsteroidLogic>().FromNew().AsTransient();
+            
         }
     }
 }
