@@ -37,7 +37,7 @@ namespace Core.Systems
             }
         }
 
-        public void RestoreHealth(int health)
+        public void Heal(int health)
         {
             health = Math.Min(1, health);
 
@@ -45,6 +45,11 @@ namespace Core.Systems
             CurrentHealth = Math.Min(CurrentHealth, MaxHealth);
 
             OnHealthChanged?.Invoke(CurrentHealth);
+        }
+
+        public void RestoreHealth()
+        {
+            CurrentHealth = MaxHealth;
         }
     }
 }

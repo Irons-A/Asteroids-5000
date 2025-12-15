@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Core.Systems.ObjectPools;
+using Player.Presentation;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -14,16 +16,20 @@ namespace Gameplay.Environment.Systems
     public class EnemySpawner
     {
         private EnvironmentSettings _environmentSettings;
-        //enemy settings
+        private UniversalObjectPool _objectPool;
+        private Transform _playerTransform;
 
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;
         private int _livingEnemyCount = 0; //Decrease with signal bus events
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider)
+        private void Construct(JsonConfigProvider configProvider, UniversalObjectPool  objectPool,
+            PlayerPresentation playerPresentation)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;
+            _objectPool = objectPool;
+            _playerTransform = playerPresentation.transform;
         }
 
         public void StartEnemySpawning(Bounds bounds)
@@ -56,8 +62,15 @@ namespace Gameplay.Environment.Systems
                     if (_livingEnemyCount < _environmentSettings.MaxEnemiesOnMap)
                     {
                         Vector3 spawnPosition = GetRandomSpawnPosition();
+                        PoolableObjectType enemyType = GetEnemyToSpawn();
 
-                        // EnemyFactory.Spawn(enemyType);
+                        PoolableObject enemy = _objectPool.GetFromPool(enemyType);
+                        
+                        enemy.transform.position = spawnPosition;
+                        
+                        Vector3 direction = _playerTransform.position - spawnPosition;
+                        
+                        enemy.transform.rotation = Quaternion.LookRotation(direction);
 
                         _livingEnemyCount++;
 
@@ -110,18 +123,18 @@ namespace Gameplay.Environment.Systems
             return spawnPosition;
         }
 
-        private EnemyType EnemyToSpawn()
+        private PoolableObjectType GetEnemyToSpawn()
         {
             float ufoSpawnChance = Mathf.Clamp01(_environmentSettings.UFOSpawnChance);
             float randomEnemyType = Random.Range(0f,1f);
 
             if (randomEnemyType <= ufoSpawnChance)
             {
-                return EnemyType.UFO;
+                return PoolableObjectType.UFO;
             }
             else
             {
-                return EnemyType.BigAsteroid;
+                return PoolableObjectType.BigAsteroid;
             }
         }
     }

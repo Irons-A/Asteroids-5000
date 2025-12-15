@@ -3,6 +3,8 @@ using Core.Systems;
 using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Physics;
+using Enemies.Logic;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +18,9 @@ namespace Gameplay.Infrastructure
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
+            
+            Container.Bind<CustomPhysics>().FromNew().AsTransient();
+            Container.Bind<BigAsteroidLogic>().FromNew().AsTransient();
 
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();

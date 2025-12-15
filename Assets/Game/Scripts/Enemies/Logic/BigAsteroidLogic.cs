@@ -15,54 +15,58 @@ namespace Enemies.Logic
     {
         private EnemyType _type;
         private BigAsteroidPresentation _presentation;
-        private Transform _transform;
+        //private Transform _transform;
         private EnemySettings _settings;
         private CustomPhysics _physics;
         private UniversalObjectPool _objectPool;
         private PoolableObject _poolableObject;
         private HealthSystem _healthSystem;
         //collisionHandler
+        
+        private bool _isConfigured = false;
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, Transform enemyTransform, 
-            CustomPhysics physics, UniversalObjectPool objectPool)
+        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, UniversalObjectPool objectPool)
         {
             _settings = configProvider.EnemySettingsRef;
-            
-            _presentation = GameObject.GetComponent<BigAsteroidPresentation>();
-            _transform = presentation.transform;
-            
-            
             _physics = physics;
-            
             _objectPool = objectPool;
-
-            _poolableObject = _presentation.GetComponent<PoolableObject>();
         }
         
         public void Initialize()
         {
-            _physics.SetMovableObject(_presentation);
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
-            
-            _healthSystem.OnHealthDepleted += GetDestroyed;
-            _presentation.OnEnabled += OnPresentationEnabled;
+
         }
 
         public void FixedTick()
         {
+            if (_isConfigured == false) return;
+            
             _physics.ProcessPhysics();
         }
 
         public void Dispose()
         {
             _healthSystem.OnHealthDepleted -= GetDestroyed;
-            _presentation.OnEnabled -= OnPresentationEnabled;
         }
 
-        private void OnPresentationEnabled()
+        public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject)
         {
+            _presentation = presentation;
+            _physics.SetMovableObject(_presentation);
+            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
+            
+            _poolableObject = presentationPoolableObject;
+            
             _healthSystem.Configure(_settings.BigAsteroidHealth, true);
+            _healthSystem.OnHealthDepleted += GetDestroyed;
+            
+            _isConfigured = true;
+        }
+
+        public void OnPresentationEnabled()
+        {
+            _healthSystem.RestoreHealth();
         }
 
 

@@ -15,7 +15,7 @@ namespace Enemies
             _shouldTeleport = false;
         }
 
-        protected virtual void SetAngle(float angle)
+        public virtual void SetAngle(float angle)
         {
             transform.rotation =  Quaternion.Euler(0, 0, angle);
         }
