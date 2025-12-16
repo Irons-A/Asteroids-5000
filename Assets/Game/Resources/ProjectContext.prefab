@@ -74,6 +74,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afeba2e742a9637469115ea8d95bdb46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _objectPool: {fileID: 4940643210221103319, guid: c3a9c0bc5a0d23744809b9bd0dceda04, type: 3}
-  _poolAccessProvider: {fileID: 7956624197552673931, guid: 4a39694c3e3865544a5f39131128663e, type: 3}
+  _objectPoolPrefab: {fileID: 4940643210221103319, guid: c3a9c0bc5a0d23744809b9bd0dceda04, type: 3}
   _poolableObjectRegistry: {fileID: 11400000, guid: 6488d9eb097d23948ae27d1da91860c2, type: 2}

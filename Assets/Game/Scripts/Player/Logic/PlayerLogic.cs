@@ -19,7 +19,7 @@ namespace Player.Logic
         private Transform _playerTransform;
         private PlayerSettings _playerSettings; 
         private CustomPhysics _playerPhysics;
-        private UniversalObjectPool _objectPool;
+        private PoolAccessProvider _objectPool;
         private UniversalPlayerWeaponSystem _bulletWeaponSystem;
         private PlayerWeaponConfig _bulletWeaponConfig;
         private UniversalPlayerWeaponSystem _laserWeaponSystem;
@@ -27,7 +27,7 @@ namespace Player.Logic
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
-            CustomPhysics playerPhysics, UniversalObjectPool objectPool, UniversalPlayerWeaponSystem bulletWeapon,
+            CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon, PlayerWeaponConfig laserWeaponConfig)
         {
             _playerSettings = configProvider.PlayerSettingsRef;

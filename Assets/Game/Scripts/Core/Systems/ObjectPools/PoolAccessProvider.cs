@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Systems.ObjectPools
 {
-    public class PoolAccessProvider : MonoBehaviour
+    public class PoolAccessProvider
     {
         private UniversalObjectPool _universalObjectPool;
 

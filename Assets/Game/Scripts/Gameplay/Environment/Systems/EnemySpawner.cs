@@ -16,7 +16,7 @@ namespace Gameplay.Environment.Systems
     public class EnemySpawner
     {
         private EnvironmentSettings _environmentSettings;
-        private UniversalObjectPool _objectPool;
+        private PoolAccessProvider _objectPool;
         private Transform _playerTransform;
 
         private Bounds _gameFieldBounds;
@@ -24,7 +24,7 @@ namespace Gameplay.Environment.Systems
         private int _livingEnemyCount = 0; //Decrease with signal bus events
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, UniversalObjectPool  objectPool,
+        private void Construct(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
             PlayerPresentation playerPresentation)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;

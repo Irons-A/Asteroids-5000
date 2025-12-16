@@ -12,43 +12,49 @@ namespace Gameplay.Infrastructure
 {
     public class ProjectInstaller : MonoInstaller
     {
-        [SerializeField] private UniversalObjectPool _objectPool;
-        [SerializeField] private PoolAccessProvider _poolAccessProvider;
+        [SerializeField] private UniversalObjectPool _objectPoolPrefab;
         [SerializeField] private PoolableObjectRegistry _poolableObjectRegistry;
+
+        private PoolAccessProvider _poolAccessProvider;
+        private UniversalObjectPool _objectPool;
 
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
             
-            PoolAccessProvider poolAccessProvider = CreatePoolAccessProvider();
-            Container.Bind<PoolAccessProvider>().FromInstance(poolAccessProvider).AsSingle().NonLazy();
+            BindPoolAccessProvider();
+            BindLogicSystems();
+            BindObjectPool();
 
+            _poolAccessProvider.SetPool(_objectPool);
+        }
+
+        private void BindPoolAccessProvider()
+        {
+            _poolAccessProvider = new PoolAccessProvider();
+            Container.Bind<PoolAccessProvider>().FromInstance(_poolAccessProvider).AsSingle();
+        }
+
+
+        private void BindLogicSystems()
+        {
             Container.Bind<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
-
+        }
+        
+        private void BindObjectPool()
+        {
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
-            UniversalObjectPool pool = CreateUniversalObjectPool();
-            Container.Bind<UniversalObjectPool>().FromInstance(pool).AsSingle().NonLazy();
-            
-            poolAccessProvider.SetPool(pool);
-        }
-
-        private PoolAccessProvider CreatePoolAccessProvider()
-        {
-            PoolAccessProvider poolAccessesProvider = Container.InstantiatePrefabForComponent<PoolAccessProvider>(
-                _poolAccessProvider, Vector3.zero, Quaternion.identity, null);
-            
-            DontDestroyOnLoad(poolAccessesProvider.gameObject);
-
-            return poolAccessesProvider;
+            _objectPool = CreateUniversalObjectPool();
+            Container.Bind<UniversalObjectPool>().FromInstance(_objectPool).AsSingle().NonLazy();
         }
 
         private UniversalObjectPool CreateUniversalObjectPool()
         {
             UniversalObjectPool objectPool = Container.InstantiatePrefabForComponent<UniversalObjectPool>(
-                _objectPool, Vector3.zero, Quaternion.identity, null);
+                _objectPoolPrefab, Vector3.zero, Quaternion.identity, null);
 
             DontDestroyOnLoad(objectPool.gameObject);
 
