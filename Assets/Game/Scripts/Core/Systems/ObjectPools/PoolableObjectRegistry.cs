@@ -7,7 +7,7 @@ namespace Core.Systems.ObjectPools
     [CreateAssetMenu(menuName = "ScriptableObjects/PoolableObjectRegistry", order = 51)]
     public class PoolableObjectRegistry : ScriptableObject
     {
-        [SerializeField] private List<PoolableObjectRegistryEntry> _registry = new List<PoolableObjectRegistryEntry>();
+        [SerializeField] private List<PoolableObjectRegistryEntry> _registry = new();
 
         private Dictionary<PoolableObjectType, PoolableObjectRegistryEntry> _cache;
 

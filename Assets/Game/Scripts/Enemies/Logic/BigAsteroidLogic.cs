@@ -26,12 +26,13 @@ namespace Enemies.Logic
         private bool _isConfigured = false;
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem)
+        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem,
+            UniversalObjectPool objectPool)
         {
             _settings = configProvider.EnemySettingsRef;
             _physics = physics;
             _healthSystem = healthSystem;
-            //_objectPool = objectPool;
+            _objectPool = objectPool;
         }
         
         public void Initialize()
