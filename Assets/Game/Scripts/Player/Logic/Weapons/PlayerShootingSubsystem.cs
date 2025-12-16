@@ -13,7 +13,7 @@ namespace Player.Logic.Weapons
 {
     public class PlayerShootingSubsystem : ITickable
     {
-        private UniversalObjectPool _objectPool;
+        private PoolAccessProvider _objectPool;
         private PlayerWeaponConfig _config;
 
         private WeaponState _weaponState = WeaponState.Idle;
@@ -28,7 +28,7 @@ namespace Player.Logic.Weapons
         public event Action OnShotFired;
 
         [Inject]
-        public void Construct(UniversalObjectPool objectPool)
+        public void Construct(PoolAccessProvider objectPool)
         {
             _objectPool = objectPool;
         }

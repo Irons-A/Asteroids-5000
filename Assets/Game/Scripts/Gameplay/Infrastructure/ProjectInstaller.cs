@@ -20,7 +20,8 @@ namespace Gameplay.Infrastructure
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
             
-            Container.Bind<PoolAccessProvider>().FromMethod(CreatePoolAccessProvider).AsSingle().NonLazy();
+            PoolAccessProvider poolAccessProvider = CreatePoolAccessProvider();
+            Container.Bind<PoolAccessProvider>().FromInstance(poolAccessProvider).AsSingle().NonLazy();
 
             Container.Bind<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
@@ -28,7 +29,10 @@ namespace Gameplay.Infrastructure
 
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
             Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
-            Container.Bind<UniversalObjectPool>().FromMethod(CreateUniversalObjectPool).AsSingle().NonLazy();
+            UniversalObjectPool pool = CreateUniversalObjectPool();
+            Container.Bind<UniversalObjectPool>().FromInstance(pool).AsSingle().NonLazy();
+            
+            poolAccessProvider.SetPool(pool);
         }
 
         private PoolAccessProvider CreatePoolAccessProvider()
