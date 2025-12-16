@@ -18,7 +18,7 @@ namespace Enemies.Logic
         //private Transform _transform;
         private EnemySettings _settings;
         private CustomPhysics _physics;
-        private UniversalObjectPool _objectPool;
+        private PoolAccessProvider _objectPool;
         private PoolableObject _poolableObject;
         private HealthSystem _healthSystem; 
         //collisionHandler
@@ -27,12 +27,12 @@ namespace Enemies.Logic
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem,
-            UniversalObjectPool objectPool)
+            PoolAccessProvider accessProvider)
         {
             _settings = configProvider.EnemySettingsRef;
             _physics = physics;
             _healthSystem = healthSystem;
-            _objectPool = objectPool;
+            _objectPool = accessProvider;
         }
         
         public void Initialize()
