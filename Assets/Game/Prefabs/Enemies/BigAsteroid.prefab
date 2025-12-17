@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 2752192714302458667}
   - component: {fileID: 2528416646827849445}
   - component: {fileID: 7406103442894176247}
-  - component: {fileID: 391024719330168895}
+  - component: {fileID: 329062442698691552}
   - component: {fileID: 5626104591624376547}
+  - component: {fileID: 391024719330168895}
   - component: {fileID: 2919849454793813626}
   m_Layer: 0
   m_Name: BigAsteroid
@@ -117,6 +118,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _poolKey: 3
   _despawnCondition: 0
+--- !u!114 &329062442698691552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3441218473777589071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df41425646659c4eb0261f8670b9cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Damage>k__BackingField: 0
+  <Affiliation>k__BackingField: 1
+  <Durability>k__BackingField: 1
+--- !u!114 &5626104591624376547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3441218473777589071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e130e9d94aa416342a4a326ba6a2f9c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &391024719330168895
 Rigidbody2D:
   serializedVersion: 4
@@ -144,18 +172,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &5626104591624376547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3441218473777589071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e130e9d94aa416342a4a326ba6a2f9c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!58 &2919849454793813626
 CircleCollider2D:
   m_ObjectHideFlags: 0

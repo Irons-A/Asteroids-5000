@@ -211,14 +211,14 @@ namespace Player.Logic.Weapons
                 Debug.LogError("Projectile does not have Projectile component!");
             }
 
-            if (poolableObject.TryGetComponent(out DamageDealer damageDealer))
+            if (poolableObject.TryGetComponent(out CollisionHandler damageDealer))
             {
                 damageDealer.Configure(_config.ProjectileDamage, _config.ProjectileAffiliation,
                     _config.ProjectileDurability);
             }
             else
             {
-                Debug.LogError("Projectile does not have DamageDealer component!");
+                Debug.LogError("Projectile does not have CollisionHandler component!");
             }
 
             projectile.transform.SetPositionAndRotation(firepoint.position, firepoint.rotation);
