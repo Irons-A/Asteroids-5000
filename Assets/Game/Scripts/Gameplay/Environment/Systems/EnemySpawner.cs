@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Systems.ObjectPools;
+using Enemies.Signals;
 using Player.Presentation;
 using UnityEngine;
 using Zenject;
@@ -13,23 +14,26 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Environment.Systems
 {
-    public class EnemySpawner
+    public class EnemySpawner : IInitializable, IDisposable
     {
         private EnvironmentSettings _environmentSettings;
         private PoolAccessProvider _objectPool;
         private Transform _playerTransform;
+        private SignalBus _signalBus;
 
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;
+        
         private int _livingEnemyCount = 0; //Decrease with signal bus events
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
-            PlayerPresentation playerPresentation)
+            PlayerPresentation playerPresentation, SignalBus signalBus)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;
             _objectPool = objectPool;
             _playerTransform = playerPresentation.transform;
+            _signalBus = signalBus;
         }
 
         public void StartEnemySpawning(Bounds bounds)
@@ -48,6 +52,28 @@ namespace Gameplay.Environment.Systems
             _spawnCTS?.Cancel();
             _spawnCTS?.Dispose();
             _spawnCTS = null;
+        }
+
+        public void Initialize()
+        {
+            _signalBus.Subscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
+            _signalBus.Subscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
+        }
+
+        public void Dispose()
+        {
+            _signalBus.Unsubscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
+            _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
+        }
+
+        private void DecreaseEnemyCount()
+        {
+            _livingEnemyCount--;
+        }
+
+        private void IncreaseEnemyCount()
+        {
+            _livingEnemyCount++;
         }
 
         private async UniTaskVoid EnemySpawnLoop(CancellationToken cancellationToken)
@@ -74,8 +100,6 @@ namespace Gameplay.Environment.Systems
                         enemy.transform.rotation = Quaternion.Euler(0, 0, angle);
 
                         _livingEnemyCount++;
-
-                        //Debug.Log($"Enemy spawned at: {spawnPosition}");
                     }
                 }
             }

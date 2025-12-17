@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Core.Systems
 {
-    public class HealthSystem
+    public class HealthSystem : IDisposable
     {
         public event Action<int> OnHealthChanged;
         public event Action OnHealthDepleted;
@@ -21,6 +21,12 @@ namespace Core.Systems
             {
                 CurrentHealth = MaxHealth;
             }
+        }
+
+        public void Dispose()
+        {
+            OnHealthChanged = null;
+            OnHealthChanged = null;
         }
 
         public void TakeDamage(int damage)

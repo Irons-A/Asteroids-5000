@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Core.Components
 {
     [RequireComponent(typeof(Collider2D))]
-    public class CollisionHandler : MonoBehaviour
+    public class CollisionHandler : MonoBehaviour, IDisposable
     {
         [field: SerializeField] public int Damage { get; private set; } = 0;
         [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
@@ -31,6 +31,11 @@ namespace Core.Components
             {
                 _poolableObject = poolableObject;
             }
+        }
+
+        public void Dispose()
+        {
+            OnDamageReceived = null;
         }
 
         public void DealDamage(int damage)

@@ -7,6 +7,7 @@ using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using Enemies.Presentation;
+using Enemies.Signals;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -17,26 +18,26 @@ namespace Enemies.Logic
     {
         private EnemyType _type;
         private BigAsteroidPresentation _presentation;
-        //private Transform _transform;
         private EnemySettings _settings;
         private CustomPhysics _physics;
         private PoolAccessProvider _objectPool;
         private PoolableObject _poolableObject;
         private HealthSystem _healthSystem; 
         private CollisionHandler _collisionHandler;
-        //collisionHandler
+        private SignalBus _signalBus;
 
         private int _minSmallAsteroidSpawnAmount;
         private int _maxSmallAsteroidSpawnAmount;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem,
-            PoolAccessProvider accessProvider)
+            PoolAccessProvider accessProvider, SignalBus signalBus)
         {
             _settings = configProvider.EnemySettingsRef;
             _physics = physics;
             _healthSystem = healthSystem;
             _objectPool = accessProvider;
+            _signalBus = signalBus;
         }
         
         public void Initialize()
@@ -58,8 +59,8 @@ namespace Enemies.Logic
 
         public void Dispose()
         {
-            _healthSystem.OnHealthDepleted -= GetDestroyed;
-            _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
+            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
+            if (_collisionHandler != null) _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
         }
 
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -86,7 +87,8 @@ namespace Enemies.Logic
         private void GetDestroyed()
         {
             //SpawnSmallAsteroids();
-            //SignalBus
+
+            _signalBus.TryFire(new EnemyDestroyedSignal());
             
             _poolableObject.Despawn();
         }
@@ -99,6 +101,7 @@ namespace Enemies.Logic
             {
                 PoolableObject smallAsteroid = _objectPool.GetFromPool(PoolableObjectType.SmallAsteroid);
                 
+                _signalBus.TryFire(new EnemySpawnedSignal());
             }
         }
     }

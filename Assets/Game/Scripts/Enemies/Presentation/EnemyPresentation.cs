@@ -15,8 +15,15 @@ namespace Enemies
             _shouldTeleport = false;
         }
 
-        public virtual void SetAngle(float angle)
+        public virtual void SetAngle(float angle, bool shouldRandomize = false)
         {
+            float angleToSet = angle;
+            
+            if (shouldRandomize)
+            {
+                angleToSet = Random.Range(0, 360);
+            }
+            
             transform.rotation =  Quaternion.Euler(0, 0, angle);
         }
     }

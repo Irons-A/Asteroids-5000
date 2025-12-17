@@ -3,8 +3,10 @@ using Core.Systems;
 using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Components;
 using Core.Physics;
 using Enemies.Logic;
+using Enemies.Signals;
 using UnityEngine;
 using Zenject;
 
@@ -22,6 +24,7 @@ namespace Gameplay.Infrastructure
         {
             Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
             
+            InstallSignals();
             BindPoolAccessProvider();
             BindLogicSystems();
             BindObjectPool();
@@ -38,7 +41,8 @@ namespace Gameplay.Infrastructure
 
         private void BindLogicSystems()
         {
-            Container.Bind<HealthSystem>().FromNew().AsTransient();
+            Container.BindInterfacesTo<CollisionHandler>().AsCached();
+            Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
         }
@@ -59,6 +63,14 @@ namespace Gameplay.Infrastructure
             DontDestroyOnLoad(objectPool.gameObject);
 
             return objectPool;
+        }
+
+        private void InstallSignals()
+        {
+            SignalBusInstaller.Install(Container);
+
+            Container.DeclareSignal<EnemySpawnedSignal>();
+            Container.DeclareSignal<EnemyDestroyedSignal>();
         }
     }
 }
