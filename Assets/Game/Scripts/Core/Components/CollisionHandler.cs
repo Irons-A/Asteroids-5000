@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using UnityEngine;
@@ -8,34 +9,20 @@ using UnityEngine;
 namespace Core.Components
 {
     [RequireComponent(typeof(Collider2D))]
-    public class CollisionHandler : MonoBehaviour, IDisposable
+    public class CollisionHandler : MonoBehaviour
     {
         [field: SerializeField] public int Damage { get; private set; } = 0;
         [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
         [field: SerializeField] public EntityDurability Durability { get; private set; }
-        
-        private PoolableObject _poolableObject;
 
         public event Action<int> OnDamageReceived;
+        public event Action OnDestructionCalled;
 
         public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability)
         {
             Damage = damage;
             Affiliation = affiliation;
             Durability = durability;
-        }
-        
-        private void Awake()
-        {
-            if (TryGetComponent(out PoolableObject poolableObject))
-            {
-                _poolableObject = poolableObject;
-            }
-        }
-
-        public void Dispose()
-        {
-            OnDamageReceived = null;
         }
 
         public void DealDamage(int damage)
@@ -44,6 +31,11 @@ namespace Core.Components
             {
                 OnDamageReceived?.Invoke(damage);
             }
+        }
+
+        public void CallForDestruction()
+        {
+            OnDestructionCalled?.Invoke();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -70,27 +62,19 @@ namespace Core.Components
             
             if (otherHandler.Durability == EntityDurability.Fragile)
             {
-                if (otherHandler.TryGetComponent(out PoolableObject otherPoolableObject))
-                {
-                    otherPoolableObject.Despawn();
-                }
-                else
-                {
-                    Destroy(otherHandler.gameObject);
-                }
+                otherHandler.CallForDestruction();
             }
             
             if (Durability == EntityDurability.Fragile)
             {
-                if (_poolableObject != null)
-                {
-                    _poolableObject.Despawn();
-                }
-                else
-                {
-                    Destroy(gameObject);
-                }
+                CallForDestruction();
             }
+        }
+        
+        private void OnDestroy()
+        {
+            OnDamageReceived = null;
+            OnDestructionCalled = null;
         }
     }
 }

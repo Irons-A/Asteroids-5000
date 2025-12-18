@@ -60,7 +60,12 @@ namespace Enemies.Logic
         public void Dispose()
         {
             if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
-            if (_collisionHandler != null) _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
+            
+            if (_collisionHandler != null)
+            {
+                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
+                _collisionHandler.OnDestructionCalled -= GetDestroyed;
+            }
         }
 
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -73,6 +78,7 @@ namespace Enemies.Logic
             
             _collisionHandler = collisionHandler;
             _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
+            _collisionHandler.OnDestructionCalled += GetDestroyed;
             
             _healthSystem.Configure(_settings.BigAsteroidHealth, true);
             _healthSystem.OnHealthDepleted += GetDestroyed;

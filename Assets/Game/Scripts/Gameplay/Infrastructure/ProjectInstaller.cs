@@ -41,7 +41,6 @@ namespace Gameplay.Infrastructure
 
         private void BindLogicSystems()
         {
-            Container.BindInterfacesTo<CollisionHandler>().AsCached();
             Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
