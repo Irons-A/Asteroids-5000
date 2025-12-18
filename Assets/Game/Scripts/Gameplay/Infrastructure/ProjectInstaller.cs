@@ -4,6 +4,7 @@ using Core.Systems.ObjectPools;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Components;
+using Core.Logic;
 using Core.Physics;
 using Enemies.Logic;
 using Enemies.Signals;
@@ -41,6 +42,7 @@ namespace Gameplay.Infrastructure
 
         private void BindLogicSystems()
         {
+            Container.BindInterfacesAndSelfTo<ProjectileLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();

@@ -16,7 +16,7 @@ namespace Enemies.Logic
 {
     public class BigAsteroidLogic : IInitializable, IDisposable
     {
-        private EnemyType _type;
+        private EnemyType _type = EnemyType.BigAsteroid;
         private BigAsteroidPresentation _presentation;
         private EnemySettings _settings;
         private CustomPhysics _physics;
@@ -77,6 +77,8 @@ namespace Enemies.Logic
             _poolableObject = presentationPoolableObject;
             
             _collisionHandler = collisionHandler;
+            _collisionHandler.Configure(_settings.BigAsteroidDamage, EntityAffiliation.Enemy, 
+                EntityDurability.Piercing);
             _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
             _collisionHandler.OnDestructionCalled += GetDestroyed;
             

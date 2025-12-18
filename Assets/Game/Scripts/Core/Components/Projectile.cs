@@ -4,26 +4,31 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Core.Logic;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Components
 {
-    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(CollisionHandler))]
     public class Projectile : MonoBehaviour
     {
-        private Transform _transform;
         private PoolableObject _poolableObject;
+        private ProjectileLogic _logic;
+        private CollisionHandler _collisionHandler;
 
-        private float _speed = 0;
-        private bool _delayedDestruction = false;
-        private float _destroyAfter = 1f;
-
-        private CancellationTokenSource _cancellationTokenSource;
-        private bool _isDelayedDestructionTaskRunning = false;
-
+        [Inject]
+        private void Construct(ProjectileLogic logic)
+        {
+            _logic = logic;
+            _logic.SetPresentationTransform(transform);
+            _logic.OnDelayedDestructionCalled += CallDespawn;
+        }
+        
         private void Awake()
         {
-            _transform = GetComponent<Transform>();
+            _collisionHandler = GetComponent<CollisionHandler>();
+            _collisionHandler.OnDestructionCalled += CallDespawn;
             
             if (TryGetComponent(out PoolableObject poolableObject))
             {
@@ -33,80 +38,33 @@ namespace Core.Components
 
         private void OnDestroy()
         {
-            CancelCurrentTask();
+            _logic.OnDelayedDestructionCalled -= CallDespawn;
+            _collisionHandler.OnDestructionCalled -= CallDespawn;
+            _logic.CancelDelayedDestruction();
         }
 
         private void Update()
         {
-            _transform.Translate(Vector3.right * _speed * Time.deltaTime);
+            _logic.MoveProjectile();
         }
 
         public void Configure(float speed, bool delayedDestruction = false, float destroyAfter = 1)
         {
-            _speed = speed;
-            _delayedDestruction = delayedDestruction;
-            _destroyAfter = destroyAfter;
-
-            if (_delayedDestruction)
-            {
-                StartDelayedDeactivation();
-            }
+            _logic.ConfigureParameters(speed, delayedDestruction, destroyAfter);
         }
 
-        private void StartDelayedDeactivation()
+        private void CallDespawn()
         {
-            CancelCurrentTask();
+            _logic.CancelDelayedDestruction();
 
-            _cancellationTokenSource = new CancellationTokenSource();
-
-            _isDelayedDestructionTaskRunning = true;
-
-            DelayedDeactivationAsync(_cancellationTokenSource.Token).Forget();
-        }
-
-        private async UniTaskVoid DelayedDeactivationAsync(CancellationToken token)
-        {
-            try
+            if (_poolableObject != null)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(_destroyAfter), cancellationToken: token);
-
-                if (this == null || !_isDelayedDestructionTaskRunning) return;
-
-                if (_poolableObject == null)
-                {
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    _poolableObject.Despawn();
-                }
-
-                _isDelayedDestructionTaskRunning = false;
+                _poolableObject.Despawn();
             }
-            catch (OperationCanceledException)
+            else
             {
-                _isDelayedDestructionTaskRunning = false;
-
-                return;
+                Destroy(gameObject);
             }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Error in delayed deactivation: {e.Message}");
-
-                _isDelayedDestructionTaskRunning = false;
-            }
-        }
-
-        private void CancelCurrentTask()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                _cancellationTokenSource.Cancel();
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
-            }
-
-            _isDelayedDestructionTaskRunning = false;
         }
     }
 }
