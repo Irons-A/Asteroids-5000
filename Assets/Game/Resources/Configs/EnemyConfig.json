@@ -1,6 +1,6 @@
 {
   "BigAsteroidSpeed": 8,
-  "BigAsteroidHealth": 2,
+  "BigAsteroidHealth": 4,
   "BigAsteroidDamage": 1,
   "MinSmallAsteroidSpawnAmount": 2,
   "MaxSmallAsteroidSpawnAmount": 4,

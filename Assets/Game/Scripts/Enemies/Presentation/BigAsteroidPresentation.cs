@@ -9,8 +9,6 @@ using Zenject;
 
 namespace Enemies.Presentation
 {
-    [RequireComponent(typeof(CollisionHandler))]
-    [RequireComponent(typeof(PoolableObject))]
     public class BigAsteroidPresentation : EnemyPresentation
     {
         private BigAsteroidLogic _logic;
@@ -35,17 +33,12 @@ namespace Enemies.Presentation
 
         private void FixedUpdate()
         {
-            _logic.ProcessFixedUpdate();
+            _logic.Move();
         }
 
         private void OnEnable()
         {
             _logic.OnPresentationEnabled();
-        }
-
-        private void OnDisable()
-        {
-            
         }
     }
 }

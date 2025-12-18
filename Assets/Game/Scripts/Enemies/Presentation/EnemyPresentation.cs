@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Core.Components;
 using Core.Physics;
 using Core.Systems.ObjectPools;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine;
 namespace Enemies
 {
     [RequireComponent(typeof(PoolableObject))]
+    [RequireComponent(typeof(CollisionHandler))]
     public class EnemyPresentation : MovableObject
     {
         protected override void Awake()

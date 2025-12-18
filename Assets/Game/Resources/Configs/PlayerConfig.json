@@ -7,7 +7,7 @@
   "UncontrollabilityDuration": 2,
   "InvulnurabilityDuration": 3,
 
-  "BulletFireRateInterval": 0.33,
+  "BulletFireRateInterval": 0.25,
   "BulletSpeed": 30,
   "BulletDamage": 1,
   "LaserFireRateInterval": 0.75,

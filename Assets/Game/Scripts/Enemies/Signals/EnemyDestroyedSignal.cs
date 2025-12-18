@@ -6,5 +6,11 @@ namespace Enemies.Signals
 {
     public class EnemyDestroyedSignal
     {
+        public EnemyType Type { get; }
+
+        public EnemyDestroyedSignal(EnemyType type)
+        {
+            Type = type;
+        }
     }
 }

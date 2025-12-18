@@ -14,17 +14,12 @@ using Random = UnityEngine.Random;
 
 namespace Enemies.Logic
 {
-    public class BigAsteroidLogic : IInitializable, IDisposable
+    public class BigAsteroidLogic : BaseEnemyLogic, IInitializable, IDisposable
     {
-        private EnemyType _type = EnemyType.BigAsteroid;
-        private BigAsteroidPresentation _presentation;
-        private EnemySettings _settings;
-        private CustomPhysics _physics;
+        protected override EnemyType Type => EnemyType.BigAsteroid;
+        
         private PoolAccessProvider _objectPool;
-        private PoolableObject _poolableObject;
-        private HealthSystem _healthSystem; 
-        private CollisionHandler _collisionHandler;
-        private SignalBus _signalBus;
+        private BigAsteroidPresentation _presentation;
 
         private int _minSmallAsteroidSpawnAmount;
         private int _maxSmallAsteroidSpawnAmount;
@@ -51,7 +46,7 @@ namespace Enemies.Logic
             }
         }
 
-        public void ProcessFixedUpdate()
+        public override void Move()
         {
             _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
             _physics.ProcessPhysics();
@@ -86,19 +81,11 @@ namespace Enemies.Logic
             _healthSystem.OnHealthDepleted += GetDestroyed;
         }
 
-        public void OnPresentationEnabled()
-        {
-            _healthSystem.RestoreHealth();
-        }
-
-
-        private void GetDestroyed()
+        protected override void GetDestroyed()
         {
             //SpawnSmallAsteroids();
-
-            _signalBus.TryFire(new EnemyDestroyedSignal());
             
-            _poolableObject.Despawn();
+            base.GetDestroyed();
         }
 
         private void SpawnSmallAsteroids()
