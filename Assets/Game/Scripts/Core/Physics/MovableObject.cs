@@ -10,15 +10,7 @@ namespace Core.Physics
         // false if the object is meant to ignore first attempt to teleport it
         protected bool _shouldTeleport = false;
 
-        private Rigidbody2D _rigidbody2D;
-
         public bool ShouldTeleport => _shouldTeleport;
-        public Rigidbody2D Rigidbody2D => _rigidbody2D;
-
-        protected virtual void Awake()
-        {
-            _rigidbody2D = GetComponent<Rigidbody2D>();
-        }
 
         public void EnableTeleportation()
         {

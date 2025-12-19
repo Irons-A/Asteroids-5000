@@ -12,9 +12,8 @@ namespace Player.Presentation
         [field: SerializeField] public Transform[] BulletFirepoints { get; private set; }
         [field: SerializeField] public Transform[] LaserFirepoints { get; private set; }
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             _shouldTeleport = true;
         }
     }

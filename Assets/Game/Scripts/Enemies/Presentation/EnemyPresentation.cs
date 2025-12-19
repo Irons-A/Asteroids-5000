@@ -11,9 +11,8 @@ namespace Enemies
     [RequireComponent(typeof(CollisionHandler))]
     public class EnemyPresentation : MovableObject
     {
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
             _shouldTeleport = false;
         }
 
