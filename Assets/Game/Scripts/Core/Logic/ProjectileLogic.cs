@@ -54,12 +54,9 @@ namespace Core.Logic
         
         public void CancelDelayedDestruction()
         {
-            if (_cancellationTokenSource != null)
-            {
-                _cancellationTokenSource.Cancel();
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
-            }
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
 
             _isDelayedDestructionTaskRunning = false;
         }
@@ -72,16 +69,16 @@ namespace Core.Logic
 
             _isDelayedDestructionTaskRunning = true;
 
-            DelayedDeactivationAsync(_cancellationTokenSource.Token).Forget();
+            DelayedDeactivationTask(_cancellationTokenSource.Token).Forget();
         }
 
-        private async UniTaskVoid DelayedDeactivationAsync(CancellationToken token)
+        private async UniTaskVoid DelayedDeactivationTask(CancellationToken token)
         {
             try
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(_destroyAfter), cancellationToken: token);
 
-                if (!_isDelayedDestructionTaskRunning) return;
+                if (_isDelayedDestructionTaskRunning == false) return;
                 
                 OnDelayedDestructionCalled?.Invoke();
 

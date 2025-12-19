@@ -35,39 +35,6 @@ namespace Enemies.Logic
             _signalBus = signalBus;
         }
         
-        public void Initialize()
-        {
-            _minSmallAsteroidSpawnAmount = _settings.MinSmallAsteroidSpawnAmount;
-            _maxSmallAsteroidSpawnAmount = _settings.MaxSmallAsteroidSpawnAmount;
-
-            if (_minSmallAsteroidSpawnAmount > _maxSmallAsteroidSpawnAmount)
-            {
-                _minSmallAsteroidSpawnAmount = _maxSmallAsteroidSpawnAmount;
-            }
-        }
-
-        public override void Move()
-        {
-            _physics.ProcessPhysics();
-        }
-
-        public void Dispose()
-        {
-            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
-            
-            if (_collisionHandler != null)
-            {
-                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
-                _collisionHandler.OnDestructionCalled -= GetDestroyed;
-                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
-            }
-
-            if (_presentation != null)
-            {
-                _presentation.OnAngleUpdated -= ResetMovement;
-            }
-        }
-
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
             CollisionHandler collisionHandler)
         {
@@ -87,6 +54,22 @@ namespace Enemies.Logic
             
             _healthSystem.Configure(_settings.BigAsteroidHealth, true);
             _healthSystem.OnHealthDepleted += GetDestroyed;
+        }
+        
+        public void Initialize()
+        {
+            _minSmallAsteroidSpawnAmount = _settings.MinSmallAsteroidSpawnAmount;
+            _maxSmallAsteroidSpawnAmount = _settings.MaxSmallAsteroidSpawnAmount;
+
+            if (_minSmallAsteroidSpawnAmount > _maxSmallAsteroidSpawnAmount)
+            {
+                _minSmallAsteroidSpawnAmount = _maxSmallAsteroidSpawnAmount;
+            }
+        }
+
+        public override void Move()
+        {
+            _physics.ProcessPhysics();
         }
 
         protected override void GetDestroyed()
@@ -110,6 +93,23 @@ namespace Enemies.Logic
                 PoolableObject smallAsteroid = _objectPool.GetFromPool(PoolableObjectType.SmallAsteroid);
                 
                 _signalBus.TryFire(new EnemySpawnedSignal());
+            }
+        }
+        
+        public void Dispose()
+        {
+            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
+            
+            if (_collisionHandler != null)
+            {
+                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
+                _collisionHandler.OnDestructionCalled -= GetDestroyed;
+                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
+            }
+
+            if (_presentation != null)
+            {
+                _presentation.OnAngleUpdated -= ResetMovement;
             }
         }
     }

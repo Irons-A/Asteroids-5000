@@ -7,8 +7,10 @@ using Player.Presentation;
 using Player.UserInput;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Core.Components;
 using Core.Systems;
+using Cysharp.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Zenject;
@@ -27,11 +29,19 @@ namespace Player.Logic
         private UniversalPlayerWeaponSystem _laserWeaponSystem;
         private PlayerWeaponConfig _laserWeaponConfig;
         private CollisionHandler _playerCollisionHandler;
+        private HealthSystem _healthSystem;
+        
+        private CancellationTokenSource _uncontrollabilityCTS;
+        private bool _isUncontrollable;
+
+        private CancellationTokenSource _invulnerabilityCTS;
+        private bool _isInvulnerable;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
-            PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon, PlayerWeaponConfig laserWeaponConfig)
+            PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
+            PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -47,9 +57,12 @@ namespace Player.Logic
 
             _laserWeaponSystem = laserWeapon;
             _laserWeaponConfig = laserWeaponConfig;
+
+            _healthSystem = healthSystem;
             
             _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
+            _playerCollisionHandler.OnDamageReceived += TakeDamage;
         }
 
         public void Initialize()
@@ -81,6 +94,8 @@ namespace Player.Logic
 
         public void MovePlayer(PlayerMovementState movementState)
         {
+            if (_isUncontrollable)  return;
+            
             if (movementState == PlayerMovementState.Accelerating)
             {
                 _playerPhysics.ApplyAcceleration(_playerSettings.AccelerationSpeed, _playerSettings.MaxSpeed);
@@ -93,21 +108,32 @@ namespace Player.Logic
 
         public void ShootBullets(bool value)
         {
+            if (_isUncontrollable)  return;
+            
             _bulletWeaponSystem.SetShouldShoot(value);
         }
 
         public void ShootLaser(bool value)
         {
+            if (_isUncontrollable)  return;
+            
             _laserWeaponSystem.SetShouldShoot(value);
         }
 
-        public void TogglePause()
+        private void TakeDamage(int damage)
         {
-
+            if (_isInvulnerable) return;
+            
+            _healthSystem.TakeDamage(damage);
+            
+            StartUncontrollabilityPeriod();
+            StartInvulnerabilityPeriod();
         }
 
         private void RotatePlayerAtSpeed(Vector2 targetDirection)
         {
+            if (_isUncontrollable)  return;
+            
             targetDirection = targetDirection.normalized;
 
             float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
@@ -156,10 +182,10 @@ namespace Player.Logic
                 shouldSetFirepointAsProjectileParent: true,
                 fireRateInterval: _playerSettings.LaserFireRateInterval,
                 maxAmmo: _playerSettings.MaxLaserCharges,
-                ammoCostPerShot: 1,
+                ammoCostPerShot: _playerSettings.LaserAmmoPerShot,
                 hasInfiniteAmmo: false,
                 reloadLength: _playerSettings.LaserCooldown,
-                ammoPerReload: 1,
+                ammoPerReload: _playerSettings.LaserAmmoPerReload,
                 shouldAutoReloadOnLessThanMaxAmmo: true,
                 shouldAutoReloadOnNoAmmo: true,
                 shouldDepleteAmmoOnReload: false,
@@ -168,11 +194,75 @@ namespace Player.Logic
             _laserWeaponSystem.Configure(_laserWeaponConfig);
         }
 
+        private void StartUncontrollabilityPeriod()
+        {
+            if (_isUncontrollable) return;
+            
+            DisposeUncontrollabilityCTS();
+                
+            _uncontrollabilityCTS = new CancellationTokenSource();
+                
+            _isUncontrollable = true;
+
+            UncontrolabilityTask(_uncontrollabilityCTS.Token).Forget();
+        }
+
+        private void DisposeUncontrollabilityCTS()
+        {
+            _uncontrollabilityCTS?.Cancel();
+            _uncontrollabilityCTS?.Dispose();
+            _uncontrollabilityCTS = null;
+        }
+
+        private async UniTaskVoid UncontrolabilityTask(CancellationToken token)
+        {
+            try
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(_playerSettings.UncontrollabilityDuration),
+                    cancellationToken: token);
+
+                if (_isUncontrollable == false) return;
+
+                _isUncontrollable = false;
+            }
+            catch (OperationCanceledException)
+            {
+                _isUncontrollable = false;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Error in UncontrolabilityTask: {e.Message}");
+
+                _isUncontrollable = false;
+            }
+        }
+        
+        private void StartInvulnerabilityPeriod()
+        {
+            if (_isInvulnerable) return;
+            
+            DisposeInvulnerabilityCTS();
+                
+            _invulnerabilityCTS = new CancellationTokenSource();
+                
+            _isInvulnerable = true;
+
+            //UncontrolabilityTask(_invulnerabilityCTS.Token).Forget();
+        }
+
+        private void DisposeInvulnerabilityCTS()
+        {
+            _invulnerabilityCTS?.Cancel();
+            _invulnerabilityCTS?.Dispose();
+            _invulnerabilityCTS = null;
+        }
+
         public void Dispose()
         {
             if (_playerCollisionHandler != null)
             {
                 _playerCollisionHandler.OnRicochetCalled -= _playerPhysics.ApplyRicochet;
+                _playerCollisionHandler.OnDamageReceived -= TakeDamage;
             }
         }
     }

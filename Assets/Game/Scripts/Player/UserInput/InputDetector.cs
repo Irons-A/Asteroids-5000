@@ -155,7 +155,7 @@ namespace Player.UserInput
 
             if (_currentStrategy.IsPausePressed())
             {
-                _playerLogic.TogglePause();
+                //toggle pause
             }
         }
     }

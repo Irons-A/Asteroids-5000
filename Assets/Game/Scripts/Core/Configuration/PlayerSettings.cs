@@ -10,15 +10,17 @@ namespace Core.Configuration
         public float DecelerationSpeed;
         public float MaxSpeed;
         public float RotationSpeed;
-        public int MaxLives3;
+        public int MaxHealth;
         public float UncontrollabilityDuration;
-        public float InvulnurabilityDuration;
+        public float InvulnerabilityDuration;
 
         public float BulletFireRateInterval;
         public float BulletSpeed;
         public int BulletDamage;
         public float LaserFireRateInterval;
         public int MaxLaserCharges;
+        public int LaserAmmoPerShot;
+        public int LaserAmmoPerReload;
         public float LaserCooldown;
         public float LaserDuration;
         public int LaserDamage;
