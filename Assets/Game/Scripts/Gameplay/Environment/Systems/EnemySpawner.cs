@@ -93,12 +93,15 @@ namespace Gameplay.Environment.Systems
                         PoolableObject enemy = _objectPool.GetFromPool(enemyType);
                         
                         enemy.transform.position = spawnPosition;
-                        
-                        Vector3 direction = _playerTransform.position - enemy.transform.position;
-                        
-                        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                        enemy.transform.rotation = Quaternion.Euler(0, 0, angle);
 
+                        if (enemy.TryGetComponent(out EnemyPresentation presentation))
+                        {
+                            Vector3 direction = _playerTransform.position - enemy.transform.position;
+                            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                            
+                            presentation.SetAngle(angle);
+                        }
+                        
                         _livingEnemyCount++;
                     }
                 }

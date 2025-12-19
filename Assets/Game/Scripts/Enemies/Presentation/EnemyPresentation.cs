@@ -1,16 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Components;
 using Core.Physics;
 using Core.Systems.ObjectPools;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Enemies
 {
     [RequireComponent(typeof(PoolableObject))]
-    [RequireComponent(typeof(CollisionHandler))]
     public class EnemyPresentation : MovableObject
     {
+        public event Action OnAngleUpdated;
+        
         protected virtual void Awake()
         {
             _shouldTeleport = false;
@@ -26,6 +29,13 @@ namespace Enemies
             }
             
             transform.rotation =  Quaternion.Euler(0, 0, angle);
+            
+            OnAngleUpdated?.Invoke();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            OnAngleUpdated = null;
         }
     }
 }

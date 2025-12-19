@@ -1,3 +1,4 @@
+using System;
 using Core.Configuration;
 using Core.Physics;
 using Core.Systems.ObjectPools;
@@ -6,6 +7,7 @@ using Player.Presentation;
 using Player.UserInput;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Components;
 using Core.Systems;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -13,7 +15,7 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerLogic : IFixedTickable, IInitializable
+    public class PlayerLogic : IFixedTickable, IInitializable, IDisposable
     {
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
@@ -24,6 +26,7 @@ namespace Player.Logic
         private PlayerWeaponConfig _bulletWeaponConfig;
         private UniversalPlayerWeaponSystem _laserWeaponSystem;
         private PlayerWeaponConfig _laserWeaponConfig;
+        private CollisionHandler _playerCollisionHandler;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
@@ -44,6 +47,9 @@ namespace Player.Logic
 
             _laserWeaponSystem = laserWeapon;
             _laserWeaponConfig = laserWeaponConfig;
+            
+            _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
+            _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
         }
 
         public void Initialize()
@@ -160,6 +166,14 @@ namespace Player.Logic
                 shouldBlockFireWhileReaload: false);
 
             _laserWeaponSystem.Configure(_laserWeaponConfig);
+        }
+
+        public void Dispose()
+        {
+            if (_playerCollisionHandler != null)
+            {
+                _playerCollisionHandler.OnRicochetCalled -= _playerPhysics.ApplyRicochet;
+            }
         }
     }
 }

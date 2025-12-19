@@ -19,10 +19,6 @@ namespace Core.Physics
         private Vector2 _currentAcceleration;
         private Vector2 _currentVelocity;
 
-        // Для отслеживания последнего движения (опционально)
-        private Vector2 _lastFramePosition;
-        private float _lastMoveTime;
-
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
             float objectMass = BaseObjectMass)
         {
@@ -32,11 +28,6 @@ namespace Core.Physics
 
             _currentAcceleration = Vector2.zero;
             _currentVelocity = Vector2.zero;
-            
-            if (_movableObject != null)
-            {
-                _lastFramePosition = _movableObject.transform.position;
-            }
         }
 
         public void ApplyAcceleration(float acceleration, float maxSpeed)
@@ -95,17 +86,14 @@ namespace Core.Physics
                 ApplyFriction();
             }
             
-            ApplyTransformMovement();
-        }
-
-        private void ApplyTransformMovement()
-        {
             Vector2 movement = _currentVelocity * Time.fixedDeltaTime;
             
             _movableObject.transform.position += new Vector3(movement.x, movement.y, 0);
-            
-            _lastFramePosition = _movableObject.transform.position;
-            _lastMoveTime = Time.time;
+        }
+
+        public void ApplyRicochet()
+        {
+            _currentVelocity = -_currentVelocity;
         }
 
         public void SetInstantVelocity(float speed)
@@ -127,7 +115,13 @@ namespace Core.Physics
                 _currentVelocity += impulse;
             }
         }
-
+        
+        public void Stop()
+        {
+            _currentVelocity = Vector2.zero;
+            _currentAcceleration = Vector2.zero;
+        }
+        
         private void ApplyFriction()
         {
             float effectiveFriction = _friction;
@@ -145,40 +139,6 @@ namespace Core.Physics
             {
                 _currentVelocity = Vector2.zero;
             }
-        }
-        
-        public Vector2 GetVelocity() => _currentVelocity;
-        public float GetSpeed() => _currentVelocity.magnitude;
-        public Vector2 GetLastFramePosition() => _lastFramePosition;
-        
-        public void ApplyExternalForce(Vector2 force)
-        {
-            float effectiveForce = force.magnitude;
-            
-            if (_objectMass > 0)
-            {
-                effectiveForce = force.magnitude / _objectMass;
-            }
-            
-            _currentVelocity += force.normalized * effectiveForce;
-        }
-        
-        public void Stop()
-        {
-            _currentVelocity = Vector2.zero;
-            _currentAcceleration = Vector2.zero;
-        }
-        
-        public void SmoothStop(float stopTime)
-        {
-            if (stopTime <= 0)
-            {
-                Stop();
-                return;
-            }
-            
-            float deceleration = _currentVelocity.magnitude / stopTime;
-            ApplyDeceleration(deceleration);
         }
     }
 }

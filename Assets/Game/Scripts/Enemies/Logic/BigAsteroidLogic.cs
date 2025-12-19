@@ -48,7 +48,6 @@ namespace Enemies.Logic
 
         public override void Move()
         {
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
             _physics.ProcessPhysics();
         }
 
@@ -60,6 +59,12 @@ namespace Enemies.Logic
             {
                 _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
                 _collisionHandler.OnDestructionCalled -= GetDestroyed;
+                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
+            }
+
+            if (_presentation != null)
+            {
+                _presentation.OnAngleUpdated -= ResetMovement;
             }
         }
 
@@ -67,15 +72,18 @@ namespace Enemies.Logic
             CollisionHandler collisionHandler)
         {
             _presentation = presentation;
+            _presentation.OnAngleUpdated += ResetMovement;
+            
             _physics.SetMovableObject(_presentation);
             
             _poolableObject = presentationPoolableObject;
             
             _collisionHandler = collisionHandler;
             _collisionHandler.Configure(_settings.BigAsteroidDamage, EntityAffiliation.Enemy, 
-                EntityDurability.Piercing);
+                EntityDurability.Piercing, shouldCauseRicochet: true);
             _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
             _collisionHandler.OnDestructionCalled += GetDestroyed;
+            _collisionHandler.OnRicochetCalled += _physics.ApplyRicochet;
             
             _healthSystem.Configure(_settings.BigAsteroidHealth, true);
             _healthSystem.OnHealthDepleted += GetDestroyed;
@@ -86,6 +94,11 @@ namespace Enemies.Logic
             //SpawnSmallAsteroids();
             
             base.GetDestroyed();
+        }
+
+        private void ResetMovement()
+        {
+            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
         }
 
         private void SpawnSmallAsteroids()

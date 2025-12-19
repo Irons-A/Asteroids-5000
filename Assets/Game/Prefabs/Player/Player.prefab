@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 4552551164705340848}
   - component: {fileID: 6162929852428033336}
   - component: {fileID: 408510366676570107}
+  - component: {fileID: 5112473622069581258}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -231,6 +232,22 @@ MonoBehaviour:
   - {fileID: 6394831848732044998}
   <LaserFirepoints>k__BackingField:
   - {fileID: 8964495639824136935}
+--- !u!114 &5112473622069581258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4467138260098913272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df41425646659c4eb0261f8670b9cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Damage>k__BackingField: 0
+  <Affiliation>k__BackingField: 0
+  <Durability>k__BackingField: 2
+  <ShouldCauseRicochet>k__BackingField: 1
 --- !u!1 &7512897743088913637
 GameObject:
   m_ObjectHideFlags: 0

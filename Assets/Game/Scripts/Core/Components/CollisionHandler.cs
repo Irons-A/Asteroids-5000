@@ -14,15 +14,19 @@ namespace Core.Components
         [field: SerializeField] public int Damage { get; private set; } = 0;
         [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
         [field: SerializeField] public EntityDurability Durability { get; private set; }
+        [field: SerializeField] public bool ShouldCauseRicochet { get; private set; } = false;
 
         public event Action<int> OnDamageReceived;
         public event Action OnDestructionCalled;
+        public event Action OnRicochetCalled;
 
-        public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability)
+        public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability, 
+            bool shouldCauseRicochet = false)
         {
             Damage = damage;
             Affiliation = affiliation;
             Durability = durability;
+            ShouldCauseRicochet = shouldCauseRicochet;
         }
 
         public void DealDamage(int damage)
@@ -36,6 +40,11 @@ namespace Core.Components
         public void CallForDestruction()
         {
             OnDestructionCalled?.Invoke();
+        }
+
+        public void CallForRicochet()
+        {
+            OnRicochetCalled?.Invoke();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -60,9 +69,19 @@ namespace Core.Components
             
             this.DealDamage(otherHandler.Damage);
             
+            if (otherHandler.ShouldCauseRicochet)
+            {
+                CallForRicochet();
+            }
+            
             if (otherHandler.Durability == EntityDurability.Fragile)
             {
                 otherHandler.CallForDestruction();
+            }
+            
+            if (ShouldCauseRicochet)
+            {
+                otherHandler.CallForRicochet();
             }
             
             if (Durability == EntityDurability.Fragile)
