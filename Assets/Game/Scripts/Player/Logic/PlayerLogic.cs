@@ -34,8 +34,12 @@ namespace Player.Logic
         private CancellationTokenSource _uncontrollabilityCTS;
         private bool _isUncontrollable;
 
+        private SpriteRenderer _playerSpriteRenderer;
         private CancellationTokenSource _invulnerabilityCTS;
         private bool _isInvulnerable;
+        private float _blinkInterval = 0.2f;
+        private Color _originalColor;
+        private Color _invulnerableColor = Color.cyan;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
@@ -63,6 +67,9 @@ namespace Player.Logic
             _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
             _playerCollisionHandler.OnDamageReceived += TakeDamage;
+            
+            _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
+            _originalColor = _playerSpriteRenderer.color;
         }
 
         public void Initialize()
@@ -227,12 +234,9 @@ namespace Player.Logic
             }
             catch (OperationCanceledException)
             {
-                _isUncontrollable = false;
             }
-            catch (Exception e)
+            finally
             {
-                Debug.LogWarning($"Error in UncontrolabilityTask: {e.Message}");
-
                 _isUncontrollable = false;
             }
         }
@@ -247,7 +251,7 @@ namespace Player.Logic
                 
             _isInvulnerable = true;
 
-            //UncontrolabilityTask(_invulnerabilityCTS.Token).Forget();
+            InvulnerabilityTask().Forget();
         }
 
         private void DisposeInvulnerabilityCTS()
@@ -255,6 +259,68 @@ namespace Player.Logic
             _invulnerabilityCTS?.Cancel();
             _invulnerabilityCTS?.Dispose();
             _invulnerabilityCTS = null;
+        }
+        
+        public async UniTask InvulnerabilityTask()
+        {
+            try
+            {
+                await BlinkEffect(_invulnerabilityCTS.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                ResetInvulnerabilityEffect();
+            }
+        }
+        
+        private async UniTask BlinkEffect(CancellationToken cancellationToken)
+        {
+            float elapsedTime = 0f;
+            bool isVisible = true;
+        
+            while (elapsedTime < _playerSettings.InvulnerabilityDuration)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+                
+                isVisible = !isVisible;
+                
+                SetSpriteVisibility(isVisible);
+                
+                await UniTask.Delay(TimeSpan.FromSeconds(_blinkInterval), 
+                    cancellationToken: cancellationToken);
+            
+                elapsedTime += _blinkInterval;
+            }
+        }
+        
+        private void SetSpriteVisibility(bool isVisible)
+        {
+            if (_playerSpriteRenderer == null) return;
+        
+            if (isVisible)
+            {
+                _playerSpriteRenderer.color = _invulnerableColor;
+                _playerSpriteRenderer.enabled = true;
+            }
+            else
+            {
+                var transparentColor = _invulnerableColor;
+                transparentColor.a = 0.3f;
+                _playerSpriteRenderer.color = transparentColor;
+            }
+        }
+        
+        private void ResetInvulnerabilityEffect()
+        {
+            DisposeInvulnerabilityCTS();
+            
+            _playerSpriteRenderer.color = _originalColor;
+            _playerSpriteRenderer.enabled = true;
+            
+            _isInvulnerable = false;
         }
 
         public void Dispose()
