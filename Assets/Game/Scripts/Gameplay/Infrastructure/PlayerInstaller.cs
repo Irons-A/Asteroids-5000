@@ -18,8 +18,9 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
-            //Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
+            Container.BindInterfacesAndSelfTo<InvulnerabilityLogic>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<UncontrollabilityLogic>().FromNew().AsTransient();
             Container.Bind<PlayerWeaponConfig>().FromNew().AsTransient();
             Container.Bind<PlayerAmmoSubsystem>().FromNew().AsTransient();
             Container.Bind<PlayerReloadingSubsystem>().FromNew().AsTransient();

@@ -4,7 +4,7 @@
   "MaxSpeed": 12,
   "RotationSpeed": 360,
   "MaxHealth": 3,
-  "UncontrollabilityDuration": 2,
+  "UncontrollabilityDuration": 1.5,
   "InvulnerabilityDuration": 3,
 
   "BulletFireRateInterval": 0.25,

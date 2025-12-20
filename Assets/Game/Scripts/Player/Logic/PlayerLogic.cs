@@ -30,22 +30,16 @@ namespace Player.Logic
         private PlayerWeaponConfig _laserWeaponConfig;
         private CollisionHandler _playerCollisionHandler;
         private HealthSystem _healthSystem;
-        
-        private CancellationTokenSource _uncontrollabilityCTS;
-        private bool _isUncontrollable;
-
+        private InvulnerabilityLogic _invulnerabilityLogic;
         private SpriteRenderer _playerSpriteRenderer;
-        private CancellationTokenSource _invulnerabilityCTS;
-        private bool _isInvulnerable;
-        private float _blinkInterval = 0.2f;
-        private Color _originalColor;
-        private Color _invulnerableColor = Color.cyan;
+        private UncontrollabilityLogic _playerUncontrollabilityLogic;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
-            PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem)
+            PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,
+            UncontrollabilityLogic  uncontrollabilityLogic)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -68,8 +62,10 @@ namespace Player.Logic
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
             _playerCollisionHandler.OnDamageReceived += TakeDamage;
             
+            _invulnerabilityLogic = invulnerabilityLogic;
             _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
-            _originalColor = _playerSpriteRenderer.color;
+            
+            _playerUncontrollabilityLogic = uncontrollabilityLogic;
         }
 
         public void Initialize()
@@ -78,6 +74,9 @@ namespace Player.Logic
             
             ConfigureBulletWeaponSystem();
             ConfigureLaserWeaponSystem();
+            
+            _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
+            _playerUncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
         }
 
         public void FixedTick()
@@ -101,7 +100,7 @@ namespace Player.Logic
 
         public void MovePlayer(PlayerMovementState movementState)
         {
-            if (_isUncontrollable)  return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
             
             if (movementState == PlayerMovementState.Accelerating)
             {
@@ -115,31 +114,31 @@ namespace Player.Logic
 
         public void ShootBullets(bool value)
         {
-            if (_isUncontrollable)  return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
             
             _bulletWeaponSystem.SetShouldShoot(value);
         }
 
         public void ShootLaser(bool value)
         {
-            if (_isUncontrollable)  return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
             
             _laserWeaponSystem.SetShouldShoot(value);
         }
 
         private void TakeDamage(int damage)
         {
-            if (_isInvulnerable) return;
+            if (_invulnerabilityLogic.IsInvulnerable) return;
             
             _healthSystem.TakeDamage(damage);
             
-            StartUncontrollabilityPeriod();
-            StartInvulnerabilityPeriod();
+            _playerUncontrollabilityLogic.StartUncontrollabilityPeriod();
+            _invulnerabilityLogic.StartInvulnerabilityPeriod();
         }
 
         private void RotatePlayerAtSpeed(Vector2 targetDirection)
         {
-            if (_isUncontrollable)  return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
             
             targetDirection = targetDirection.normalized;
 
@@ -199,128 +198,6 @@ namespace Player.Logic
                 shouldBlockFireWhileReaload: false);
 
             _laserWeaponSystem.Configure(_laserWeaponConfig);
-        }
-
-        private void StartUncontrollabilityPeriod()
-        {
-            if (_isUncontrollable) return;
-            
-            DisposeUncontrollabilityCTS();
-                
-            _uncontrollabilityCTS = new CancellationTokenSource();
-                
-            _isUncontrollable = true;
-
-            UncontrolabilityTask(_uncontrollabilityCTS.Token).Forget();
-        }
-
-        private void DisposeUncontrollabilityCTS()
-        {
-            _uncontrollabilityCTS?.Cancel();
-            _uncontrollabilityCTS?.Dispose();
-            _uncontrollabilityCTS = null;
-        }
-
-        private async UniTaskVoid UncontrolabilityTask(CancellationToken token)
-        {
-            try
-            {
-                await UniTask.Delay(TimeSpan.FromSeconds(_playerSettings.UncontrollabilityDuration),
-                    cancellationToken: token);
-
-                if (_isUncontrollable == false) return;
-
-                _isUncontrollable = false;
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            finally
-            {
-                _isUncontrollable = false;
-            }
-        }
-        
-        private void StartInvulnerabilityPeriod()
-        {
-            if (_isInvulnerable) return;
-            
-            DisposeInvulnerabilityCTS();
-                
-            _invulnerabilityCTS = new CancellationTokenSource();
-                
-            _isInvulnerable = true;
-
-            InvulnerabilityTask().Forget();
-        }
-
-        private void DisposeInvulnerabilityCTS()
-        {
-            _invulnerabilityCTS?.Cancel();
-            _invulnerabilityCTS?.Dispose();
-            _invulnerabilityCTS = null;
-        }
-        
-        public async UniTask InvulnerabilityTask()
-        {
-            try
-            {
-                await BlinkEffect(_invulnerabilityCTS.Token);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            finally
-            {
-                ResetInvulnerabilityEffect();
-            }
-        }
-        
-        private async UniTask BlinkEffect(CancellationToken cancellationToken)
-        {
-            float elapsedTime = 0f;
-            bool isVisible = true;
-        
-            while (elapsedTime < _playerSettings.InvulnerabilityDuration)
-            {
-                if (cancellationToken.IsCancellationRequested) break;
-                
-                isVisible = !isVisible;
-                
-                SetSpriteVisibility(isVisible);
-                
-                await UniTask.Delay(TimeSpan.FromSeconds(_blinkInterval), 
-                    cancellationToken: cancellationToken);
-            
-                elapsedTime += _blinkInterval;
-            }
-        }
-        
-        private void SetSpriteVisibility(bool isVisible)
-        {
-            if (_playerSpriteRenderer == null) return;
-        
-            if (isVisible)
-            {
-                _playerSpriteRenderer.color = _invulnerableColor;
-                _playerSpriteRenderer.enabled = true;
-            }
-            else
-            {
-                var transparentColor = _invulnerableColor;
-                transparentColor.a = 0.3f;
-                _playerSpriteRenderer.color = transparentColor;
-            }
-        }
-        
-        private void ResetInvulnerabilityEffect()
-        {
-            DisposeInvulnerabilityCTS();
-            
-            _playerSpriteRenderer.color = _originalColor;
-            _playerSpriteRenderer.enabled = true;
-            
-            _isInvulnerable = false;
         }
 
         public void Dispose()
