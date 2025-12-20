@@ -25,7 +25,7 @@ namespace Enemies.Logic
         private int _maxSmallAsteroidSpawnAmount;
 
         [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem  healthSystem,
+        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             PoolAccessProvider accessProvider, SignalBus signalBus)
         {
             _settings = configProvider.EnemySettingsRef;

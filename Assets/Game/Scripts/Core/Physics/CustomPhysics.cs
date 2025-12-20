@@ -14,7 +14,7 @@ namespace Core.Physics
         private float _friction;
         private float _objectMass;
 
-        private MovableObject _movableObject;
+        private Transform _movableObjectTransform;
 
         private Vector2 _currentAcceleration;
         private Vector2 _currentVelocity;
@@ -22,7 +22,7 @@ namespace Core.Physics
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
             float objectMass = BaseObjectMass)
         {
-            _movableObject = movableObject;
+            _movableObjectTransform = movableObject.transform;
             _friction = friction <= 0 ? BaseFriction : friction;
             _objectMass = objectMass <= 0 ? BaseObjectMass : objectMass;
 
@@ -32,9 +32,9 @@ namespace Core.Physics
 
         public void ApplyAcceleration(float acceleration, float maxSpeed)
         {
-            if (_movableObject == null) return;
+            if (_movableObjectTransform == null) return;
 
-            Vector2 direction = _movableObject.transform.right;
+            Vector2 direction = _movableObjectTransform.right;
 
             float effectiveAcceleration = acceleration;
 
@@ -55,7 +55,7 @@ namespace Core.Physics
 
         public void ApplyDeceleration(float deceleration)
         {
-            if (_movableObject == null) return;
+            if (_movableObjectTransform == null) return;
 
             float effectiveDeceleration = deceleration;
 
@@ -76,7 +76,7 @@ namespace Core.Physics
         
         public void ProcessPhysics()
         {
-            if (_movableObject == null || _movableObject.transform == null) return;
+            if (_movableObjectTransform == null) return;
             
             _currentVelocity += _currentAcceleration * Time.fixedDeltaTime;
             _currentAcceleration = Vector2.zero;
@@ -88,7 +88,7 @@ namespace Core.Physics
             
             Vector2 movement = _currentVelocity * Time.fixedDeltaTime;
             
-            _movableObject.transform.position += new Vector3(movement.x, movement.y, 0);
+            _movableObjectTransform.position += new Vector3(movement.x, movement.y, 0);
         }
 
         public void ApplyRicochet()
@@ -98,9 +98,10 @@ namespace Core.Physics
 
         public void SetInstantVelocity(float speed)
         {
-            if (_movableObject == null) return;
+            if (_movableObjectTransform == null) return;
 
-            Vector2 direction = _movableObject.transform.right;
+            Vector2 direction = _movableObjectTransform.right;
+            
             _currentVelocity = direction * speed;
         }
 

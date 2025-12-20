@@ -12,11 +12,11 @@ using Zenject;
 
 namespace Enemies.Logic
 {
-    public class SmallAsteroidLogic : BaseEnemyLogic, IDisposable
+    public class UFOLogic : BaseEnemyLogic, IDisposable
     {
-        protected override EnemyType Type => EnemyType.SmallAsteroid;
+        protected override EnemyType Type => EnemyType.UFO;
         
-        private SmallAsteroidPresentation _presentation;
+        private UFOPresentation _presentation;
         
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
@@ -28,7 +28,7 @@ namespace Enemies.Logic
             _signalBus = signalBus;
         }
         
-        public void Configure(SmallAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
+        public void Configure(UFOPresentation presentation, PoolableObject presentationPoolableObject,
             CollisionHandler collisionHandler)
         {
             _presentation = presentation;
