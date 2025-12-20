@@ -12,6 +12,9 @@ namespace Enemies
     [RequireComponent(typeof(PoolableObject))]
     public class EnemyPresentation : MovableObject
     {
+        protected PoolableObject _poolableObject;
+        protected CollisionHandler _collisionHandler;
+        
         public event Action OnAngleUpdated;
         
         protected virtual void Awake()
@@ -28,7 +31,7 @@ namespace Enemies
                 angleToSet = Random.Range(0, 360);
             }
             
-            transform.rotation =  Quaternion.Euler(0, 0, angle);
+            transform.rotation =  Quaternion.Euler(0, 0, angleToSet);
             
             OnAngleUpdated?.Invoke();
         }

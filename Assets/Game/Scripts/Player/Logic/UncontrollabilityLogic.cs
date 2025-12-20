@@ -25,7 +25,7 @@ namespace Player.Logic
 
         public void StartUncontrollabilityPeriod()
         {
-            if (IsUncontrollable) return;
+            if (IsUncontrollable || _isConfigured == false) return;
             
             DisposeUncontrollabilityCTS();
                 

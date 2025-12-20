@@ -155,7 +155,6 @@ namespace Player.Logic.Weapons
             }
             catch (OperationCanceledException)
             {
-                //Debug.Log("Shooting loop cancelled");
             }
             finally
             {
@@ -211,9 +210,9 @@ namespace Player.Logic.Weapons
                 Debug.LogError("Projectile does not have Projectile component!");
             }
 
-            if (poolableObject.TryGetComponent(out CollisionHandler damageDealer))
+            if (poolableObject.TryGetComponent(out CollisionHandler collisionHandler))
             {
-                damageDealer.Configure(_config.ProjectileDamage, _config.ProjectileAffiliation,
+                collisionHandler.Configure(_config.ProjectileDamage, _config.ProjectileAffiliation,
                     _config.ProjectileDurability);
             }
             else

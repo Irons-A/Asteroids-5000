@@ -39,13 +39,13 @@ namespace Gameplay.Infrastructure
             Container.Bind<PoolAccessProvider>().FromInstance(_poolAccessProvider).AsSingle();
         }
 
-
         private void BindLogicSystems()
         {
             Container.BindInterfacesAndSelfTo<ProjectileLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
             Container.Bind<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<SmallAsteroidLogic>().FromNew().AsTransient();
         }
         
         private void BindObjectPool()

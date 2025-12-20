@@ -12,8 +12,6 @@ namespace Enemies.Presentation
     public class BigAsteroidPresentation : EnemyPresentation
     {
         private BigAsteroidLogic _logic;
-        private PoolableObject _poolableObject;
-        private CollisionHandler _collisionHandler;
         
         [Inject]
         private void Construct(BigAsteroidLogic logic)

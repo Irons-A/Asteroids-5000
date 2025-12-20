@@ -114,14 +114,20 @@ namespace Player.Logic
 
         public void ShootBullets(bool value)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable)
+            {
+                value = false;
+            }
             
             _bulletWeaponSystem.SetShouldShoot(value);
         }
 
         public void ShootLaser(bool value)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
+            if (_playerUncontrollabilityLogic.IsUncontrollable)
+            {
+                value = false;
+            }
             
             _laserWeaponSystem.SetShouldShoot(value);
         }

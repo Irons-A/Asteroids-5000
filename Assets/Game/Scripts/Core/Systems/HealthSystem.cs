@@ -26,11 +26,13 @@ namespace Core.Systems
         public void Dispose()
         {
             OnHealthChanged = null;
-            OnHealthChanged = null;
+            OnHealthDepleted = null;
         }
 
         public void TakeDamage(int damage)
         {
+            if (CurrentHealth <= 0) return;
+            
             damage = Math.Max(1, damage);
 
             CurrentHealth -= damage;
