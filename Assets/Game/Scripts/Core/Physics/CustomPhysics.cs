@@ -94,6 +94,7 @@ namespace Core.Physics
         public void ApplyRicochet()
         {
             _currentVelocity = -_currentVelocity;
+            _movableObjectTransform.Rotate(0f, 0f, 180f, Space.Self);
         }
 
         public void SetInstantVelocity(float speed)
