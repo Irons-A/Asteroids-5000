@@ -15,25 +15,25 @@ namespace Enemies.Logic
     {
         protected abstract EnemyType Type { get; }
         
-        protected EnemySettings _settings;
-        protected CustomPhysics _physics;
-        protected PoolableObject _poolableObject;
-        protected HealthSystem _healthSystem; 
-        protected CollisionHandler _collisionHandler;
-        protected SignalBus _signalBus;
+        protected EnemySettings Settings;
+        protected CustomPhysics Physics;
+        protected PoolableObject PoolableObject;
+        protected HealthSystem HealthSystem; 
+        protected CollisionHandler CollisionHandler;
+        protected SignalBus SignalBus;
 
         public abstract void Move();
 
         public virtual void OnPresentationEnabled()
         {
-            _healthSystem.RestoreHealth();
+            HealthSystem.RestoreHealth();
         }
         
         protected virtual void GetDestroyed()
         {
-            _signalBus.TryFire(new EnemyDestroyedSignal(Type));
+            SignalBus.TryFire(new EnemyDestroyedSignal(Type));
             
-            _poolableObject.Despawn();
+            PoolableObject.Despawn();
         }
     }
 }

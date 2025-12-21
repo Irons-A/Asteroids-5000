@@ -9,10 +9,11 @@
   "SmallAsteroidHealth": 1,
   "SmallAsteroidDamage": 1,
   
-  "UFOSpeed": 3,
+  "UFOSpeed": 5,
   "UFOHealth": 4,
   "UFODamage": 1,
   "UFOProjectileDamage": 1,
-  "UFORotationSpeed": 60,
+  "UFOProjectileSpeed": 10,
+  "UFORotationSpeed": 30,
   "UFOFireRateInterval": 1.5
 }

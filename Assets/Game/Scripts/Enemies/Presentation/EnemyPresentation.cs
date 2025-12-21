@@ -14,17 +14,20 @@ namespace Enemies
     {
         protected PoolableObject PoolableObject;
         protected CollisionHandler CollisionHandler;
+        protected Transform PlayerTransform;
 
-        public Transform PlayerTransform { get; private set; }
+        public event Action<Transform> OnTargetTransformChanged;
+        
         
         protected virtual void Awake()
         {
             _shouldTeleport = false;
         }
 
-        public void SetPlayerTransform(Transform playerTransform)
+        public void SetTargetTransform(Transform playerTransform)
         {
             PlayerTransform = playerTransform;
+            OnTargetTransformChanged?.Invoke(PlayerTransform);
         }
 
         public virtual void SetAngle(float angle, bool shouldRandomize = false, bool setAngleToPlayer = false)
@@ -43,6 +46,11 @@ namespace Enemies
             }
             
             transform.rotation =  Quaternion.Euler(0, 0, angleToSet);
+        }
+
+        protected void OnDestroy()
+        {
+            OnTargetTransformChanged = null;
         }
     }
 }

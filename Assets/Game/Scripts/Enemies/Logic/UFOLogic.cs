@@ -17,74 +17,101 @@ namespace Enemies.Logic
         protected override EnemyType Type => EnemyType.UFO;
         
         private UFOPresentation _presentation;
+        private Transform _targetTransform;
+        private EnemyShootingSystem _shootingSystem;
         
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
-            SignalBus signalBus)
+            SignalBus signalBus, EnemyShootingSystem shootingSystem)
         {
-            _settings = configProvider.EnemySettingsRef;
-            _physics = physics;
-            _healthSystem = healthSystem;
-            _signalBus = signalBus;
+            Settings = configProvider.EnemySettingsRef;
+            Physics = physics;
+            HealthSystem = healthSystem;
+            SignalBus = signalBus;
+            _shootingSystem = shootingSystem;
         }
         
         public void Configure(UFOPresentation presentation, PoolableObject presentationPoolableObject,
             CollisionHandler collisionHandler)
         {
             _presentation = presentation;
+            _presentation.OnTargetTransformChanged += SetTargetTransform;
             
-            _physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation);
             
-            _poolableObject = presentationPoolableObject;
+            PoolableObject = presentationPoolableObject;
             
-            _collisionHandler = collisionHandler;
-            _collisionHandler.Configure(_settings.SmallAsteroidDamage, EntityAffiliation.Enemy, 
+            CollisionHandler = collisionHandler;
+            CollisionHandler.Configure(Settings.UFODamage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true);
-            _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
-            _collisionHandler.OnDestructionCalled += GetDestroyed;
-            _collisionHandler.OnRicochetCalled += _physics.ApplyRicochet;
+            CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
+            CollisionHandler.OnDestructionCalled += GetDestroyed;
+            CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            _healthSystem.Configure(_settings.SmallAsteroidHealth, true);
-            _healthSystem.OnHealthDepleted += GetDestroyed;
+            HealthSystem.Configure(Settings.UFOHealth, true);
+            HealthSystem.OnHealthDepleted += GetDestroyed;
+            
+            _shootingSystem.Configure(Settings.UFODamage, Settings.UFOFireRateInterval,
+                Settings.UFOProjectileSpeed, _presentation.transform, PoolableObjectType.UFOBullet,
+                _presentation.Firepoints);
         }
 
         public void RotateTowardsPlayer()
         {
-            if (_presentation.PlayerTransform == null) return;
+            if (_targetTransform == null) return;
             
-            Vector3 direction = _presentation.PlayerTransform.position - _presentation.transform.position;
+            Vector3 direction = _targetTransform.position - _presentation.transform.position;
             
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             
             Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
 
             _presentation.transform.rotation = Quaternion.RotateTowards(_presentation.transform.rotation,
-                targetRotation, _settings.UFORotationSpeed * Time.deltaTime);
-            
+                targetRotation, Settings.UFORotationSpeed * Time.deltaTime);
         }
         
         public override void Move()
         {
-            //set moveAtRotationAngle to true for UFO to home to player, to false for chaotic movement
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed, false);
-            _physics.ProcessPhysics();
+            Physics.SetInstantVelocity(Settings.UFOSpeed);
+            Physics.ProcessPhysics();
         }
 
         public override void OnPresentationEnabled()
         {
             base.OnPresentationEnabled();
-            _presentation.SetAngle(0, true);
+            _presentation.SetAngle(0, shouldRandomize:false, setAngleToPlayer: true);
+            _shootingSystem.TryStartShooting();
+        }
+
+        protected override void GetDestroyed()
+        {
+            _shootingSystem.StopShooting();
+            base.GetDestroyed();
+        }
+
+        private void SetTargetTransform(Transform targetTransform)
+        {
+            _targetTransform = targetTransform;
+            _shootingSystem.SetTarget(_targetTransform);
+            _shootingSystem.TryStartShooting();
         }
         
         public void Dispose()
         {
-            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
+            _shootingSystem.StopShooting();
             
-            if (_collisionHandler != null)
+            if (HealthSystem != null) HealthSystem.OnHealthDepleted -= GetDestroyed;
+            
+            if (CollisionHandler != null)
             {
-                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
-                _collisionHandler.OnDestructionCalled -= GetDestroyed;
-                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
+                CollisionHandler.OnDamageReceived -= HealthSystem.TakeDamage;
+                CollisionHandler.OnDestructionCalled -= GetDestroyed;
+                CollisionHandler.OnRicochetCalled -= Physics.ApplyRicochet;
+            }
+
+            if (_presentation != null)
+            {
+                _presentation.OnTargetTransformChanged -= SetTargetTransform;
             }
         }
     }

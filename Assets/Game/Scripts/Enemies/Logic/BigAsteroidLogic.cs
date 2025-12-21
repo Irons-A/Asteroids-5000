@@ -28,11 +28,11 @@ namespace Enemies.Logic
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             PoolAccessProvider accessProvider, SignalBus signalBus)
         {
-            _settings = configProvider.EnemySettingsRef;
-            _physics = physics;
-            _healthSystem = healthSystem;
+            Settings = configProvider.EnemySettingsRef;
+            Physics = physics;
+            HealthSystem = healthSystem;
             _objectPool = accessProvider;
-            _signalBus = signalBus;
+            SignalBus = signalBus;
         }
         
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -40,25 +40,25 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            _physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation);
             
-            _poolableObject = presentationPoolableObject;
+            PoolableObject = presentationPoolableObject;
             
-            _collisionHandler = collisionHandler;
-            _collisionHandler.Configure(_settings.BigAsteroidDamage, EntityAffiliation.Enemy, 
+            CollisionHandler = collisionHandler;
+            CollisionHandler.Configure(Settings.BigAsteroidDamage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true);
-            _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
-            _collisionHandler.OnDestructionCalled += GetDestroyed;
-            _collisionHandler.OnRicochetCalled += _physics.ApplyRicochet;
+            CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
+            CollisionHandler.OnDestructionCalled += GetDestroyed;
+            CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            _healthSystem.Configure(_settings.BigAsteroidHealth, true);
-            _healthSystem.OnHealthDepleted += GetDestroyed;
+            HealthSystem.Configure(Settings.BigAsteroidHealth, true);
+            HealthSystem.OnHealthDepleted += GetDestroyed;
         }
 
         public override void Move()
         {
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
-            _physics.ProcessPhysics();
+            Physics.SetInstantVelocity(Settings.BigAsteroidSpeed);
+            Physics.ProcessPhysics();
         }
 
         protected override void GetDestroyed()
@@ -70,8 +70,8 @@ namespace Enemies.Logic
 
         private void SpawnSmallAsteroids()
         {
-            int asteroidsToSpawn = Random.Range(_settings.MinSmallAsteroidSpawnAmount,
-                _settings.MaxSmallAsteroidSpawnAmount + 1);
+            int asteroidsToSpawn = Random.Range(Settings.MinSmallAsteroidSpawnAmount,
+                Settings.MaxSmallAsteroidSpawnAmount + 1);
             
             for (int i = 0; i < asteroidsToSpawn; i++)
             {
@@ -79,19 +79,19 @@ namespace Enemies.Logic
                 
                 smallAsteroid.transform.position = _presentation.transform.position;
                 
-                _signalBus.TryFire(new EnemySpawnedSignal());
+                SignalBus.TryFire(new EnemySpawnedSignal());
             }
         }
         
         public void Dispose()
         {
-            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
+            if (HealthSystem != null) HealthSystem.OnHealthDepleted -= GetDestroyed;
             
-            if (_collisionHandler != null)
+            if (CollisionHandler != null)
             {
-                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
-                _collisionHandler.OnDestructionCalled -= GetDestroyed;
-                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
+                CollisionHandler.OnDamageReceived -= HealthSystem.TakeDamage;
+                CollisionHandler.OnDestructionCalled -= GetDestroyed;
+                CollisionHandler.OnRicochetCalled -= Physics.ApplyRicochet;
             }
         }
     }

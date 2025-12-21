@@ -22,10 +22,10 @@ namespace Enemies.Logic
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             SignalBus signalBus)
         {
-            _settings = configProvider.EnemySettingsRef;
-            _physics = physics;
-            _healthSystem = healthSystem;
-            _signalBus = signalBus;
+            Settings = configProvider.EnemySettingsRef;
+            Physics = physics;
+            HealthSystem = healthSystem;
+            SignalBus = signalBus;
         }
         
         public void Configure(SmallAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -33,42 +33,42 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            _physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation);
             
-            _poolableObject = presentationPoolableObject;
+            PoolableObject = presentationPoolableObject;
             
-            _collisionHandler = collisionHandler;
-            _collisionHandler.Configure(_settings.SmallAsteroidDamage, EntityAffiliation.Enemy, 
+            CollisionHandler = collisionHandler;
+            CollisionHandler.Configure(Settings.SmallAsteroidDamage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true);
-            _collisionHandler.OnDamageReceived += _healthSystem.TakeDamage;
-            _collisionHandler.OnDestructionCalled += GetDestroyed;
-            _collisionHandler.OnRicochetCalled += _physics.ApplyRicochet;
+            CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
+            CollisionHandler.OnDestructionCalled += GetDestroyed;
+            CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            _healthSystem.Configure(_settings.SmallAsteroidHealth, true);
-            _healthSystem.OnHealthDepleted += GetDestroyed;
+            HealthSystem.Configure(Settings.SmallAsteroidHealth, true);
+            HealthSystem.OnHealthDepleted += GetDestroyed;
         }
         
         public override void Move()
         {
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
-            _physics.ProcessPhysics();
+            Physics.SetInstantVelocity(Settings.SmallAsteroidSpeed);
+            Physics.ProcessPhysics();
         }
 
         public override void OnPresentationEnabled()
         {
             base.OnPresentationEnabled();
-            _presentation.SetAngle(0, true);
+            _presentation.SetAngle(0, shouldRandomize: true);
         }
         
         public void Dispose()
         {
-            if (_healthSystem != null) _healthSystem.OnHealthDepleted -= GetDestroyed;
+            if (HealthSystem != null) HealthSystem.OnHealthDepleted -= GetDestroyed;
             
-            if (_collisionHandler != null)
+            if (CollisionHandler != null)
             {
-                _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
-                _collisionHandler.OnDestructionCalled -= GetDestroyed;
-                _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
+                CollisionHandler.OnDamageReceived -= HealthSystem.TakeDamage;
+                CollisionHandler.OnDestructionCalled -= GetDestroyed;
+                CollisionHandler.OnRicochetCalled -= Physics.ApplyRicochet;
             }
         }
     }

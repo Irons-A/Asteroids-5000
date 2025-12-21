@@ -47,6 +47,7 @@ namespace Gameplay.Infrastructure
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<SmallAsteroidLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UFOLogic>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<EnemyShootingSystem>().FromNew().AsTransient();
         }
         
         private void BindObjectPool()

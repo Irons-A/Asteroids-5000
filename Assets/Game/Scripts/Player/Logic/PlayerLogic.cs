@@ -175,7 +175,7 @@ namespace Player.Logic
                 shouldAutoReloadOnLessThanMaxAmmo: false,
                 shouldAutoReloadOnNoAmmo: false,
                 shouldDepleteAmmoOnReload: false,
-                shouldBlockFireWhileReaload: false);
+                shouldBlockFireWhileReload: false);
 
             _bulletWeaponSystem.Configure(_bulletWeaponConfig);
         }
@@ -201,7 +201,7 @@ namespace Player.Logic
                 shouldAutoReloadOnLessThanMaxAmmo: true,
                 shouldAutoReloadOnNoAmmo: true,
                 shouldDepleteAmmoOnReload: false,
-                shouldBlockFireWhileReaload: false);
+                shouldBlockFireWhileReload: false);
 
             _laserWeaponSystem.Configure(_laserWeaponConfig);
         }

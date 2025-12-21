@@ -33,7 +33,7 @@ namespace Player.Logic.Weapons
             EntityAffiliation projectileAffiliation, EntityDurability projectileDurability,
             bool shouldSetFirepointAsProjectileParent, float fireRateInterval, int maxAmmo, int ammoCostPerShot,
             bool hasInfiniteAmmo, float reloadLength, int ammoPerReload, bool shouldAutoReloadOnLessThanMaxAmmo,
-            bool shouldAutoReloadOnNoAmmo, bool shouldDepleteAmmoOnReload, bool shouldBlockFireWhileReaload)
+            bool shouldAutoReloadOnNoAmmo, bool shouldDepleteAmmoOnReload, bool shouldBlockFireWhileReload)
         {
             ProjectileType = projectileType;
             FirePoints = firepoints;
@@ -53,7 +53,7 @@ namespace Player.Logic.Weapons
             ShouldAutoReloadOnLessThanMaxAmmo = shouldAutoReloadOnLessThanMaxAmmo;
             ShouldAutoReloadOnNoAmmo = shouldAutoReloadOnNoAmmo;
             ShouldDepleteAmmoOnReload = shouldDepleteAmmoOnReload;
-            ShouldBlockFireWhileReload = shouldBlockFireWhileReaload;
+            ShouldBlockFireWhileReload = shouldBlockFireWhileReload;
         }
     }
 }

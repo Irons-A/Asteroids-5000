@@ -1,8 +1,8 @@
 {
-  "AccelerationSpeed": 2,
+  "AccelerationSpeed": 2.5,
   "DecelerationSpeed": 0.03,
   "MaxSpeed": 12,
-  "RotationSpeed": 360,
+  "RotationSpeed": 540,
   "MaxHealth": 3,
   "UncontrollabilityDuration": 1.5,
   "InvulnerabilityDuration": 3,

@@ -80,7 +80,7 @@ namespace Gameplay.Environment.Systems
         {
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
+                while (cancellationToken.IsCancellationRequested == false)
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(_environmentSettings.EnemySpawnRate),
                         ignoreTimeScale: false, cancellationToken: cancellationToken);
@@ -96,8 +96,8 @@ namespace Gameplay.Environment.Systems
 
                         if (enemy.TryGetComponent(out EnemyPresentation presentation))
                         {
-                            presentation.SetPlayerTransform(_playerTransform);
-                            presentation.SetAngle(0, false, true);
+                            presentation.SetTargetTransform(_playerTransform);
+                            presentation.SetAngle(0, shouldRandomize: false, setAngleToPlayer: true);
                         }
                         
                         _livingEnemyCount++;

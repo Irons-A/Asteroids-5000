@@ -20,6 +20,7 @@ namespace Core.Configuration
         public int UFOHealth;
         public int UFODamage;
         public int UFOProjectileDamage;
+        public int UFOProjectileSpeed;
         public float UFORotationSpeed;
         public float UFOFireRateInterval;
     }

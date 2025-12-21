@@ -97,20 +97,13 @@ namespace Core.Physics
             _movableObjectTransform.Rotate(0f, 0f, 180f, Space.Self);
         }
 
-        public void SetInstantVelocity(float speed, bool moveAtRotationAngle = false)
+        public void SetInstantVelocity(float speed)
         {
             if (_movableObjectTransform == null) return;
 
             Vector2 direction;
-
-            if (moveAtRotationAngle)
-            {
-                direction = _movableObjectTransform.up;
-            }
-            else
-            {
-                direction = _movableObjectTransform.right;
-            }
+            
+            direction = _movableObjectTransform.right;
             
             _currentVelocity = direction * speed;
         }
