@@ -4,8 +4,8 @@
   "MinimalFieldWidth": 23,
   "MinimalFieldHeight": 12,
 
-  "MaxEnemiesOnMap": 3,
+  "MaxEnemiesOnMap": 6,
   "EnemySpawnRate": 3,
   "EnemySpawnOffset": 6,
-  "UFOSpawnChance": 1
+  "UFOSpawnChance": 0
 }

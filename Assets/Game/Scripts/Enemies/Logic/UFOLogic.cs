@@ -32,7 +32,6 @@ namespace Enemies.Logic
             CollisionHandler collisionHandler)
         {
             _presentation = presentation;
-            _presentation.OnAngleUpdated += ResetMovement;
             
             _physics.SetMovableObject(_presentation);
             
@@ -61,13 +60,13 @@ namespace Enemies.Logic
 
             _presentation.transform.rotation = Quaternion.RotateTowards(_presentation.transform.rotation,
                 targetRotation, _settings.UFORotationSpeed * Time.deltaTime);
-
-            Debug.Log($"PlayerTransform is {_presentation.PlayerTransform}");
+            
         }
         
         public override void Move()
         {
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
+            //set moveAtRotationAngle to true for UFO to home to player, to false for chaotic movement
+            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed, false);
             _physics.ProcessPhysics();
         }
 
@@ -75,11 +74,6 @@ namespace Enemies.Logic
         {
             base.OnPresentationEnabled();
             _presentation.SetAngle(0, true);
-        }
-
-        private void ResetMovement()
-        {
-            //_physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
         }
         
         public void Dispose()
@@ -91,11 +85,6 @@ namespace Enemies.Logic
                 _collisionHandler.OnDamageReceived -= _healthSystem.TakeDamage;
                 _collisionHandler.OnDestructionCalled -= GetDestroyed;
                 _collisionHandler.OnRicochetCalled -= _physics.ApplyRicochet;
-            }
-
-            if (_presentation != null)
-            {
-                _presentation.OnAngleUpdated -= ResetMovement;
             }
         }
     }

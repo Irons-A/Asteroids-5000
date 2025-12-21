@@ -16,8 +16,6 @@ namespace Enemies
         protected CollisionHandler CollisionHandler;
 
         public Transform PlayerTransform { get; private set; }
-
-        public event Action OnAngleUpdated;
         
         protected virtual void Awake()
         {
@@ -45,13 +43,6 @@ namespace Enemies
             }
             
             transform.rotation =  Quaternion.Euler(0, 0, angleToSet);
-            
-            OnAngleUpdated?.Invoke();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            OnAngleUpdated = null;
         }
     }
 }
