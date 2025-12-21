@@ -12,9 +12,11 @@ namespace Enemies
     [RequireComponent(typeof(PoolableObject))]
     public class EnemyPresentation : MovableObject
     {
-        protected PoolableObject _poolableObject;
-        protected CollisionHandler _collisionHandler;
-        
+        protected PoolableObject PoolableObject;
+        protected CollisionHandler CollisionHandler;
+
+        public Transform PlayerTransform { get; private set; }
+
         public event Action OnAngleUpdated;
         
         protected virtual void Awake()
@@ -22,9 +24,20 @@ namespace Enemies
             _shouldTeleport = false;
         }
 
-        public virtual void SetAngle(float angle, bool shouldRandomize = false)
+        public void SetPlayerTransform(Transform playerTransform)
+        {
+            PlayerTransform = playerTransform;
+        }
+
+        public virtual void SetAngle(float angle, bool shouldRandomize = false, bool setAngleToPlayer = false)
         {
             float angleToSet = angle;
+
+            if (setAngleToPlayer && PlayerTransform != null)
+            {
+                Vector3 direction = PlayerTransform.position - transform.position;
+                angleToSet = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            }
             
             if (shouldRandomize)
             {

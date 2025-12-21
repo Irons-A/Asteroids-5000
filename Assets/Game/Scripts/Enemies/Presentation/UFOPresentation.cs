@@ -12,7 +12,7 @@ namespace Enemies.Presentation
     {
         private UFOLogic _logic;
         
-        [field: SerializeField] public Transform Firepoint { get; private set; }
+        [field: SerializeField] public Transform[] Firepoints { get; private set; }
         
         [Inject]
         private void Construct(UFOLogic logic)
@@ -24,10 +24,15 @@ namespace Enemies.Presentation
         {
             base.Awake();
             
-            _poolableObject = GetComponent<PoolableObject>();
-            _collisionHandler = GetComponent<CollisionHandler>();
+            PoolableObject = GetComponent<PoolableObject>();
+            CollisionHandler = GetComponent<CollisionHandler>();
             
-            _logic.Configure(this, _poolableObject, _collisionHandler);
+            _logic.Configure(this, PoolableObject, CollisionHandler);
+        }
+
+        private void Update()
+        {
+            _logic.RotateTowardsPlayer();
         }
 
         private void FixedUpdate()

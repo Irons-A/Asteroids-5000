@@ -22,10 +22,10 @@ namespace Enemies.Presentation
         {
             _shouldTeleport = true;
             
-            _poolableObject = GetComponent<PoolableObject>();
-            _collisionHandler = GetComponent<CollisionHandler>();
+            PoolableObject = GetComponent<PoolableObject>();
+            CollisionHandler = GetComponent<CollisionHandler>();
             
-            _logic.Configure(this, _poolableObject, _collisionHandler);
+            _logic.Configure(this, PoolableObject, CollisionHandler);
         }
 
         private void FixedUpdate()

@@ -23,10 +23,10 @@ namespace Enemies.Presentation
         {
             base.Awake();
             
-            _poolableObject = GetComponent<PoolableObject>();
-            _collisionHandler = GetComponent<CollisionHandler>();
+            PoolableObject = GetComponent<PoolableObject>();
+            CollisionHandler = GetComponent<CollisionHandler>();
             
-            _logic.Configure(this, _poolableObject, _collisionHandler);
+            _logic.Configure(this, PoolableObject, CollisionHandler);
         }
 
         private void FixedUpdate()
@@ -37,6 +37,7 @@ namespace Enemies.Presentation
         private void OnEnable()
         {
             _logic.OnPresentationEnabled();
+            SetAngle(0, false, true);
         }
     }
 }

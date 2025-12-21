@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2063629279200790544
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6543112666176940347}
+  m_Layer: 0
+  m_Name: Firepoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6543112666176940347
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2063629279200790544}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7567647377002056125}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3441218473777589071
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,11 +43,11 @@ GameObject:
   - component: {fileID: 2528416646827849445}
   - component: {fileID: 7406103442894176247}
   - component: {fileID: 329062442698691552}
-  - component: {fileID: 8571169988522123926}
+  - component: {fileID: -9028290898076873946}
   - component: {fileID: 391024719330168895}
   - component: {fileID: 2919849454793813626}
   m_Layer: 0
-  m_Name: BigAsteroid
+  m_Name: UFO
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +63,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7567647377002056125}
@@ -64,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633b906c443081a49936c24243ab356e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolKey: 3
+  _poolKey: 5
   _despawnCondition: 0
 --- !u!114 &329062442698691552
 MonoBehaviour:
@@ -82,7 +113,7 @@ MonoBehaviour:
   <Affiliation>k__BackingField: 1
   <Durability>k__BackingField: 1
   <ShouldCauseRicochet>k__BackingField: 1
---- !u!114 &8571169988522123926
+--- !u!114 &-9028290898076873946
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,9 +122,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441218473777589071}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e130e9d94aa416342a4a326ba6a2f9c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a66307319b84c498b19fd16f58e663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Firepoints>k__BackingField:
+  - {fileID: 6543112666176940347}
 --- !u!50 &391024719330168895
 Rigidbody2D:
   serializedVersion: 4
@@ -186,7 +219,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6543112666176940347}
   m_Father: {fileID: 7267899682198464435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3287510629934849497
@@ -230,7 +264,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5e9543b66cbf18c4f9afc43d8fca5ea9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ee3360404db71b941b7564cac6dd4110, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -248,10 +282,10 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4236418595687971142}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 745939f2b72c3794bb1ba9d7a54e6b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minSpeed: 60
-  _maxSpeed: 150
+  _minSpeed: 90
+  _maxSpeed: 90

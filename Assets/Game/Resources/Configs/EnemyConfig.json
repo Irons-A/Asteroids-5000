@@ -13,6 +13,6 @@
   "UFOHealth": 4,
   "UFODamage": 1,
   "UFOProjectileDamage": 1,
-  "UFORotationSpeed": 2,
+  "UFORotationSpeed": 60,
   "UFOFireRateInterval": 1.5
 }

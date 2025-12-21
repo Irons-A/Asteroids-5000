@@ -96,10 +96,8 @@ namespace Gameplay.Environment.Systems
 
                         if (enemy.TryGetComponent(out EnemyPresentation presentation))
                         {
-                            Vector3 direction = _playerTransform.position - enemy.transform.position;
-                            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                            
-                            presentation.SetAngle(angle);
+                            presentation.SetPlayerTransform(_playerTransform);
+                            presentation.SetAngle(0, false, true);
                         }
                         
                         _livingEnemyCount++;

@@ -48,9 +48,26 @@ namespace Enemies.Logic
             _healthSystem.Configure(_settings.SmallAsteroidHealth, true);
             _healthSystem.OnHealthDepleted += GetDestroyed;
         }
+
+        public void RotateTowardsPlayer()
+        {
+            if (_presentation.PlayerTransform == null) return;
+            
+            Vector3 direction = _presentation.PlayerTransform.position - _presentation.transform.position;
+            
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            
+            Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+
+            _presentation.transform.rotation = Quaternion.RotateTowards(_presentation.transform.rotation,
+                targetRotation, _settings.UFORotationSpeed * Time.deltaTime);
+
+            Debug.Log($"PlayerTransform is {_presentation.PlayerTransform}");
+        }
         
         public override void Move()
         {
+            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
             _physics.ProcessPhysics();
         }
 
@@ -62,7 +79,7 @@ namespace Enemies.Logic
 
         private void ResetMovement()
         {
-            _physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
+            //_physics.SetInstantVelocity(_settings.BigAsteroidSpeed);
         }
         
         public void Dispose()
