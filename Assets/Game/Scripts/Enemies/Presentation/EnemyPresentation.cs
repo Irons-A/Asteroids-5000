@@ -14,7 +14,7 @@ namespace Enemies
     {
         protected PoolableObject PoolableObject;
         protected CollisionHandler CollisionHandler;
-        protected Transform PlayerTransform;
+        private Transform _targetTransform;
 
         public event Action<Transform> OnTargetTransformChanged;
         
@@ -24,19 +24,19 @@ namespace Enemies
             _shouldTeleport = false;
         }
 
-        public void SetTargetTransform(Transform playerTransform)
+        public void SetTargetTransform(Transform targetTransform)
         {
-            PlayerTransform = playerTransform;
-            OnTargetTransformChanged?.Invoke(PlayerTransform);
+            _targetTransform = targetTransform;
+            OnTargetTransformChanged?.Invoke(_targetTransform);
         }
 
-        public virtual void SetAngle(float angle, bool shouldRandomize = false, bool setAngleToPlayer = false)
+        public void SetAngle(float angle, bool shouldRandomize = false, bool setAngleToPlayer = false)
         {
             float angleToSet = angle;
 
-            if (setAngleToPlayer && PlayerTransform != null)
+            if (setAngleToPlayer && _targetTransform != null)
             {
-                Vector3 direction = PlayerTransform.position - transform.position;
+                Vector3 direction = _targetTransform.position - transform.position;
                 angleToSet = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             }
             

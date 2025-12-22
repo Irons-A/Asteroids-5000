@@ -57,6 +57,12 @@ namespace Gameplay.CameraControl
 
             transform.position = _currentPosition;
         }
+        
+        public void OnDrawGizmos()
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(Vector2.zero, _gameFieldSize);
+        }
 
         private void InitializeCameraBounds()
         {
@@ -103,12 +109,6 @@ namespace Gameplay.CameraControl
         {
             return new Vector3(Mathf.Clamp(desiredPosition.x, _cameraMinX, _cameraMaxX),
                 Mathf.Clamp(desiredPosition.y, _cameraMinY, _cameraMaxY), desiredPosition.z);
-        }
-
-        public void OnDrawGizmos()
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireCube(Vector2.zero, _gameFieldSize);
         }
     }
 }

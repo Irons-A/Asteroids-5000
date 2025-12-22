@@ -76,11 +76,6 @@ namespace Player.Logic.Weapons
             }
         }
 
-        public void Dispose()
-        {
-            CancelReload();
-        }
-
         private async UniTaskVoid ReloadLoop(CancellationToken token)
         {
             try
@@ -110,6 +105,11 @@ namespace Player.Logic.Weapons
 
                 OnReloadCompleted?.Invoke();
             }
+        }
+        
+        public void Dispose()
+        {
+            CancelReload();
         }
     }
 }

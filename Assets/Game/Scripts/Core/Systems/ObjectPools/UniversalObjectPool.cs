@@ -8,10 +8,8 @@ namespace Core.Systems.ObjectPools
 {
     public class UniversalObjectPool : MonoBehaviour
     {
-        private Dictionary<PoolableObjectType, Queue<PoolableObject>> _pools = 
-            new Dictionary<PoolableObjectType, Queue<PoolableObject>>();
-        private Dictionary<PoolableObjectType, Transform> _poolContainers = 
-            new Dictionary<PoolableObjectType, Transform>();
+        private readonly Dictionary<PoolableObjectType, Queue<PoolableObject>> _pools = new();
+        private readonly Dictionary<PoolableObjectType, Transform> _poolContainers =  new();
 
         private PoolableObjectFactory _factory;
         private PoolableObjectRegistry _registry;

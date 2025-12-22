@@ -14,7 +14,7 @@ namespace Gameplay.Environment
         private SceneBorderFactory _sceneBorderFactory;
         private EnemySpawner _enemySpawner;
 
-        private Vector2 _fieldCenter = Vector2.zero;
+        private readonly Vector2 _fieldCenter = Vector2.zero;
         private Vector2 _fieldSize;
 
         public Bounds Bounds => new Bounds(_fieldCenter, _fieldSize);

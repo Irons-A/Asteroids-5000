@@ -14,9 +14,9 @@ namespace Enemies.Logic
 {
     public class SmallAsteroidLogic : BaseEnemyLogic, IDisposable
     {
-        protected override EnemyType Type => EnemyType.SmallAsteroid;
-        
         private SmallAsteroidPresentation _presentation;
+        
+        protected override EnemyType Type => EnemyType.SmallAsteroid;
         
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,

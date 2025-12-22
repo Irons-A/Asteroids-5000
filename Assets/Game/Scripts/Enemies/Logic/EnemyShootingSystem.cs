@@ -92,6 +92,10 @@ namespace Enemies.Logic
             catch (OperationCanceledException)
             {
             }
+            finally
+            {
+                StopShooting();
+            }
         }
         
         private void ShootProjectile()

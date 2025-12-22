@@ -97,6 +97,8 @@ namespace Player.UserInput
 
         private void CheckIfGamepadInputWithAxis()
         {
+            //Disabled because of unity bug
+            
             //Debug.Log(_currentStrategy);
 
             //float axisX = Input.GetAxis("RightStickHorizontal");

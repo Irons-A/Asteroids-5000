@@ -29,6 +29,11 @@ namespace Enemies.Presentation
             
             _logic.Configure(this, PoolableObject, CollisionHandler);
         }
+        
+        private void OnEnable()
+        {
+            _logic.OnPresentationEnabled();
+        }
 
         private void Update()
         {
@@ -38,11 +43,6 @@ namespace Enemies.Presentation
         private void FixedUpdate()
         {
             _logic.Move();
-        }
-
-        private void OnEnable()
-        {
-            _logic.OnPresentationEnabled();
         }
     }
 }

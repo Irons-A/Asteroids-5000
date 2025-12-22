@@ -101,11 +101,6 @@ namespace Player.Logic.Weapons
             }
         }
 
-        public void Dispose()
-        {
-            StopShooting();
-        }
-
         private void StartShooting()
         {
             if (_weaponState == WeaponState.Shooting) return;
@@ -233,6 +228,11 @@ namespace Player.Logic.Weapons
             _shootingCTS?.Cancel();
             _shootingCTS?.Dispose();
             _shootingCTS = null;
+        }
+        
+        public void Dispose()
+        {
+            StopShooting();
         }
     }
 }

@@ -13,14 +13,14 @@ namespace Enemies.Logic
 {
     public abstract class BaseEnemyLogic
     {
-        protected abstract EnemyType Type { get; }
-        
         protected EnemySettings Settings;
         protected CustomPhysics Physics;
         protected PoolableObject PoolableObject;
         protected HealthSystem HealthSystem; 
         protected CollisionHandler CollisionHandler;
         protected SignalBus SignalBus;
+        
+        protected abstract EnemyType Type { get; }
 
         public abstract void Move();
 

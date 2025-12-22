@@ -16,13 +16,13 @@ namespace Enemies.Logic
 {
     public class BigAsteroidLogic : BaseEnemyLogic, IDisposable
     {
-        protected override EnemyType Type => EnemyType.BigAsteroid;
-        
         private PoolAccessProvider _objectPool;
         private BigAsteroidPresentation _presentation;
 
         private int _minSmallAsteroidSpawnAmount;
         private int _maxSmallAsteroidSpawnAmount;
+        
+        protected override EnemyType Type => EnemyType.BigAsteroid;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,

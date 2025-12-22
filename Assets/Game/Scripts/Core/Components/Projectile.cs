@@ -36,13 +36,6 @@ namespace Core.Components
             }
         }
 
-        private void OnDestroy()
-        {
-            _logic.OnDelayedDestructionCalled -= CallDespawn;
-            _collisionHandler.OnDestructionCalled -= CallDespawn;
-            _logic.CancelDelayedDestruction();
-        }
-
         private void Update()
         {
             _logic.MoveProjectile();
@@ -65,6 +58,13 @@ namespace Core.Components
             {
                 Destroy(gameObject);
             }
+        }
+        
+        private void OnDestroy()
+        {
+            _logic.OnDelayedDestructionCalled -= CallDespawn;
+            _collisionHandler.OnDestructionCalled -= CallDespawn;
+            _logic.CancelDelayedDestruction();
         }
     }
 }

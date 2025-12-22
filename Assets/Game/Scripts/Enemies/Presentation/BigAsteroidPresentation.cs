@@ -28,16 +28,16 @@ namespace Enemies.Presentation
             
             _logic.Configure(this, PoolableObject, CollisionHandler);
         }
-
-        private void FixedUpdate()
-        {
-            _logic.Move();
-        }
-
+        
         private void OnEnable()
         {
             _logic.OnPresentationEnabled();
             SetAngle(0, false, true);
+        }
+
+        private void FixedUpdate()
+        {
+            _logic.Move();
         }
     }
 }

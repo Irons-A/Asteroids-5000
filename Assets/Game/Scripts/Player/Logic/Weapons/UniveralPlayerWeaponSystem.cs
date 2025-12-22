@@ -81,26 +81,6 @@ namespace Player.Logic.Weapons
             _reloadingSubsystem.CancelReload();
         }
 
-        public void DebugInfo()
-        {
-            Debug.Log($"Ammo: {_ammoManager.CurrentAmmo}/{_ammoManager.MaxAmmo}, " +
-                      $"Infinite: {_ammoManager.HasInfiniteAmmo}, " +
-                      $"ShouldShoot: {_shouldShoot}, " +
-                      $"IsReloading: {_reloadingSubsystem.IsReloading}, " +
-                      $"CanShoot: {_shootingSubsystem.CanShoot}");
-        }
-
-        public void Dispose()
-        {
-            _shootingSubsystem.Dispose();
-            _reloadingSubsystem.Dispose();
-
-            _shootingSubsystem.OnShotFired -= ProcessFiring;
-            _reloadingSubsystem.OnReloadCompleted -= ProcessReloadCompletion;
-            _reloadingSubsystem.OnReloadStarted -= ProcessReloadStart;
-            _ammoManager.OnAmmoChanged -= ProcessAmmoChange;
-        }
-
         private void ProcessFiring()
         {
             if (_ammoManager.HasInfiniteAmmo == false)
@@ -131,6 +111,17 @@ namespace Player.Logic.Weapons
             {
                 _shootingSubsystem.TryStartShooting();
             }
+        }
+        
+        public void Dispose()
+        {
+            _shootingSubsystem.Dispose();
+            _reloadingSubsystem.Dispose();
+
+            _shootingSubsystem.OnShotFired -= ProcessFiring;
+            _reloadingSubsystem.OnReloadCompleted -= ProcessReloadCompletion;
+            _reloadingSubsystem.OnReloadStarted -= ProcessReloadStart;
+            _ammoManager.OnAmmoChanged -= ProcessAmmoChange;
         }
     }
 }

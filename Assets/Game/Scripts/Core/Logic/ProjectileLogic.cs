@@ -41,12 +41,6 @@ namespace Core.Logic
             }
         }
 
-        public void Dispose()
-        {
-            CancelDelayedDestruction();
-            OnDelayedDestructionCalled = null;
-        }
-
         public void MoveProjectile()
         {
             _projectileTransform.Translate(Vector3.right * _speed * Time.deltaTime);
@@ -94,6 +88,12 @@ namespace Core.Logic
 
                 _isDelayedDestructionTaskRunning = false;
             }
+        }
+        
+        public void Dispose()
+        {
+            CancelDelayedDestruction();
+            OnDelayedDestructionCalled = null;
         }
     }
 }

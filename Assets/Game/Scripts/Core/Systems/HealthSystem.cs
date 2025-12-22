@@ -21,12 +21,10 @@ namespace Core.Systems
             {
                 CurrentHealth = MaxHealth;
             }
-        }
-
-        public void Dispose()
-        {
-            OnHealthChanged = null;
-            OnHealthDepleted = null;
+            else
+            {
+                CurrentHealth = currentHealth;
+            }
         }
 
         public void TakeDamage(int damage)
@@ -47,6 +45,8 @@ namespace Core.Systems
 
         public void Heal(int health)
         {
+            if (CurrentHealth ==  MaxHealth) return;
+            
             health = Math.Min(1, health);
 
             CurrentHealth += health;
@@ -58,6 +58,12 @@ namespace Core.Systems
         public void RestoreHealth()
         {
             CurrentHealth = MaxHealth;
+        }
+        
+        public void Dispose()
+        {
+            OnHealthChanged = null;
+            OnHealthDepleted = null;
         }
     }
 }

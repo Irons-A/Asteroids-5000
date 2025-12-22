@@ -14,11 +14,11 @@ namespace Enemies.Logic
 {
     public class UFOLogic : BaseEnemyLogic, IDisposable
     {
-        protected override EnemyType Type => EnemyType.UFO;
-        
         private UFOPresentation _presentation;
         private Transform _targetTransform;
         private EnemyShootingSystem _shootingSystem;
+        
+        protected override EnemyType Type => EnemyType.UFO;
         
         [Inject]
         private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,

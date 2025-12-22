@@ -24,7 +24,7 @@ namespace Gameplay.Environment.Systems
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;
         
-        private int _livingEnemyCount = 0; //Decrease with signal bus events
+        private int _livingEnemyCount = 0;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
@@ -58,12 +58,6 @@ namespace Gameplay.Environment.Systems
         {
             _signalBus.Subscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
             _signalBus.Subscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
-        }
-
-        public void Dispose()
-        {
-            _signalBus.Unsubscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
-            _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
         }
 
         private void DecreaseEnemyCount()
@@ -162,6 +156,12 @@ namespace Gameplay.Environment.Systems
             {
                 return PoolableObjectType.BigAsteroid;
             }
+        }
+        
+        public void Dispose()
+        {
+            _signalBus.Unsubscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
+            _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
         }
     }
 }

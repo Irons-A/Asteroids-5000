@@ -15,7 +15,7 @@ namespace Gameplay.Environment
         [SerializeField] private float _borderThickness = 2f;
         [SerializeField] private float _teleportOffset = 1f;
 
-        [SerializeField] private BorderSide _borderSide;
+        private BorderSide _borderSide;
         private float _sceneWidth;
         private float _sceneHeight;
 
