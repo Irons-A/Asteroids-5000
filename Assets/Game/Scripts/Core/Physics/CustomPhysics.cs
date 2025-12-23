@@ -19,6 +19,8 @@ namespace Core.Physics
         private Vector2 _currentAcceleration;
         private Vector2 _currentVelocity;
 
+        public float CurrentSpeed { get; private set; } = 0f;
+
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
             float objectMass = BaseObjectMass)
         {
@@ -45,9 +47,9 @@ namespace Core.Physics
 
             _currentAcceleration += direction * effectiveAcceleration;
 
-            float currentSpeed = _currentVelocity.magnitude;
+            CurrentSpeed = _currentVelocity.magnitude;
 
-            if (currentSpeed > maxSpeed)
+            if (CurrentSpeed > maxSpeed)
             {
                 _currentVelocity = _currentVelocity.normalized * maxSpeed;
             }

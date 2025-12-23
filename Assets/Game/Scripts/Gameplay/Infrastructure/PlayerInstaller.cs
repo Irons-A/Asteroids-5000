@@ -6,6 +6,7 @@ using Player.UserInput;
 using Player.UserInput.Strategies;
 using System.Collections;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 using Zenject;
 
@@ -18,6 +19,8 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
+            Container.Bind<PlayerUIModel>().AsSingle().NonLazy();
+            Container.Bind<PlayerUIViewModel>().AsSingle().NonLazy();
             Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
             Container.BindInterfacesAndSelfTo<InvulnerabilityLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UncontrollabilityLogic>().FromNew().AsTransient();

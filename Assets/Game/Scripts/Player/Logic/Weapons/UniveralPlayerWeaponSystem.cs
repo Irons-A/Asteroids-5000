@@ -22,6 +22,9 @@ namespace Player.Logic.Weapons
         private bool _shouldShoot = false;
         private bool _isInitialized = false;
 
+        public int CurrentAmmo => _ammoManager.CurrentAmmo;
+        public float ReloadProgress => _reloadingSubsystem.ReloadProgress;
+
         [Inject]
         public void Construct(PlayerShootingSubsystem shootingSubsystem, PlayerReloadingSubsystem reloadingSubsystem,
             PlayerAmmoSubsystem ammoManager)

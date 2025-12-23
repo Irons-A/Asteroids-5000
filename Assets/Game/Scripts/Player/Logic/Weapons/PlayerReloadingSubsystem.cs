@@ -19,6 +19,7 @@ namespace Player.Logic.Weapons
 
         public bool IsReloading { get; private set; }
         public bool ShouldBlockFire => _config.ShouldBlockFireWhileReload;
+        public float ReloadProgress { get; private set; } = 1;
 
         public void Configure(PlayerWeaponConfig config, PlayerAmmoSubsystem ammoManager)
         {
@@ -42,6 +43,7 @@ namespace Player.Logic.Weapons
             OnReloadStarted?.Invoke();
 
             ReloadLoop(_reloadCTS.Token).Forget();
+            ReloadProgressTask(_reloadCTS.Token).Forget();
         }
 
         public void CancelReload()
@@ -104,6 +106,26 @@ namespace Player.Logic.Weapons
                 IsReloading = false;
 
                 OnReloadCompleted?.Invoke();
+            }
+        }
+        
+        private async UniTask ReloadProgressTask(CancellationToken token)
+        {
+            float duration = _config.ReloadLength;
+            float elapsedTime = 0f;
+    
+            while (elapsedTime < duration && !token.IsCancellationRequested)
+            {
+                ReloadProgress = Mathf.Clamp01(elapsedTime / duration);
+        
+                await UniTask.Yield();
+                
+                elapsedTime += Time.deltaTime;
+            }
+            
+            if (!token.IsCancellationRequested)
+            {
+                ReloadProgress = 1f;
             }
         }
         

@@ -11,8 +11,8 @@ namespace UI
     {
         public ReactiveProperty<int> Health { get; private set; } = new();
         public ReactiveProperty<Vector2> Coordinates { get; private set; } = new();
-        public ReactiveProperty<float> ShipAngle { get; private set; } = new();
-        public ReactiveProperty<int> ImmediateSpeed { get; private set; } = new();
+        public ReactiveProperty<float> PlayerAngle { get; private set; } = new();
+        public ReactiveProperty<float> CurrentSpeed { get; private set; } = new();
         public ReactiveProperty<int> LaserAmmo { get; private set; } = new();
         public ReactiveProperty<float> LaserCooldown { get; private set; } = new();
 
@@ -31,14 +31,14 @@ namespace UI
         {
             Coordinates.Value = coordinates;
         }
-        public void SetShipAngle(float shipAngle)
+        public void SetPlayerAngle(float shipAngle)
         {
-            ShipAngle.Value = shipAngle;
+            PlayerAngle.Value = shipAngle;
         }
         
-        public void SetImmediateSpeed(int immediateSpeed)
+        public void SetCurrentSpeed(float immediateSpeed)
         {
-            ImmediateSpeed.Value = immediateSpeed;
+            CurrentSpeed.Value = immediateSpeed;
         }
         public void SetLaserAmmo(int laserAmmo)
         {

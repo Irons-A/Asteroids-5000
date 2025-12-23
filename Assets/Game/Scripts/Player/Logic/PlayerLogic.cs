@@ -11,13 +11,14 @@ using System.Threading;
 using Core.Components;
 using Core.Systems;
 using Cysharp.Threading.Tasks;
+using UI;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerLogic : IFixedTickable, IInitializable, IDisposable
+    public class PlayerLogic : ITickable, IFixedTickable, IInitializable, IDisposable
     {
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
@@ -33,13 +34,14 @@ namespace Player.Logic
         private InvulnerabilityLogic _invulnerabilityLogic;
         private SpriteRenderer _playerSpriteRenderer;
         private UncontrollabilityLogic _playerUncontrollabilityLogic;
+        private PlayerUIModel _playerUIModel;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
             PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,
-            UncontrollabilityLogic  uncontrollabilityLogic)
+            UncontrollabilityLogic  uncontrollabilityLogic, PlayerUIModel playerUIModel)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -67,6 +69,8 @@ namespace Player.Logic
             _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
             
             _playerUncontrollabilityLogic = uncontrollabilityLogic;
+            
+            _playerUIModel = playerUIModel;
         }
 
         public void Initialize()
@@ -78,6 +82,13 @@ namespace Player.Logic
             
             _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
             _playerUncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
+        }
+
+        public void Tick()
+        {
+            _playerUIModel.SetCoordinates(_playerTransform.position);
+            _playerUIModel.SetPlayerAngle(_playerTransform.eulerAngles.z);
+            _playerUIModel.SetCurrentSpeed(_playerPhysics.CurrentSpeed);
         }
 
         public void FixedTick()
