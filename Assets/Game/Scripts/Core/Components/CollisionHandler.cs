@@ -15,6 +15,7 @@ namespace Core.Components
         [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
         [field: SerializeField] public EntityDurability Durability { get; private set; }
         [field: SerializeField] public bool ShouldCauseRicochet { get; private set; } = false;
+        [field: SerializeField] public bool ShouldProcessCollisions { get; private set; } = true;
 
         public event Action<int> OnDamageReceived;
         public event Action OnDestructionCalled;
@@ -47,14 +48,22 @@ namespace Core.Components
             OnRicochetCalled?.Invoke();
         }
 
+        public void SetShouldProcessCollisions(bool value)
+        {
+            ShouldProcessCollisions = value;
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.TryGetComponent(out CollisionHandler otherHandler)) return;
-            
-            if (otherHandler.Affiliation != this.Affiliation && 
-                ShouldHandleCollision(otherHandler))
+            if (other.TryGetComponent(out CollisionHandler otherHandler) == false) return;
+
+            if (ShouldProcessCollisions && otherHandler.ShouldProcessCollisions)
             {
-                HandleCollision(otherHandler);
+                if (otherHandler.Affiliation != this.Affiliation && 
+                    ShouldHandleCollision(otherHandler))
+                {
+                    HandleCollision(otherHandler);
+                }
             }
         }
 

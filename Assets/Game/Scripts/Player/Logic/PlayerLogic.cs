@@ -64,6 +64,7 @@ namespace Player.Logic
             
             _invulnerabilityLogic = invulnerabilityLogic;
             _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
+            _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
             
             _playerUncontrollabilityLogic = uncontrollabilityLogic;
         }
@@ -132,11 +133,17 @@ namespace Player.Logic
             _laserWeaponSystem.SetShouldShoot(value);
         }
 
+        private void EnableCollisions()
+        {
+            _playerCollisionHandler.SetShouldProcessCollisions(true);
+        }
+
         private void TakeDamage(int damage)
         {
             if (_invulnerabilityLogic.IsInvulnerable) return;
             
             _healthSystem.TakeDamage(damage);
+            _playerCollisionHandler.SetShouldProcessCollisions(false);
             
             _playerUncontrollabilityLogic.StartUncontrollabilityPeriod();
             _invulnerabilityLogic.StartInvulnerabilityPeriod();
@@ -213,6 +220,8 @@ namespace Player.Logic
                 _playerCollisionHandler.OnRicochetCalled -= _playerPhysics.ApplyRicochet;
                 _playerCollisionHandler.OnDamageReceived -= TakeDamage;
             }
+            
+            _invulnerabilityLogic.OnInvulnerabilityEnded -= EnableCollisions;
         }
     }
 }
