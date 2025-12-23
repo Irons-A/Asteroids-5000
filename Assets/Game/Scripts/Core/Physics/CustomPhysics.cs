@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Physics
 {
-    public class CustomPhysics
+    public class CustomPhysics : ITickable
     {
         public const float BaseFriction = 0;
         public const float BaseObjectMass = 0;
@@ -19,7 +20,7 @@ namespace Core.Physics
         private Vector2 _currentAcceleration;
         private Vector2 _currentVelocity;
 
-        public float CurrentSpeed { get; private set; } = 0f;
+        public float CurrentSpeed { get; private set; } = 0;
 
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
             float objectMass = BaseObjectMass)
@@ -30,6 +31,11 @@ namespace Core.Physics
 
             _currentAcceleration = Vector2.zero;
             _currentVelocity = Vector2.zero;
+        }
+
+        public void Tick()
+        {
+            //CurrentSpeed = _currentVelocity.magnitude;
         }
 
         public void ApplyAcceleration(float acceleration, float maxSpeed)
@@ -47,9 +53,9 @@ namespace Core.Physics
 
             _currentAcceleration += direction * effectiveAcceleration;
 
-            CurrentSpeed = _currentVelocity.magnitude;
+            float currentSpeed = _currentVelocity.magnitude;
 
-            if (CurrentSpeed > maxSpeed)
+            if (currentSpeed > maxSpeed)
             {
                 _currentVelocity = _currentVelocity.normalized * maxSpeed;
             }

@@ -15,13 +15,6 @@ namespace UI
         public ReactiveProperty<float> CurrentSpeed { get; private set; } = new();
         public ReactiveProperty<int> LaserAmmo { get; private set; } = new();
         public ReactiveProperty<float> LaserCooldown { get; private set; } = new();
-
-        public PlayerUIModel(PlayerSettings playerSettings)
-        {
-            SetHealth(playerSettings.MaxHealth);
-            SetLaserAmmo(playerSettings.MaxLaserCharges);
-            SetLaserCooldown(playerSettings.LaserCooldown);
-        }
         
         public void SetHealth(int health)
         {

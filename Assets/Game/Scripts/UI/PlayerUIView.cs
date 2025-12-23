@@ -34,8 +34,8 @@ namespace UI
             _viewModel.CurrentSpeed.Subscribe(SetCurrentSpeed).AddTo(_disposables);
             _viewModel.LaserCooldown.Subscribe(SetLaserCooldown).AddTo(_disposables);
             _viewModel.LaserAmmo.Subscribe(SetAmmo).AddTo(_disposables);
-            _viewModel.Health.Subscribe(SetHealthView).AddTo(_disposables);
-            InitHealth(viewModel);
+            //_viewModel.Health.Subscribe(SetHealthView).AddTo(_disposables);
+            //InitHealth(viewModel);
         }
 
         private void InitHealth(PlayerUIViewModel viewModel)
@@ -76,7 +76,10 @@ namespace UI
         private void SetPlayerAngle(float angle)
         {
             _angleText.text = $"{angle:F1}°";
-            _angleIndicator.fillAmount = angle;
+
+            float amountToFill = angle / 360;
+            
+            _angleIndicator.fillAmount = amountToFill;
         }
 
         private void SetCoordinates(Vector2 pos)

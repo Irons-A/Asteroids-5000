@@ -111,21 +111,28 @@ namespace Player.Logic.Weapons
         
         private async UniTask ReloadProgressTask(CancellationToken token)
         {
-            float duration = _config.ReloadLength;
-            float elapsedTime = 0f;
+            try
+            {
+                float duration = _config.ReloadLength;
+                float elapsedTime = 0f;
+                ReloadProgress = 0f;
     
-            while (elapsedTime < duration && !token.IsCancellationRequested)
-            {
-                ReloadProgress = Mathf.Clamp01(elapsedTime / duration);
+                while (elapsedTime < duration && !token.IsCancellationRequested)
+                {
+                    ReloadProgress = Mathf.Clamp01(elapsedTime / duration);
         
-                await UniTask.Yield();
+                    await UniTask.Yield();
                 
-                elapsedTime += Time.deltaTime;
-            }
+                    elapsedTime += Time.deltaTime;
+                }
             
-            if (!token.IsCancellationRequested)
+                if (!token.IsCancellationRequested)
+                {
+                    ReloadProgress = 1f;
+                }
+            }
+            catch (OperationCanceledException)
             {
-                ReloadProgress = 1f;
             }
         }
         

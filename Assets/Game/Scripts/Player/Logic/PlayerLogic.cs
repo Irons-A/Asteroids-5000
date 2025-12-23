@@ -86,9 +86,14 @@ namespace Player.Logic
 
         public void Tick()
         {
+            _playerUIModel.SetHealth(_healthSystem.CurrentHealth);
             _playerUIModel.SetCoordinates(_playerTransform.position);
             _playerUIModel.SetPlayerAngle(_playerTransform.eulerAngles.z);
             _playerUIModel.SetCurrentSpeed(_playerPhysics.CurrentSpeed);
+            _playerUIModel.SetLaserAmmo(_laserWeaponSystem.CurrentAmmo);
+            _playerUIModel.SetLaserCooldown(_laserWeaponSystem.ReloadProgress);
+            
+            Debug.Log($"laser ammo {_laserWeaponSystem.CurrentAmmo} laser cooldown {_laserWeaponSystem.ReloadProgress}");
         }
 
         public void FixedTick()

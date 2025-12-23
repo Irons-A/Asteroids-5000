@@ -8,6 +8,7 @@ using Core.Logic;
 using Core.Physics;
 using Enemies.Logic;
 using Enemies.Signals;
+using UI;
 using UnityEngine;
 using Zenject;
 
@@ -29,6 +30,7 @@ namespace Gameplay.Infrastructure
             BindPoolAccessProvider();
             BindLogicSystems();
             BindObjectPool();
+            BindGameUI();
 
             _poolAccessProvider.SetPool(_objectPool);
         }
@@ -43,7 +45,7 @@ namespace Gameplay.Infrastructure
         {
             Container.BindInterfacesAndSelfTo<ProjectileLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
-            Container.Bind<CustomPhysics>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<CustomPhysics>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<SmallAsteroidLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UFOLogic>().FromNew().AsTransient();
@@ -66,6 +68,12 @@ namespace Gameplay.Infrastructure
             DontDestroyOnLoad(objectPool.gameObject);
 
             return objectPool;
+        }
+
+        private void BindGameUI()
+        {
+            Container.Bind<PlayerUIModel>().AsSingle().NonLazy();
+            Container.Bind<PlayerUIViewModel>().AsSingle().NonLazy();
         }
 
         private void InstallSignals()
