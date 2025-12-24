@@ -4,10 +4,12 @@
   "BigAsteroidDamage": 1,
   "MinSmallAsteroidSpawnAmount": 2,
   "MaxSmallAsteroidSpawnAmount": 3,
+  "BigAsteroidReward": 100,
   
   "SmallAsteroidSpeed": 9,
   "SmallAsteroidHealth": 1,
   "SmallAsteroidDamage": 1,
+  "SmallAsteroidReward": 50,
   
   "UFOSpeed": 5,
   "UFOHealth": 4,
@@ -15,5 +17,6 @@
   "UFOProjectileDamage": 1,
   "UFOProjectileSpeed": 10,
   "UFORotationSpeed": 30,
-  "UFOFireRateInterval": 1.5
+  "UFOFireRateInterval": 1.5,
+  "UFOReward": 200
 }

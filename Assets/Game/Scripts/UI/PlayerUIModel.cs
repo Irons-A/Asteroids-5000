@@ -15,6 +15,7 @@ namespace UI
         public ReactiveProperty<float> CurrentSpeed { get; private set; } = new();
         public ReactiveProperty<int> LaserAmmo { get; private set; } = new();
         public ReactiveProperty<float> LaserCooldown { get; private set; } = new();
+        public ReactiveProperty<int> Score { get; private set; } = new();
         
         public void SetHealth(int health)
         {
@@ -44,6 +45,11 @@ namespace UI
         public void SetLaserCooldown(float laserCooldown)
         {
             LaserCooldown.Value = MathF.Max(0,laserCooldown);
+        }
+
+        public void SetScore(int score)
+        {
+            Score.Value = score;
         }
     }
 }

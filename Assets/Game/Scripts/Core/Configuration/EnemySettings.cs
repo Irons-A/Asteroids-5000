@@ -11,10 +11,12 @@ namespace Core.Configuration
         public int BigAsteroidDamage;
         public int MinSmallAsteroidSpawnAmount;
         public int MaxSmallAsteroidSpawnAmount;
+        public int BigAsteroidReward;
         
         public float SmallAsteroidSpeed;
         public int SmallAsteroidHealth;
         public int SmallAsteroidDamage;
+        public int SmallAsteroidReward;
 
         public float UFOSpeed;
         public int UFOHealth;
@@ -23,5 +25,6 @@ namespace Core.Configuration
         public int UFOProjectileSpeed;
         public float UFORotationSpeed;
         public float UFOFireRateInterval;
+        public int UFOReward;
     }
 }

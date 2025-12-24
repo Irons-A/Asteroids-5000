@@ -51,7 +51,7 @@ namespace Enemies.Logic
             HealthSystem.Configure(Settings.UFOHealth, true);
             HealthSystem.OnHealthDepleted += GetDestroyed;
             
-            _shootingSystem.Configure(Settings.UFODamage, Settings.UFOFireRateInterval,
+            _shootingSystem.Configure(Settings.UFOProjectileDamage, Settings.UFOFireRateInterval,
                 Settings.UFOProjectileSpeed, _presentation.transform, PoolableObjectType.UFOBullet,
                 _presentation.Firepoints);
         }

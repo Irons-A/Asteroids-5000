@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
+using Zenject;
 
 namespace UI
 {
@@ -13,9 +14,10 @@ namespace UI
         public IReadOnlyReactiveProperty<float> LaserCooldown => _model.LaserCooldown;
         public IReadOnlyReactiveProperty<float> CurrentSpeed => _model.CurrentSpeed;
         public IReadOnlyReactiveProperty<int> Health => _model.Health;
+        public IReadOnlyReactiveProperty<int> Score => _model.Score;
         
         private readonly PlayerUIModel _model;
-
+        
         public PlayerUIViewModel(PlayerUIModel model)
         {
             _model = model;

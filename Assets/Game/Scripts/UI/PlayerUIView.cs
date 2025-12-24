@@ -16,6 +16,7 @@ namespace UI
         [SerializeField] private TMP_Text _speedText;
         [SerializeField] private TMP_Text _laserAmmoText;
         [SerializeField] private Image _laserCooldownIndicator;
+        [SerializeField] private TMP_Text _scoreText;
 
         [Header("Health")] 
         [SerializeField] private Image[] _lives;
@@ -24,7 +25,7 @@ namespace UI
         private CompositeDisposable _disposables = new CompositeDisposable();
 
         [Inject]
-        public void Init(PlayerUIViewModel viewModel)
+        public void Construct(PlayerUIViewModel viewModel)
         {
             _viewModel = viewModel;
             _viewModel.Coordinates.Subscribe(SetCoordinates).AddTo(_disposables);
@@ -33,7 +34,7 @@ namespace UI
             _viewModel.LaserCooldown.Subscribe(SetLaserCooldown).AddTo(_disposables);
             _viewModel.LaserAmmo.Subscribe(SetAmmo).AddTo(_disposables);
             _viewModel.Health.Subscribe(SetHealthView).AddTo(_disposables);
-            //SetHealthView(viewModel.Health.Value);
+            _viewModel.Score.Subscribe(SetScore).AddTo(_disposables);
         }
         
         private void SetHealthView(int health)
@@ -71,6 +72,11 @@ namespace UI
         private void SetCoordinates(Vector2 pos)
         {
             _coordinatesText.text = $"X: {pos.x:F1}\nY: {pos.y:F1}";
+        }
+
+        private void SetScore(int score)
+        {
+            _scoreText.text = $"SCORE:\n{score}";
         }
 
         private void OnDestroy()

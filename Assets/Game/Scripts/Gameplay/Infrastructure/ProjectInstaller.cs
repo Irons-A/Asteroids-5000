@@ -8,6 +8,7 @@ using Core.Logic;
 using Core.Physics;
 using Enemies.Logic;
 using Enemies.Signals;
+using Gameplay.Systems;
 using UI;
 using UnityEngine;
 using Zenject;
@@ -74,6 +75,7 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<PlayerUIModel>().AsSingle().NonLazy();
             Container.Bind<PlayerUIViewModel>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle().NonLazy();
         }
 
         private void InstallSignals()
@@ -82,6 +84,7 @@ namespace Gameplay.Infrastructure
 
             Container.DeclareSignal<EnemySpawnedSignal>();
             Container.DeclareSignal<EnemyDestroyedSignal>();
+            Container.DeclareSignal<ResetEnemyCountSignal>();
         }
     }
 }
