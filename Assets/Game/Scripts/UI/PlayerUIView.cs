@@ -18,9 +18,7 @@ namespace UI
         [SerializeField] private Image _laserCooldownIndicator;
 
         [Header("Health")] 
-        [SerializeField] private Image[] _hearts;
-        [SerializeField] private GameObject _heartPrefab;
-        [SerializeField] private Transform _healthContainer;
+        [SerializeField] private Image[] _lives;
 
         private PlayerUIViewModel _viewModel;
         private CompositeDisposable _disposables = new CompositeDisposable();
@@ -34,27 +32,15 @@ namespace UI
             _viewModel.CurrentSpeed.Subscribe(SetCurrentSpeed).AddTo(_disposables);
             _viewModel.LaserCooldown.Subscribe(SetLaserCooldown).AddTo(_disposables);
             _viewModel.LaserAmmo.Subscribe(SetAmmo).AddTo(_disposables);
-            //_viewModel.Health.Subscribe(SetHealthView).AddTo(_disposables);
-            //InitHealth(viewModel);
+            _viewModel.Health.Subscribe(SetHealthView).AddTo(_disposables);
+            //SetHealthView(viewModel.Health.Value);
         }
-
-        private void InitHealth(PlayerUIViewModel viewModel)
-        {
-            var hearts = new Image[viewModel.Health.Value];
-            for (var i = 0; i < viewModel.Health.Value; i++)
-            {
-                var heart = Instantiate(_heartPrefab, _healthContainer);
-                hearts[i] = heart.GetComponent<Image>();;
-            }
-            _hearts = hearts;
-        }
-        
         
         private void SetHealthView(int health)
         {
-            for (var i = 0; i < _hearts.Length; i++)
+            for (var i = 0; i < _lives.Length; i++)
             {
-                _hearts[i].gameObject.SetActive(i < health);
+                _lives[i].gameObject.SetActive(i < health);
             }
         }
 

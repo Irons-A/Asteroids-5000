@@ -20,10 +20,12 @@ namespace UI
         {
             Health.Value = Math.Max(0,health);
         }
+        
         public void SetCoordinates(Vector2 coordinates)
         {
             Coordinates.Value = coordinates;
         }
+        
         public void SetPlayerAngle(float shipAngle)
         {
             PlayerAngle.Value = shipAngle;
@@ -33,6 +35,7 @@ namespace UI
         {
             CurrentSpeed.Value = immediateSpeed;
         }
+        
         public void SetLaserAmmo(int laserAmmo)
         {
             LaserAmmo.Value = laserAmmo;

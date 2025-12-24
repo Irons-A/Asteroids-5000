@@ -3,7 +3,7 @@
   "DecelerationSpeed": 0.03,
   "MaxSpeed": 12,
   "RotationSpeed": 540,
-  "MaxHealth": 3,
+  "MaxHealth": 5,
   "UncontrollabilityDuration": 1.5,
   "InvulnerabilityDuration": 3,
 

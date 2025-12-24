@@ -59,6 +59,7 @@ namespace Player.Logic
             _laserWeaponConfig = laserWeaponConfig;
 
             _healthSystem = healthSystem;
+            _healthSystem.Configure(_playerSettings.MaxHealth, true);
             
             _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
