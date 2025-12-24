@@ -93,7 +93,9 @@ namespace Player.Logic
             _playerUIModel.SetLaserAmmo(_laserWeaponSystem.CurrentAmmo);
             _playerUIModel.SetLaserCooldown(_laserWeaponSystem.ReloadProgress);
             
-            Debug.Log($"laser ammo {_laserWeaponSystem.CurrentAmmo} laser cooldown {_laserWeaponSystem.ReloadProgress}");
+            //Zenject bug: Tick is not working in subclasses if there are any bool checks. Calling from here.
+            _bulletWeaponSystem.Tick();
+            _laserWeaponSystem.Tick();
         }
 
         public void FixedTick()

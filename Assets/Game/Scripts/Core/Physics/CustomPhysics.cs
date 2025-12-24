@@ -7,7 +7,7 @@ using Zenject;
 
 namespace Core.Physics
 {
-    public class CustomPhysics : ITickable
+    public class CustomPhysics
     {
         public const float BaseFriction = 0;
         public const float BaseObjectMass = 0;
@@ -31,11 +31,6 @@ namespace Core.Physics
 
             _currentAcceleration = Vector2.zero;
             _currentVelocity = Vector2.zero;
-        }
-
-        public void Tick()
-        {
-            //CurrentSpeed = _currentVelocity.magnitude;
         }
 
         public void ApplyAcceleration(float acceleration, float maxSpeed)
@@ -88,6 +83,8 @@ namespace Core.Physics
             
             _currentVelocity += _currentAcceleration * Time.fixedDeltaTime;
             _currentAcceleration = Vector2.zero;
+            
+            CurrentSpeed = _currentVelocity.magnitude;
             
             if (_friction > 0)
             {

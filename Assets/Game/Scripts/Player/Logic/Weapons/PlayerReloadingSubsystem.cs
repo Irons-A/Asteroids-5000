@@ -17,7 +17,7 @@ namespace Player.Logic.Weapons
         public event Action OnReloadStarted;
         public event Action OnReloadCompleted;
 
-        public bool IsReloading { get; private set; }
+        public bool IsReloading { get; private set; } = false;
         public bool ShouldBlockFire => _config.ShouldBlockFireWhileReload;
         public float ReloadProgress { get; private set; } = 1;
 
@@ -30,10 +30,8 @@ namespace Player.Logic.Weapons
 
         public void StartReload()
         {
-            if (_ammoManager.IsFull || _ammoManager.HasInfiniteAmmo) return;
-
-            if (IsReloading) return;
-
+            if (_ammoManager.IsFull || _ammoManager.HasInfiniteAmmo || IsReloading) return;
+            
             CancelReload();
 
             _reloadCTS = new CancellationTokenSource();
@@ -43,7 +41,6 @@ namespace Player.Logic.Weapons
             OnReloadStarted?.Invoke();
 
             ReloadLoop(_reloadCTS.Token).Forget();
-            ReloadProgressTask(_reloadCTS.Token).Forget();
         }
 
         public void CancelReload()
@@ -67,12 +64,12 @@ namespace Player.Logic.Weapons
             {
                 shouldStartReload = true;
             }
-            else if (_config.ShouldAutoReloadOnLessThanMaxAmmo && !_ammoManager.IsFull)
+            else if (_config.ShouldAutoReloadOnLessThanMaxAmmo && _ammoManager.IsFull == false)
             {
                 shouldStartReload = true;
             }
 
-            if (shouldStartReload && !IsReloading)
+            if (shouldStartReload && IsReloading == false)
             {
                 StartReload();
             }
@@ -89,6 +86,8 @@ namespace Player.Logic.Weapons
 
                 while (!token.IsCancellationRequested && !_ammoManager.IsFull)
                 {
+                    ReloadProgressTask(_reloadCTS.Token).Forget();
+                    
                     await UniTask.Delay(TimeSpan.FromSeconds(_config.ReloadLength),
                         cancellationToken: token);
 

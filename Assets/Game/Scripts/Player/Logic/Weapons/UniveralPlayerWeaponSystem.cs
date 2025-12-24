@@ -40,8 +40,7 @@ namespace Player.Logic.Weapons
 
             _shootingSubsystem.Configure(config, _reloadingSubsystem, _ammoManager);
             _reloadingSubsystem.Configure(config, _ammoManager);
-
-            _shootingSubsystem.OnShotFired += ProcessFiring;
+            
             _reloadingSubsystem.OnReloadCompleted += ProcessReloadCompletion;
             _reloadingSubsystem.OnReloadStarted += ProcessReloadStart;
             _ammoManager.OnAmmoChanged += ProcessAmmoChange;
@@ -84,14 +83,6 @@ namespace Player.Logic.Weapons
             _reloadingSubsystem.CancelReload();
         }
 
-        private void ProcessFiring()
-        {
-            if (_ammoManager.HasInfiniteAmmo == false)
-            {
-                _reloadingSubsystem.ProcessAutoReloading();
-            }
-        }
-
         private void ProcessReloadCompletion()
         {
             if (_shouldShoot)
@@ -120,8 +111,7 @@ namespace Player.Logic.Weapons
         {
             _shootingSubsystem.Dispose();
             _reloadingSubsystem.Dispose();
-
-            _shootingSubsystem.OnShotFired -= ProcessFiring;
+            
             _reloadingSubsystem.OnReloadCompleted -= ProcessReloadCompletion;
             _reloadingSubsystem.OnReloadStarted -= ProcessReloadStart;
             _ammoManager.OnAmmoChanged -= ProcessAmmoChange;
