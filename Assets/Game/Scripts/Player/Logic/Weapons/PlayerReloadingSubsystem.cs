@@ -86,13 +86,10 @@ namespace Player.Logic.Weapons
 
                 while (!token.IsCancellationRequested && !_ammoManager.IsFull)
                 {
-                    ReloadProgressTask(_reloadCTS.Token).Forget();
-                    
-                    await UniTask.Delay(TimeSpan.FromSeconds(_config.ReloadLength),
-                        cancellationToken: token);
-
+                    await ReloadProgressTask(token);
+            
                     if (token.IsCancellationRequested) return;
-
+            
                     _ammoManager.AddAmmo(_config.AmmoPerReload);
                 }
             }
@@ -110,28 +107,20 @@ namespace Player.Logic.Weapons
         
         private async UniTask ReloadProgressTask(CancellationToken token)
         {
-            try
-            {
-                float duration = _config.ReloadLength;
-                float elapsedTime = 0f;
-                ReloadProgress = 0f;
+            float duration = _config.ReloadLength;
+            float elapsedTime = 0f;
+            ReloadProgress = 0f;
     
-                while (elapsedTime < duration && !token.IsCancellationRequested)
-                {
-                    ReloadProgress = Mathf.Clamp01(elapsedTime / duration);
-        
-                    await UniTask.Yield();
-                
-                    elapsedTime += Time.deltaTime;
-                }
-            
-                if (!token.IsCancellationRequested)
-                {
-                    ReloadProgress = 1f;
-                }
-            }
-            catch (OperationCanceledException)
+            while (elapsedTime < duration && !token.IsCancellationRequested)
             {
+                ReloadProgress = Mathf.Clamp01(elapsedTime / duration);
+                await UniTask.Yield();
+                elapsedTime += Time.deltaTime;
+            }
+    
+            if (!token.IsCancellationRequested)
+            {
+                ReloadProgress = 1f;
             }
         }
         
