@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gameplay.Signals
+namespace UI.Signals
 {
-    public class StartGameSignal : MonoBehaviour
+    public class ContinueGameSignal
     {
     }
 }

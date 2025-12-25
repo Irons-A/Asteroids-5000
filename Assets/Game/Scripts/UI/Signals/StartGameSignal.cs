@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Enemies.Signals
+namespace UI.Signals
 {
-    public class ResetEnemyCountSignal
+    public class StartGameSignal
     {
     }
 }

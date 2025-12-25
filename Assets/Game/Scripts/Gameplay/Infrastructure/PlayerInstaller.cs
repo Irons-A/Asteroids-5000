@@ -15,7 +15,6 @@ namespace Gameplay.Infrastructure
     public class PlayerInstaller : MonoInstaller
     {
         [SerializeField] private PlayerPresentation _playerPrefab;
-        [SerializeField] private Transform _playerSpawnPoint;
 
         public override void InstallBindings()
         {
@@ -34,8 +33,7 @@ namespace Gameplay.Infrastructure
 
         private PlayerPresentation CreatePlayerPresentation()
         {
-            PlayerPresentation playerInstance = Instantiate(_playerPrefab,
-                _playerSpawnPoint?.position ?? Vector3.zero, Quaternion.identity);
+            PlayerPresentation playerInstance = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
 
             InputDetector inputDetector = playerInstance.gameObject.AddComponent<InputDetector>();
             Container.Inject(inputDetector);

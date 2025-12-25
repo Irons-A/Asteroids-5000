@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Gameplay.Signals
 {
-    public class EndGameSignal : MonoBehaviour
+    public class EndGameSignal
     {
     }
 }

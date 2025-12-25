@@ -83,6 +83,11 @@ namespace Player.Logic.Weapons
             _reloadingSubsystem.CancelReload();
         }
 
+        public void RefillAmmo()
+        {
+            _ammoManager.RefillAmmo();
+        }
+
         private void ProcessReloadCompletion()
         {
             if (_shouldShoot)

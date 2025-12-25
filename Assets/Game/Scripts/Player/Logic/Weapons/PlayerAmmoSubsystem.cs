@@ -50,5 +50,10 @@ namespace Player.Logic.Weapons
 
             OnAmmoChanged?.Invoke();
         }
+
+        public void RefillAmmo()
+        {
+            CurrentAmmo = MaxAmmo;
+        }
     }
 }

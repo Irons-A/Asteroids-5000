@@ -6,6 +6,7 @@ using Enemies;
 using Enemies.Signals;
 using Gameplay.Signals;
 using UI;
+using UI.Signals;
 using UnityEngine;
 using Zenject;
 

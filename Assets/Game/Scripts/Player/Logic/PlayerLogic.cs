@@ -60,6 +60,7 @@ namespace Player.Logic
 
             _healthSystem = healthSystem;
             _healthSystem.Configure(_playerSettings.MaxHealth, true);
+            _healthSystem.OnHealthDepleted += DisablePlayer;
             
             _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
@@ -180,6 +181,21 @@ namespace Player.Logic
                 Quaternion.Euler(0, 0, targetAngle), _playerSettings.RotationSpeed * Time.deltaTime);
         }
 
+        private void DisablePlayer()
+        {
+            _playerPresentation.gameObject.SetActive(false);
+            _playerPhysics.Stop();
+        }
+
+        private void ResetPlayer()
+        {
+            _playerPresentation.transform.position = Vector3.zero;
+            _healthSystem.Configure(_playerSettings.MaxHealth, true);
+            _bulletWeaponSystem.RefillAmmo();
+            _laserWeaponSystem.RefillAmmo();
+            _playerPresentation.gameObject.SetActive(true);
+        }
+
         private void ConfigureBulletWeaponSystem()
         {
             _bulletWeaponConfig.Configure(
@@ -240,6 +256,7 @@ namespace Player.Logic
                 _playerCollisionHandler.OnDamageReceived -= TakeDamage;
             }
             
+            _healthSystem.OnHealthDepleted -= DisablePlayer;
             _invulnerabilityLogic.OnInvulnerabilityEnded -= EnableCollisions;
         }
     }
