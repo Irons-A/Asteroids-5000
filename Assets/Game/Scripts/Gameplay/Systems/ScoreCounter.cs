@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Configuration;
+using Core.Signals;
 using Enemies;
 using Enemies.Signals;
-using Gameplay.Signals;
 using UI;
 using UI.Signals;
 using UnityEngine;
@@ -68,7 +68,7 @@ namespace Gameplay.Systems
 
         private void ResetScore()
         {
-            
+            _currentScore = 0;
         }
 
         public void Dispose()

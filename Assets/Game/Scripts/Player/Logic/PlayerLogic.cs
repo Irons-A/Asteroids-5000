@@ -9,8 +9,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Components;
+using Core.Signals;
 using Core.Systems;
 using Cysharp.Threading.Tasks;
+using Player.Signals;
 using UI;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -35,13 +37,14 @@ namespace Player.Logic
         private SpriteRenderer _playerSpriteRenderer;
         private UncontrollabilityLogic _playerUncontrollabilityLogic;
         private PlayerUIModel _playerUIModel;
+        private SignalBus _signalBus;
 
         [Inject]
         private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
             PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,
-            UncontrollabilityLogic  uncontrollabilityLogic, PlayerUIModel playerUIModel)
+            UncontrollabilityLogic  uncontrollabilityLogic, PlayerUIModel playerUIModel, SignalBus signalBus)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
@@ -73,6 +76,8 @@ namespace Player.Logic
             _playerUncontrollabilityLogic = uncontrollabilityLogic;
             
             _playerUIModel = playerUIModel;
+            
+            _signalBus = signalBus;
         }
 
         public void Initialize()
@@ -84,6 +89,8 @@ namespace Player.Logic
             
             _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
             _playerUncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
+            
+            _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
         }
 
         public void Tick()
@@ -185,6 +192,7 @@ namespace Player.Logic
         {
             _playerPresentation.gameObject.SetActive(false);
             _playerPhysics.Stop();
+            _signalBus.TryFire(new EndGameSignal());
         }
 
         private void ResetPlayer()
@@ -258,6 +266,7 @@ namespace Player.Logic
             
             _healthSystem.OnHealthDepleted -= DisablePlayer;
             _invulnerabilityLogic.OnInvulnerabilityEnded -= EnableCollisions;
+            _signalBus.Unsubscribe<ResetPlayerSignal>(ResetPlayer);
         }
     }
 }

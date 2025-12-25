@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UI.Signals
+namespace Player.Signals
 {
-    public class PauseGameSignal
+    public class ResetPlayerSignal
     {
     }
 }

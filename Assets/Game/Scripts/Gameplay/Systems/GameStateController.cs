@@ -1,8 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Signal;
+using Core.Signals;
 using Gameplay.Signals;
 using Player.Presentation;
+using Player.Signals;
+using Player.UserInput;
 using UI.Signals;
 using UnityEngine;
 using Zenject;
@@ -14,26 +18,28 @@ namespace Gameplay.Systems
         [SerializeField] private Canvas _gameUICanvas;
         [SerializeField] private Canvas _menuCanvas;
         [SerializeField] private Canvas _pauseCanvas;
+        [SerializeField] private Canvas _gameOverCanvas;
+        [SerializeField] private Canvas _mobileControlsCanvas;
         
         private SignalBus _signalBus;
-        private PlayerPresentation _presentation;
+
+        private IInputStrategy _currentInputStrategy; //how to set? Input detector is created later. via events?
         
         [Inject]
-        private void Construct(PlayerPresentation presentation, SignalBus signalBus)
+        private void Construct(SignalBus signalBus)
         {
-            _presentation = presentation;
             _signalBus = signalBus;
         }
 
         private void OnEnable()
         {
-            _signalBus.Subscribe<ContinueGameSignal>();
-            _signalBus.Subscribe<ExitGameSignal>();
-            _signalBus.Subscribe<GoToMenuSignal>();
-            _signalBus.Subscribe<PauseGameSignal>(); //move to player asmdef?
-            _signalBus.Subscribe<RestartGameSignal>();
-            _signalBus.Subscribe<StartGameSignal>();
-            _signalBus.Subscribe<EndGameSignal>();
+            _signalBus.Subscribe<ContinueGameSignal>(ContinueGame);
+            _signalBus.Subscribe<ExitGameSignal>(ExitGame);
+            _signalBus.Subscribe<GoToMenuSignal>(GoToMenu);
+            _signalBus.Subscribe<PauseGameSignal>(TogglePause);
+            _signalBus.Subscribe<RestartGameSignal>(RestartGame);
+            _signalBus.Subscribe<StartGameSignal>(StartGame);
+            _signalBus.Subscribe<EndGameSignal>(DisplayGameOverCanvas); //Go to menu or show game over canvas?
         }
 
         private void TogglePause()
@@ -65,30 +71,41 @@ namespace Gameplay.Systems
             Time.timeScale = 0;
             _pauseCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(false);
+            //_mobileControlsCanvas.gameObject.SetActive(false);
+            _gameOverCanvas.gameObject.SetActive(false);
             _menuCanvas.gameObject.SetActive(true);
         }
         
         private void RestartGame()
         {
             ContinueGame();
-            //ResetGame
+            ResetGame();
         }
 
         private void StartGame()
         {
             _menuCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(true);
-            //ResetGame
+            
+            //if (_currentInputStrategy is MobileInputStrategy)
+            //_mobileControlsCanvas.gameObject.SetActive(true);
+            
+            ResetGame();
+        }
+
+        private void DisplayGameOverCanvas()
+        {
+            _gameUICanvas.gameObject.SetActive(false);
+            //_mobileControlsCanvas.gameObject.SetActive(false);
+            _gameOverCanvas.gameObject.SetActive(true);
         }
 
         private void ResetGame()
         {
-            //сохранение счёта
-            //сброс счёта
-            //чистка врагов
-            //восстановление здоровья игрока
-            //включение презентации игрока
-            //перенос презентации игрока в центр поля
+            _signalBus.TryFire(new StartGameSignal());
+            _signalBus.TryFire(new DespawnAllSignal());
+            _signalBus.TryFire(new StartEnemySpawningSignal());
+            _signalBus.TryFire(new ResetPlayerSignal());
         }
     }
 }

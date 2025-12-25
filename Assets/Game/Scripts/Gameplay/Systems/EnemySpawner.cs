@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Core.Systems.ObjectPools;
 using Enemies.Signals;
+using Gameplay.Signals;
 using Player.Presentation;
 using UnityEngine;
 using Zenject;
@@ -36,10 +37,13 @@ namespace Gameplay.Environment.Systems
             _signalBus = signalBus;
         }
 
-        public void StartEnemySpawning(Bounds bounds)
+        public void SetGameFieldBounds(Bounds gameFieldBounds)
         {
-            _gameFieldBounds = bounds;
+            _gameFieldBounds = gameFieldBounds;
+        }
 
+        public void StartEnemySpawning()
+        {
             StopEnemySpawning();
 
             _spawnCTS = new CancellationTokenSource();
@@ -58,6 +62,7 @@ namespace Gameplay.Environment.Systems
         {
             _signalBus.Subscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
             _signalBus.Subscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
+            _signalBus.Subscribe<StartEnemySpawningSignal>(StartEnemySpawning);
         }
 
         private void DecreaseEnemyCount()
@@ -162,6 +167,7 @@ namespace Gameplay.Environment.Systems
         {
             _signalBus.Unsubscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
             _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
+            _signalBus.Unsubscribe<StartEnemySpawningSignal>(StartEnemySpawning);
         }
     }
 }

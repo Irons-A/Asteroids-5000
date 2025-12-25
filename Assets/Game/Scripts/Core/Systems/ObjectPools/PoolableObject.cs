@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Core.Signal;
 using UnityEngine;
 using Zenject;
 
@@ -12,12 +13,20 @@ namespace Core.Systems.ObjectPools
         [SerializeField] private PoolableObjectType _poolKey;
         [SerializeField] private DespawnCondition _despawnCondition;
 
-        public PoolableObjectType PoolKey => _poolKey;
-        public DespawnCondition DespawnCondition => _despawnCondition;
+        protected SignalBus SignalBus;
 
         private UniversalObjectPool _parentPool;
         private OutsideOfViewportDestroyer _viewportDestroyer;
+        
+        public PoolableObjectType PoolKey => _poolKey;
+        public DespawnCondition DespawnCondition => _despawnCondition;
 
+        [Inject]
+        private void Construct(SignalBus signalBus)
+        {
+            SignalBus = signalBus;
+        }
+        
         private void Awake()
         {
             _viewportDestroyer = GetComponent<OutsideOfViewportDestroyer>();
@@ -29,11 +38,14 @@ namespace Core.Systems.ObjectPools
             {
                 _viewportDestroyer.OnLeftViewport += Despawn;
             }
+            
+            SignalBus.Subscribe<DespawnAllSignal>(Despawn);
         }
 
         private void OnDisable()
         {
             _viewportDestroyer.OnLeftViewport -= Despawn;
+            SignalBus.Unsubscribe<DespawnAllSignal>(Despawn);
         }
 
         private void Update()

@@ -3,6 +3,7 @@ using Player.Logic;
 using Player.UserInput.Strategies;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Signals;
 using UnityEngine;
 using Zenject;
 
@@ -15,13 +16,14 @@ namespace Player.UserInput
         private GamepadInputStrategy _gamepadStrategy;
 
         private PlayerLogic _playerLogic;
+        private SignalBus _signalBus;
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
-            GamepadInputStrategy gamepadStrategy, PlayerLogic playermodel)
+            GamepadInputStrategy gamepadStrategy, PlayerLogic playerLogic, SignalBus signalBus)
         {
             _configProvider = configProvider;
             _inputSettings = _configProvider.InputSettingsRef;
@@ -30,7 +32,8 @@ namespace Player.UserInput
             _gamepadStrategy = gamepadStrategy;
             _currentStrategy = pcStrategy;
 
-            _playerLogic = playermodel;
+            _playerLogic = playerLogic;
+            _signalBus = signalBus;
         }
 
         private void Update()
@@ -157,7 +160,7 @@ namespace Player.UserInput
 
             if (_currentStrategy.IsPausePressed())
             {
-                //toggle pause
+                _signalBus.TryFire(new PauseGameSignal());
             }
         }
     }

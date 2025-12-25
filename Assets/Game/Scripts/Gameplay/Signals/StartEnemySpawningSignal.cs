@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Gameplay.Signals
 {
-    public class EndGameSignal
+    public class StartEnemySpawningSignal
     {
     }
 }

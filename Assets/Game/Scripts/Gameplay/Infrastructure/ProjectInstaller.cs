@@ -7,10 +7,12 @@ using Core.Components;
 using Core.Logic;
 using Core.Physics;
 using Core.Signal;
+using Core.Signals;
 using Enemies.Logic;
 using Enemies.Signals;
 using Gameplay.Signals;
 using Gameplay.Systems;
+using Player.Signals;
 using UI;
 using UI.Signals;
 using UnityEngine;
@@ -86,17 +88,20 @@ namespace Gameplay.Infrastructure
             SignalBusInstaller.Install(Container);
 
             Container.DeclareSignal<DespawnAllSignal>();
+            Container.DeclareSignal<EndGameSignal>();
+            Container.DeclareSignal<PauseGameSignal>();
 
             Container.DeclareSignal<EnemySpawnedSignal>();
             Container.DeclareSignal<EnemyDestroyedSignal>();
             Container.DeclareSignal<ResetEnemyCountSignal>();
 
-            Container.DeclareSignal<EndGameSignal>();
+            Container.DeclareSignal<StartEnemySpawningSignal>();
+
+            Container.DeclareSignal<ResetPlayerSignal>();
             
             Container.DeclareSignal<ContinueGameSignal>();
             Container.DeclareSignal<ExitGameSignal>();
             Container.DeclareSignal<GoToMenuSignal>();
-            Container.DeclareSignal<PauseGameSignal>();
             Container.DeclareSignal<RestartGameSignal>();
             Container.DeclareSignal<StartGameSignal>();
         }
