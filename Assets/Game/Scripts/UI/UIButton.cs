@@ -23,6 +23,11 @@ namespace UI
             _signalBus = signalBus;
         }
 
+        private void Awake()
+        {
+            _button = GetComponent<Button>();
+        }
+
         private void OnEnable()
         {
             _button.onClick.AddListener(OnButtonClicked);
