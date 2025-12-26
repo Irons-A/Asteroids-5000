@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Core.Signal;
 using Core.Systems.ObjectPools;
 using Enemies.Signals;
 using Gameplay.Signals;
@@ -63,6 +64,7 @@ namespace Gameplay.Environment.Systems
             _signalBus.Subscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
             _signalBus.Subscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
             _signalBus.Subscribe<StartEnemySpawningSignal>(StartEnemySpawning);
+            _signalBus.Subscribe<DespawnAllSignal>(ResetEnemyCount);
         }
 
         private void DecreaseEnemyCount()
@@ -73,6 +75,11 @@ namespace Gameplay.Environment.Systems
         private void IncreaseEnemyCount()
         {
             _livingEnemyCount++;
+        }
+
+        private void ResetEnemyCount()
+        {
+            _livingEnemyCount = 0;
         }
 
         private async UniTaskVoid EnemySpawnLoop(CancellationToken cancellationToken)
@@ -105,7 +112,6 @@ namespace Gameplay.Environment.Systems
             }
             catch (OperationCanceledException)
             {
-                Debug.Log("Enemy spawning cancelled");
             }
             catch (Exception e)
             {
@@ -168,6 +174,7 @@ namespace Gameplay.Environment.Systems
             _signalBus.Unsubscribe<EnemySpawnedSignal>(IncreaseEnemyCount);
             _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
             _signalBus.Unsubscribe<StartEnemySpawningSignal>(StartEnemySpawning);
+            _signalBus.Unsubscribe<DespawnAllSignal>(ResetEnemyCount);
         }
     }
 }

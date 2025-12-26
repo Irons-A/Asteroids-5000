@@ -52,7 +52,7 @@ namespace Enemies.Logic
             HealthSystem.OnHealthDepleted += GetDestroyed;
             
             _shootingSystem.Configure(Settings.UFOProjectileDamage, Settings.UFOFireRateInterval,
-                Settings.UFOProjectileSpeed, _presentation.transform, PoolableObjectType.UFOBullet,
+                Settings.UFOProjectileSpeed, _presentation, PoolableObjectType.UFOBullet,
                 _presentation.Firepoints);
         }
 

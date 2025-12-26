@@ -39,7 +39,7 @@ namespace Gameplay.Systems
             _signalBus.Subscribe<PauseGameSignal>(TogglePause);
             _signalBus.Subscribe<RestartGameSignal>(RestartGame);
             _signalBus.Subscribe<StartGameSignal>(StartGame);
-            _signalBus.Subscribe<EndGameSignal>(DisplayGameOverCanvas); //Go to menu or show game over canvas?
+            _signalBus.Subscribe<EndGameSignal>(DisplayGameOverCanvas);
         }
 
         private void TogglePause()
@@ -63,12 +63,15 @@ namespace Gameplay.Systems
 
         private void ExitGame()
         {
-            
+            Application.Quit();
         }
 
         private void GoToMenu()
         {
             Time.timeScale = 0;
+            
+            _signalBus.TryFire(new DespawnAllSignal());
+            
             _pauseCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(false);
             //_mobileControlsCanvas.gameObject.SetActive(false);
@@ -98,11 +101,12 @@ namespace Gameplay.Systems
             _gameUICanvas.gameObject.SetActive(false);
             //_mobileControlsCanvas.gameObject.SetActive(false);
             _gameOverCanvas.gameObject.SetActive(true);
+            //ScoreSaver
         }
 
         private void ResetGame()
         {
-            _signalBus.TryFire(new StartGameSignal());
+            _signalBus.TryFire(new ResetScoreSignal());
             _signalBus.TryFire(new DespawnAllSignal());
             _signalBus.TryFire(new StartEnemySpawningSignal());
             _signalBus.TryFire(new ResetPlayerSignal());

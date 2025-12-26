@@ -91,6 +91,9 @@ namespace Player.Logic
             _playerUncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
             
             _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
+            
+            _playerPresentation.gameObject.SetActive(false);
+            _playerPhysics.Stop();
         }
 
         public void Tick()

@@ -18,7 +18,6 @@ namespace Enemies
 
         public event Action<Transform> OnTargetTransformChanged;
         
-        
         protected virtual void Awake()
         {
             _shouldTeleport = false;

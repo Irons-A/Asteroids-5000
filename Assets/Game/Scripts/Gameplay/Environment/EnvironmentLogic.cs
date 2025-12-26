@@ -38,7 +38,6 @@ namespace Gameplay.Environment
             CreateSceneBorders();
             
             _enemySpawner.SetGameFieldBounds(Bounds);
-            _enemySpawner.StartEnemySpawning();
         }
 
         private void CreateSceneBorders()

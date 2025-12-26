@@ -95,6 +95,7 @@ namespace Gameplay.Infrastructure
             Container.DeclareSignal<EnemyDestroyedSignal>();
             Container.DeclareSignal<ResetEnemyCountSignal>();
 
+            Container.DeclareSignal<ResetScoreSignal>();
             Container.DeclareSignal<StartEnemySpawningSignal>();
 
             Container.DeclareSignal<ResetPlayerSignal>();

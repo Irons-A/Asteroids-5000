@@ -20,6 +20,7 @@ namespace Enemies.Logic
         private Transform[] _firepoints;
         private Transform _targetTransform;
         private Transform _selfTransform;
+        private EnemyPresentation _selfPresentation;
         private float _shotInterval;
         private int _damage;
         private float _projectileSpeed;
@@ -34,13 +35,14 @@ namespace Enemies.Logic
             _objectPool = objectPool;
         }
 
-        public void Configure(int damage, float shotInterval, float projectileSpeed, Transform selfTransform,
+        public void Configure(int damage, float shotInterval, float projectileSpeed, EnemyPresentation selfPresentation,
             PoolableObjectType projectile, Transform[] firepoints)
         {
             _damage = damage;
             _shotInterval = shotInterval;
             _projectileSpeed = projectileSpeed;
-            _selfTransform = selfTransform;
+            _selfPresentation = selfPresentation;
+            _selfTransform = selfPresentation.transform;
             _projectile = projectile;
             _firepoints = firepoints;
             
@@ -82,11 +84,11 @@ namespace Enemies.Logic
         {
             try
             {
-                while (token.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false && _selfPresentation.isActiveAndEnabled)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_shotInterval), cancellationToken: token);
-
                     ShootProjectile();
+                    
+                    await UniTask.Delay(TimeSpan.FromSeconds(_shotInterval), cancellationToken: token);
                 }
             }
             catch (OperationCanceledException)

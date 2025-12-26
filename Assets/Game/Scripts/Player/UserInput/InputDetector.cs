@@ -143,20 +143,23 @@ namespace Player.UserInput
         {
             if (_playerLogic == null) return;
 
-            if (_currentStrategy is KeyboardMouseInputStrategy)
+            if (Time.timeScale > 0)
             {
-                _playerLogic.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());
+                if (_currentStrategy is KeyboardMouseInputStrategy)
+                {
+                    _playerLogic.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());
+                }
+                else
+                {
+                    _playerLogic.RotatePlayerTowardsStick(_currentStrategy.GetRotationInput());
+                }
+
+                _playerLogic.MovePlayer(_currentStrategy.GetPlayerMovementState());
+
+                _playerLogic.ShootBullets(_currentStrategy.IsShootingBullets());
+
+                _playerLogic.ShootLaser(_currentStrategy.IsShootingLaser());
             }
-            else
-            {
-                _playerLogic.RotatePlayerTowardsStick(_currentStrategy.GetRotationInput());
-            }
-
-            _playerLogic.MovePlayer(_currentStrategy.GetPlayerMovementState());
-
-            _playerLogic.ShootBullets(_currentStrategy.IsShootingBullets());
-
-            _playerLogic.ShootLaser(_currentStrategy.IsShootingLaser());
 
             if (_currentStrategy.IsPausePressed())
             {

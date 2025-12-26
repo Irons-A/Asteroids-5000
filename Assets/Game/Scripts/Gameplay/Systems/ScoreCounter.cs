@@ -5,6 +5,7 @@ using Core.Configuration;
 using Core.Signals;
 using Enemies;
 using Enemies.Signals;
+using Gameplay.Signals;
 using UI;
 using UI.Signals;
 using UnityEngine;
@@ -43,7 +44,7 @@ namespace Gameplay.Systems
         {
             _signalBus.Subscribe<EnemyDestroyedSignal>(AddScore);
             _signalBus.Subscribe<EndGameSignal>(TrySavingScore);
-            _signalBus.Subscribe<StartGameSignal>(ResetScore);
+            _signalBus.Subscribe<ResetScoreSignal>(ResetScore);
             
             SetRewards();
         }
@@ -75,7 +76,7 @@ namespace Gameplay.Systems
         {
             _signalBus.Unsubscribe<EnemyDestroyedSignal>(AddScore);
             _signalBus.Unsubscribe<EndGameSignal>(TrySavingScore);
-            _signalBus.Unsubscribe<StartGameSignal>(ResetScore);
+            _signalBus.Unsubscribe<ResetScoreSignal>(ResetScore);
         }
     }
 }
