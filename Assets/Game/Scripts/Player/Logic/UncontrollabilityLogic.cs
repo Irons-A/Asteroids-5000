@@ -27,7 +27,7 @@ namespace Player.Logic
         {
             if (IsUncontrollable || _isConfigured == false) return;
             
-            DisposeUncontrollabilityCTS();
+            StopUncontrollabilityPeriod();
                 
             _uncontrollabilityCTS = new CancellationTokenSource();
                 
@@ -36,7 +36,7 @@ namespace Player.Logic
             UncontrolabilityTask(_uncontrollabilityCTS.Token).Forget();
         }
 
-        private void DisposeUncontrollabilityCTS()
+        public void StopUncontrollabilityPeriod()
         {
             _uncontrollabilityCTS?.Cancel();
             _uncontrollabilityCTS?.Dispose();
@@ -60,13 +60,13 @@ namespace Player.Logic
             }
             finally
             {
-                DisposeUncontrollabilityCTS();
+                StopUncontrollabilityPeriod();
             }
         }
         
         public void Dispose()
         {
-            DisposeUncontrollabilityCTS();
+            StopUncontrollabilityPeriod();
         }
     }
 }

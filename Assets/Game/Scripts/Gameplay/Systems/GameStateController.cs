@@ -22,13 +22,14 @@ namespace Gameplay.Systems
         [SerializeField] private Canvas _mobileControlsCanvas;
         
         private SignalBus _signalBus;
-
+        private InputDetector _inputDetector;
         private IInputStrategy _currentInputStrategy; //how to set? Input detector is created later. via events?
         
         [Inject]
-        private void Construct(SignalBus signalBus)
+        private void Construct(SignalBus signalBus, InputDetector inputDetector)
         {
             _signalBus = signalBus;
+            _inputDetector = inputDetector;
         }
 
         private void OnEnable()
@@ -68,7 +69,7 @@ namespace Gameplay.Systems
 
         private void GoToMenu()
         {
-            Time.timeScale = 0;
+            Time.timeScale = 1;
             
             _signalBus.TryFire(new DespawnAllSignal());
             

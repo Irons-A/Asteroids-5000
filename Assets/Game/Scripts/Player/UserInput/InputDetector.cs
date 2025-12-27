@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Player.UserInput
 {
-    public class InputDetector : MonoBehaviour
+    public class InputDetector : ITickable
     {
         private IInputStrategy _currentStrategy;
         private KeyboardMouseInputStrategy _pcStrategy;
@@ -23,7 +23,7 @@ namespace Player.UserInput
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
-            GamepadInputStrategy gamepadStrategy, PlayerLogic playerLogic, SignalBus signalBus)
+            GamepadInputStrategy gamepadStrategy, SignalBus signalBus)
         {
             _configProvider = configProvider;
             _inputSettings = _configProvider.InputSettingsRef;
@@ -31,16 +31,25 @@ namespace Player.UserInput
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;
             _currentStrategy = pcStrategy;
-
-            _playerLogic = playerLogic;
+            
             _signalBus = signalBus;
         }
 
-        private void Update()
+        public void Tick()
         {
             DefineInputStrategy();
 
             ProcessUserInput();
+        }
+
+        public void SetPlayerLogic(PlayerLogic playerLogic)
+        {
+            _playerLogic = playerLogic;
+        }
+
+        public void SetCamera()
+        {
+            _pcStrategy.SetCamera();
         }
 
         private void DefineInputStrategy()

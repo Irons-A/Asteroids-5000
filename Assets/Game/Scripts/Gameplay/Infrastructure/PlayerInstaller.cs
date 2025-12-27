@@ -18,7 +18,6 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
-            Container.Bind<PlayerPresentation>().FromMethod(CreatePlayerPresentation).AsSingle();
             Container.BindInterfacesAndSelfTo<InvulnerabilityLogic>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UncontrollabilityLogic>().FromNew().AsTransient();
             Container.Bind<PlayerWeaponConfig>().FromNew().AsTransient();
@@ -26,19 +25,17 @@ namespace Gameplay.Infrastructure
             Container.Bind<PlayerReloadingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<PlayerShootingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UniversalPlayerWeaponSystem>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<PlayerLogic>().AsSingle();
-            Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
-            Container.Bind<GamepadInputStrategy>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerLogic>().FromNew().AsSingle().NonLazy();
+            
+            Container.BindInterfacesAndSelfTo<PlayerPresentation>() .FromMethod(CreatePlayerWithTransform) .AsSingle();
         }
 
-        private PlayerPresentation CreatePlayerPresentation()
+        private PlayerPresentation CreatePlayerWithTransform(InjectContext ctx)
         {
-            PlayerPresentation playerInstance = Instantiate(_playerPrefab, Vector3.zero, Quaternion.identity);
-
-            InputDetector inputDetector = playerInstance.gameObject.AddComponent<InputDetector>();
-            Container.Inject(inputDetector);
-
-            return playerInstance;
+            GameObject playerObj = ctx.Container.InstantiatePrefab( _playerPrefab,  Vector3.zero,    
+                Quaternion.identity, null);
+            
+            return playerObj.GetComponent<PlayerPresentation>();
         }
     }
 }

@@ -13,6 +13,8 @@ using Enemies.Signals;
 using Gameplay.Signals;
 using Gameplay.Systems;
 using Player.Signals;
+using Player.UserInput;
+using Player.UserInput.Strategies;
 using UI;
 using UI.Signals;
 using UnityEngine;
@@ -36,6 +38,7 @@ namespace Gameplay.Infrastructure
             BindPoolAccessProvider();
             BindLogicSystems();
             BindObjectPool();
+            BindUserInput();
             BindGameUI();
 
             _poolAccessProvider.SetPool(_objectPool);
@@ -74,6 +77,13 @@ namespace Gameplay.Infrastructure
             DontDestroyOnLoad(objectPool.gameObject);
 
             return objectPool;
+        }
+
+        private void BindUserInput()
+        {
+            Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
+            Container.Bind<GamepadInputStrategy>().AsSingle();
+            Container.BindInterfacesAndSelfTo<InputDetector>().FromNew().AsSingle().NonLazy();
         }
 
         private void BindGameUI()

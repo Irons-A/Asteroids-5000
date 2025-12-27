@@ -16,7 +16,6 @@ namespace Player.UserInput.Strategies
         private void Construct(JsonConfigProvider configProvider)
         {
             _configProvider = configProvider;
-            _mainCamera = Camera.main;
 
             _inputSettings = configProvider.InputSettingsRef;
         }
@@ -37,8 +36,15 @@ namespace Player.UserInput.Strategies
             }
         }
 
+        public void SetCamera()
+        {
+            _mainCamera = Camera.main;
+        }
+
         public Vector2 GetRotationInput()
         {
+            if (_mainCamera == null) return Vector2.zero;
+            
             Vector3 mouseWorldPosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = mouseWorldPosition;
 

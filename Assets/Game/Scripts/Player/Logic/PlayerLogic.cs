@@ -20,7 +20,7 @@ using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerLogic : ITickable, IFixedTickable, IInitializable, IDisposable
+    public class PlayerLogic : ITickable, IFixedTickable, IDisposable
     {
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
@@ -35,21 +35,20 @@ namespace Player.Logic
         private HealthSystem _healthSystem;
         private InvulnerabilityLogic _invulnerabilityLogic;
         private SpriteRenderer _playerSpriteRenderer;
-        private UncontrollabilityLogic _playerUncontrollabilityLogic;
+        private UncontrollabilityLogic _UncontrollabilityLogic;
         private PlayerUIModel _playerUIModel;
         private SignalBus _signalBus;
 
+        private bool _isConfigured = false;
+
         [Inject]
-        private void Construct(PlayerPresentation playerPresentation, JsonConfigProvider configProvider,
+        private void Construct(JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
             PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,
             UncontrollabilityLogic  uncontrollabilityLogic, PlayerUIModel playerUIModel, SignalBus signalBus)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
-
-            _playerPresentation = playerPresentation;
-            _playerTransform = playerPresentation.transform;
 
             _playerPhysics = playerPhysics;
 
@@ -65,49 +64,44 @@ namespace Player.Logic
             _healthSystem.Configure(_playerSettings.MaxHealth, true);
             _healthSystem.OnHealthDepleted += DisablePlayer;
             
-            _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
-            _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
-            _playerCollisionHandler.OnDamageReceived += TakeDamage;
-            
+            _UncontrollabilityLogic = uncontrollabilityLogic;
             _invulnerabilityLogic = invulnerabilityLogic;
-            _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
-            _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
-            
-            _playerUncontrollabilityLogic = uncontrollabilityLogic;
             
             _playerUIModel = playerUIModel;
             
             _signalBus = signalBus;
+            _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
         }
 
-        public void Initialize()
+        public void Configure(PlayerPresentation playerPresentation)
         {
+            _playerPresentation = playerPresentation;
+            _playerTransform = playerPresentation.transform;
+            
+            _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
+            _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
+            _playerCollisionHandler.OnDamageReceived += TakeDamage;
+            
+            _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
+            _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
+            
             _playerPhysics.SetMovableObject(_playerPresentation);
             
             ConfigureBulletWeaponSystem();
             ConfigureLaserWeaponSystem();
             
             _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
-            _playerUncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
-            
-            _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
+            _UncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
             
             _playerPresentation.gameObject.SetActive(false);
             _playerPhysics.Stop();
+
+            _isConfigured = true;
         }
 
         public void Tick()
         {
-            _playerUIModel.SetHealth(_healthSystem.CurrentHealth);
-            _playerUIModel.SetCoordinates(_playerTransform.position);
-            _playerUIModel.SetPlayerAngle(_playerTransform.eulerAngles.z);
-            _playerUIModel.SetCurrentSpeed(_playerPhysics.CurrentSpeed);
-            _playerUIModel.SetLaserAmmo(_laserWeaponSystem.CurrentAmmo);
-            _playerUIModel.SetLaserCooldown(_laserWeaponSystem.ReloadProgress);
-            
-            //Zenject bug: Tick is not working in subclasses if there are any bool checks. Calling from here.
-            _bulletWeaponSystem.Tick();
-            _laserWeaponSystem.Tick();
+            UpdateLogic();
         }
 
         public void FixedTick()
@@ -131,7 +125,7 @@ namespace Player.Logic
 
         public void MovePlayer(PlayerMovementState movementState)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
+            if (_UncontrollabilityLogic.IsUncontrollable) return;
             
             if (movementState == PlayerMovementState.Accelerating)
             {
@@ -145,7 +139,7 @@ namespace Player.Logic
 
         public void ShootBullets(bool value)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable)
+            if (_UncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
             {
                 value = false;
             }
@@ -155,7 +149,7 @@ namespace Player.Logic
 
         public void ShootLaser(bool value)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable)
+            if (_UncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
             {
                 value = false;
             }
@@ -167,6 +161,23 @@ namespace Player.Logic
         {
             _playerCollisionHandler.SetShouldProcessCollisions(true);
         }
+        
+        private void UpdateLogic()
+        {
+            if (_isConfigured)
+            {
+                _playerUIModel.SetHealth(_healthSystem.CurrentHealth);
+                _playerUIModel.SetCoordinates(_playerTransform.position);
+                _playerUIModel.SetPlayerAngle(_playerTransform.eulerAngles.z);
+                _playerUIModel.SetCurrentSpeed(_playerPhysics.CurrentSpeed);
+                _playerUIModel.SetLaserAmmo(_laserWeaponSystem.CurrentAmmo);
+                _playerUIModel.SetLaserCooldown(_laserWeaponSystem.ReloadProgress);
+            
+                //Zenject bug: Tick is not working in subclasses if there are any bool checks. Calling from here.
+                _bulletWeaponSystem.Tick();
+                _laserWeaponSystem.Tick();
+            }
+        }
 
         private void TakeDamage(int damage)
         {
@@ -175,13 +186,13 @@ namespace Player.Logic
             _healthSystem.TakeDamage(damage);
             _playerCollisionHandler.SetShouldProcessCollisions(false);
             
-            _playerUncontrollabilityLogic.StartUncontrollabilityPeriod();
+            _UncontrollabilityLogic.StartUncontrollabilityPeriod();
             _invulnerabilityLogic.StartInvulnerabilityPeriod();
         }
 
         private void RotatePlayerAtSpeed(Vector2 targetDirection)
         {
-            if (_playerUncontrollabilityLogic.IsUncontrollable) return;
+            if (_UncontrollabilityLogic.IsUncontrollable) return;
             
             targetDirection = targetDirection.normalized;
 
@@ -204,6 +215,8 @@ namespace Player.Logic
             _healthSystem.Configure(_playerSettings.MaxHealth, true);
             _bulletWeaponSystem.RefillAmmo();
             _laserWeaponSystem.RefillAmmo();
+            _UncontrollabilityLogic.StopUncontrollabilityPeriod();
+            _invulnerabilityLogic.StopInvulnerabilityPeriod();
             _playerPresentation.gameObject.SetActive(true);
         }
 
