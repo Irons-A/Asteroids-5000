@@ -26,8 +26,9 @@ namespace Gameplay.Systems
             { EnemyType.SmallAsteroid, 0},
             { EnemyType.UFO, 0}
         };
-        
-        private int _currentScore = 0;
+
+        public int HighScore { get; }
+        public int CurrentScore { get; private set; } = 0;
 
         [Inject]
         private void Construct(PlayerUIModel playerUIModel, JsonConfigProvider jsonConfigProvider, SignalBus signalBus)
@@ -58,8 +59,8 @@ namespace Gameplay.Systems
 
         private void AddScore(EnemyDestroyedSignal signal)
         {
-            _currentScore += _enemyRewards[signal.Type];
-            _playerUIModel.SetScore(_currentScore);
+            CurrentScore += _enemyRewards[signal.Type];
+            _playerUIModel.SetScore(CurrentScore);
         }
 
         private void TrySavingScore()
@@ -69,7 +70,7 @@ namespace Gameplay.Systems
 
         private void ResetScore()
         {
-            _currentScore = 0;
+            CurrentScore = 0;
         }
 
         public void Dispose()

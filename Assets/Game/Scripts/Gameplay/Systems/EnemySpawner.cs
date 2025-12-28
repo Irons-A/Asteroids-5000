@@ -65,6 +65,7 @@ namespace Gameplay.Environment.Systems
             _signalBus.Subscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
             _signalBus.Subscribe<StartEnemySpawningSignal>(StartEnemySpawning);
             _signalBus.Subscribe<DespawnAllSignal>(ResetEnemyCount);
+            _signalBus.Subscribe<StopEnemySpawningSignal>(StopEnemySpawning);
         }
 
         private void DecreaseEnemyCount()
@@ -175,6 +176,7 @@ namespace Gameplay.Environment.Systems
             _signalBus.Unsubscribe<EnemyDestroyedSignal>(DecreaseEnemyCount);
             _signalBus.Unsubscribe<StartEnemySpawningSignal>(StartEnemySpawning);
             _signalBus.Unsubscribe<DespawnAllSignal>(ResetEnemyCount);
+            _signalBus.Unsubscribe<StopEnemySpawningSignal>(StopEnemySpawning);
         }
     }
 }

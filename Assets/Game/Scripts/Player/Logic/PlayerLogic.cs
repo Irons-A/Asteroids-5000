@@ -62,7 +62,7 @@ namespace Player.Logic
 
             _healthSystem = healthSystem;
             _healthSystem.Configure(_playerSettings.MaxHealth, true);
-            _healthSystem.OnHealthDepleted += DisablePlayer;
+            _healthSystem.OnHealthDepleted += DefeatPlayer;
             
             _UncontrollabilityLogic = uncontrollabilityLogic;
             _invulnerabilityLogic = invulnerabilityLogic;
@@ -71,6 +71,7 @@ namespace Player.Logic
             
             _signalBus = signalBus;
             _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
+            _signalBus.Subscribe<DisablePlayerSignal>(DisablePlayer);
         }
 
         public void Configure(PlayerPresentation playerPresentation)
@@ -206,6 +207,11 @@ namespace Player.Logic
         {
             _playerPresentation.gameObject.SetActive(false);
             _playerPhysics.Stop();
+        }
+
+        private void DefeatPlayer()
+        {
+            DisablePlayer();
             _signalBus.TryFire(new EndGameSignal());
         }
 
@@ -217,6 +223,7 @@ namespace Player.Logic
             _laserWeaponSystem.RefillAmmo();
             _UncontrollabilityLogic.StopUncontrollabilityPeriod();
             _invulnerabilityLogic.StopInvulnerabilityPeriod();
+            _playerPhysics.Stop();
             _playerPresentation.gameObject.SetActive(true);
         }
 
@@ -280,9 +287,10 @@ namespace Player.Logic
                 _playerCollisionHandler.OnDamageReceived -= TakeDamage;
             }
             
-            _healthSystem.OnHealthDepleted -= DisablePlayer;
+            _healthSystem.OnHealthDepleted -= DefeatPlayer;
             _invulnerabilityLogic.OnInvulnerabilityEnded -= EnableCollisions;
             _signalBus.Unsubscribe<ResetPlayerSignal>(ResetPlayer);
+            _signalBus.Unsubscribe<DisablePlayerSignal>(DisablePlayer);
         }
     }
 }
