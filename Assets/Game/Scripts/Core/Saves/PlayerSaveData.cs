@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Core.Saves
 {
     [System.Serializable]
-    public class HighScoreData
+    public class PlayerSaveData
     {
         public int HighScore = 0;
     }

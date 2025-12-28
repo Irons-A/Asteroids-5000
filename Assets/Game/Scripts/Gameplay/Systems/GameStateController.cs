@@ -97,7 +97,7 @@ namespace Gameplay.Systems
             
             _pauseCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(false);
-            //_mobileControlsCanvas.gameObject.SetActive(false);
+            _mobileControlsCanvas.gameObject.SetActive(false);
             _gameOverCanvas.gameObject.SetActive(false);
             _menuCanvas.gameObject.SetActive(true);
             
@@ -125,7 +125,7 @@ namespace Gameplay.Systems
         private void DisplayGameOverCanvas()
         {
             _gameUICanvas.gameObject.SetActive(false);
-            //_mobileControlsCanvas.gameObject.SetActive(false);
+            _mobileControlsCanvas.gameObject.SetActive(false);
             _gameOverCanvas.gameObject.SetActive(true);
             
             _currentGameState = GameState.GameOver;

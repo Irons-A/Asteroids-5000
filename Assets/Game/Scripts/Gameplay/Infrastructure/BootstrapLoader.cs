@@ -1,40 +1,103 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using Core.Configuration;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
+using Debug = UnityEngine.Debug;
 
 namespace Gameplay.Infrastructure
 {
-    public class BootstrapLoader : MonoBehaviour, IInitializable
+    public class BootstrapLoader : MonoBehaviour, IInitializable, IDisposable
     {
-        public const string GameSceneName = "Game";
-
+        private const string GameSceneName = "Game";
+        private const float MinLoadingDelay = 0.5f;
+        
+        private JsonConfigProvider _configProvider;
+        private CancellationTokenSource _cancellationTokenSource;
+        
+        [Inject]
+        private void Construct(JsonConfigProvider configProvider)
+        {
+            _configProvider = configProvider;
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+        
         public void Initialize()
         {
-            //Check if all configs are loaded
-
-            LoadGameScene();
+            StartLoadingProcess().Forget();
         }
-
-        private void LoadSaves()
+        
+        private async UniTaskVoid StartLoadingProcess()
         {
-
+            try
+            {
+                await LoadWithTimingControl();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Loading failed: {ex.Message}");
+            }
         }
-
-        private void LoadGameScene()
+        
+        private async UniTask LoadWithTimingControl()
         {
-            //Another service can be used
-
-            StartCoroutine(LoadSceneWithDelay());
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            
+            await WaitForConfigsInitialization();
+            
+            float elapsedTime = (float)stopwatch.Elapsed.TotalSeconds;
+            
+            float remainingTime = MinLoadingDelay - elapsedTime;
+            
+            if (remainingTime > 0)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(remainingTime), 
+                    cancellationToken: _cancellationTokenSource.Token);
+            }
+            
+            await LoadGameSceneAsync();
         }
-
-        private IEnumerator LoadSceneWithDelay()
+        
+        private async UniTask WaitForConfigsInitialization()
         {
-            //Change to UniTask?
-            yield return new WaitForSeconds(0.5f);
+            while (_configProvider.IsInitialized == false && _cancellationTokenSource.IsCancellationRequested == false)
+            {
+                await UniTask.Delay(100, cancellationToken: _cancellationTokenSource.Token);
+            }
+        }
+        
+        private async UniTask LoadGameSceneAsync()
+        {
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(GameSceneName, LoadSceneMode.Single);
+            
+            loadOperation.allowSceneActivation = false;
 
-            yield return SceneManager.LoadSceneAsync(GameSceneName, LoadSceneMode.Single);
+            while (loadOperation.isDone == false)
+            {
+                if (loadOperation.progress >= 0.9f)
+                {
+                    await UniTask.Delay(100, cancellationToken: _cancellationTokenSource.Token);
+                    
+                    loadOperation.allowSceneActivation = true;
+                }
+                
+                await UniTask.Yield();
+            }
+        }
+        
+        public void Dispose()
+        {
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
         }
     }
 }

@@ -10,24 +10,24 @@ namespace Core.Configuration
 {
     public class JsonConfigProvider : IInitializable
     {
-        public const string UserInputConfigPath = "Configs/UserInputConfig";
-        public const string PlayerConfigPath = "Configs/PlayerConfig";
-        public const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
-        public const string EnemyConfigPath = "Configs/EnemyConfig";
+        private const string UserInputConfigPath = "Configs/UserInputConfig";
+        private const string PlayerConfigPath = "Configs/PlayerConfig";
+        private const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
+        private const string EnemyConfigPath = "Configs/EnemyConfig";
 
-        public const string HighScoreFileName = "highscore.json";
+        private const string SaveDataFileName = "saveData.json";
         
         private UserInputSettings _userInputSettings;
         private PlayerSettings _playerSettings;
         private EnvironmentSettings _environmentSettings;
         private EnemySettings _enemySettings;
         
-        private HighScoreData _highScoreData;
-        private string _highScoreFilePath;
-        
-        private bool _isInitialized = false;
-        
-        public int HighScore => _highScoreData?.HighScore ?? 0;
+        private PlayerSaveData _playerSaveData;
+        private string _saveDataFilePath;
+
+        public bool IsInitialized { get; private set; } = false;
+
+        public int HighScore => _playerSaveData?.HighScore ?? 0;
         
         [Inject]
         private void Construct()
@@ -37,10 +37,7 @@ namespace Core.Configuration
         
         public void Initialize()
         {
-            _highScoreFilePath = Path.Combine(
-                Application.persistentDataPath, 
-                HighScoreFileName
-            );
+            _saveDataFilePath = Path.Combine(Application.persistentDataPath, SaveDataFileName );
             
             LoadHighScore();
         }
@@ -87,7 +84,7 @@ namespace Core.Configuration
         
             if (newScore > HighScore)
             {
-                _highScoreData.HighScore = newScore;
+                _playerSaveData.HighScore = newScore;
                 SaveHighScore();
             
                 Debug.Log($"New high score: {newScore}");
@@ -96,10 +93,10 @@ namespace Core.Configuration
 
         private void EnsureInitialized()
         {
-            if (_isInitialized) return;
+            if (IsInitialized) return;
         
             LoadSettings();
-            _isInitialized = true;
+            IsInitialized = true;
         }
 
         private void LoadSettings()
@@ -135,29 +132,29 @@ namespace Core.Configuration
         
         private void LoadHighScore()
         {
-            if (File.Exists(_highScoreFilePath))
+            if (File.Exists(_saveDataFilePath))
             {
                 try
                 {
-                    string json = File.ReadAllText(_highScoreFilePath);
-                    _highScoreData = JsonConvert.DeserializeObject<HighScoreData>(json);
+                    string json = File.ReadAllText(_saveDataFilePath);
+                    _playerSaveData = JsonConvert.DeserializeObject<PlayerSaveData>(json);
                 
-                    if (_highScoreData == null)
+                    if (_playerSaveData == null)
                     {
-                        _highScoreData = new HighScoreData();
+                        _playerSaveData = new PlayerSaveData();
                     }
                 
-                    Debug.Log($"Loaded high score: {_highScoreData.HighScore}");
+                    Debug.Log($"Loaded high score: {_playerSaveData.HighScore}");
                 }
                 catch (System.Exception ex)
                 {
                     Debug.LogError($"Failed to load high score: {ex.Message}");
-                    _highScoreData = new HighScoreData();
+                    _playerSaveData = new PlayerSaveData();
                 }
             }
             else
             {
-                _highScoreData = new HighScoreData();
+                _playerSaveData = new PlayerSaveData();
                 SaveHighScore();
                 Debug.Log("High score file created with default value");
             }
@@ -167,10 +164,10 @@ namespace Core.Configuration
         {
             try
             {
-                string json = JsonConvert.SerializeObject(_highScoreData, Formatting.Indented);
-                File.WriteAllText(_highScoreFilePath, json);
+                string json = JsonConvert.SerializeObject(_playerSaveData, Formatting.Indented);
+                File.WriteAllText(_saveDataFilePath, json);
             
-                Debug.Log($"High score saved: {_highScoreData.HighScore}");
+                Debug.Log($"High score saved: {_playerSaveData.HighScore}");
             }
             catch (System.Exception ex)
             {
