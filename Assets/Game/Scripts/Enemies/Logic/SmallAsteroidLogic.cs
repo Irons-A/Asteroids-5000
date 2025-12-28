@@ -18,8 +18,7 @@ namespace Enemies.Logic
         
         protected override EnemyType Type => EnemyType.SmallAsteroid;
         
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
+        public SmallAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             SignalBus signalBus)
         {
             Settings = configProvider.EnemySettingsRef;

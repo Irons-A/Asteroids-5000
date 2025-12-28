@@ -29,9 +29,8 @@ namespace Gameplay.Systems
 
         public int HighScore { get; }
         public int CurrentScore { get; private set; } = 0;
-
-        [Inject]
-        private void Construct(PlayerUIModel playerUIModel, JsonConfigProvider jsonConfigProvider, SignalBus signalBus)
+        
+        public ScoreCounter(PlayerUIModel playerUIModel, JsonConfigProvider jsonConfigProvider, SignalBus signalBus)
         {
             _playerUIModel = playerUIModel;
             

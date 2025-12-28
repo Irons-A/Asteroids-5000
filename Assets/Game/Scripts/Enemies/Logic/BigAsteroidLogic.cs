@@ -23,9 +23,8 @@ namespace Enemies.Logic
         private int _maxSmallAsteroidSpawnAmount;
         
         protected override EnemyType Type => EnemyType.BigAsteroid;
-
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
+        
+        public BigAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             PoolAccessProvider accessProvider, SignalBus signalBus)
         {
             Settings = configProvider.EnemySettingsRef;

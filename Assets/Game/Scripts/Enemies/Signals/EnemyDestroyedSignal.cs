@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Enemies.Signals
 {
-    public class EnemyDestroyedSignal
+    public struct EnemyDestroyedSignal
     {
         public EnemyType Type { get; }
 

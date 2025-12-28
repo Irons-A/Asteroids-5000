@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Player.Signals
 {
-    public class ResetPlayerSignal
+    public struct ResetPlayerSignal
     {
     }
 }

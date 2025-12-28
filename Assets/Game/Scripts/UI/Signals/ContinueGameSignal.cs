@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UI.Signals
 {
-    public class ContinueGameSignal
+    public struct ContinueGameSignal
     {
     }
 }

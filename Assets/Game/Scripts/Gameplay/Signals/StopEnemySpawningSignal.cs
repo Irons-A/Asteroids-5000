@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Gameplay.Signals
 {
-    public class StopEnemySpawningSignal
+    public struct StopEnemySpawningSignal
     {
     }
 }

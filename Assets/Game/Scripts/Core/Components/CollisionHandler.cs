@@ -29,8 +29,13 @@ namespace Core.Components
             Durability = durability;
             ShouldCauseRicochet = shouldCauseRicochet;
         }
+        
+        public void SetShouldProcessCollisions(bool value)
+        {
+            ShouldProcessCollisions = value;
+        }
 
-        public void DealDamage(int damage)
+        private void DealDamage(int damage)
         {
             if (damage > 0)
             {
@@ -38,19 +43,14 @@ namespace Core.Components
             }
         }
 
-        public void CallForDestruction()
+        private void CallForDestruction()
         {
             OnDestructionCalled?.Invoke();
         }
 
-        public void CallForRicochet()
+        private void CallForRicochet()
         {
             OnRicochetCalled?.Invoke();
-        }
-
-        public void SetShouldProcessCollisions(bool value)
-        {
-            ShouldProcessCollisions = value;
         }
 
         private void OnTriggerEnter2D(Collider2D other)

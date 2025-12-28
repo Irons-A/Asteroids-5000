@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Enemies.Signals
 {
-    public class EnemySpawnedSignal
+    public struct EnemySpawnedSignal
     {
     }
 }

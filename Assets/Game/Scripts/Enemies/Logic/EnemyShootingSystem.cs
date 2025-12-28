@@ -28,9 +28,8 @@ namespace Enemies.Logic
 
         private CancellationTokenSource _shootingCTS;
         private bool _isShooting = false;
-
-        [Inject]
-        private void Construct(PoolAccessProvider objectPool)
+        
+        public EnemyShootingSystem(PoolAccessProvider objectPool)
         {
             _objectPool = objectPool;
         }

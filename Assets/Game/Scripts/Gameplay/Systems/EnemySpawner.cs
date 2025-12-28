@@ -27,9 +27,8 @@ namespace Gameplay.Environment.Systems
         private CancellationTokenSource _spawnCTS;
         
         private int _livingEnemyCount = 0;
-
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
+        
+        public EnemySpawner(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
             PlayerPresentation playerPresentation, SignalBus signalBus)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;

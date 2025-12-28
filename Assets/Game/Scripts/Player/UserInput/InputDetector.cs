@@ -20,9 +20,8 @@ namespace Player.UserInput
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
-
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
+        
+        public InputDetector(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
             GamepadInputStrategy gamepadStrategy, SignalBus signalBus)
         {
             _configProvider = configProvider;

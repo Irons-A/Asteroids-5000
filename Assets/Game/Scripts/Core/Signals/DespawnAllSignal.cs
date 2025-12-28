@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Signal
 {
-    public class DespawnAllSignal
+    public struct DespawnAllSignal
     {
     }
 }

@@ -20,8 +20,7 @@ namespace Enemies.Logic
         
         protected override EnemyType Type => EnemyType.UFO;
         
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
+        public UFOLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             SignalBus signalBus, EnemyShootingSystem shootingSystem)
         {
             Settings = configProvider.EnemySettingsRef;

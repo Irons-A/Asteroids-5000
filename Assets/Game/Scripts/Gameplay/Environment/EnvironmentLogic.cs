@@ -18,9 +18,8 @@ namespace Gameplay.Environment
         private Vector2 _fieldSize;
 
         public Bounds Bounds => new Bounds(_fieldCenter, _fieldSize);
-
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory,
+        
+        public EnvironmentLogic(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory,
             EnemySpawner enemySpawner)
         {
             _environmentSettings = configProvider.EnvironmentSettingsRef;

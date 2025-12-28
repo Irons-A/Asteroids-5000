@@ -26,9 +26,8 @@ namespace Player.Logic.Weapons
         private bool _isInitialized = false;
 
         public event Action OnShotFired;
-
-        [Inject]
-        public void Construct(PoolAccessProvider objectPool)
+        
+        public PlayerShootingSubsystem(PoolAccessProvider objectPool)
         {
             _objectPool = objectPool;
         }

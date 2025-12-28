@@ -40,9 +40,8 @@ namespace Player.Logic
         private SignalBus _signalBus;
 
         private bool _isConfigured = false;
-
-        [Inject]
-        private void Construct(JsonConfigProvider configProvider,
+        
+        public PlayerLogic(JsonConfigProvider configProvider,
             CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
             PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
             PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,

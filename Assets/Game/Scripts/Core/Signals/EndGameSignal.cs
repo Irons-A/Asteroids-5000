@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Signals
 {
-    public class EndGameSignal
+    public struct EndGameSignal
     {
     }
 }

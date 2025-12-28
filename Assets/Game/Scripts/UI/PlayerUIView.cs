@@ -25,7 +25,7 @@ namespace UI
         private CompositeDisposable _disposables = new CompositeDisposable();
 
         [Inject]
-        public void Construct(PlayerUIViewModel viewModel)
+        private void Construct(PlayerUIViewModel viewModel)
         {
             _viewModel = viewModel;
             _viewModel.Coordinates.Subscribe(SetCoordinates).AddTo(_disposables);

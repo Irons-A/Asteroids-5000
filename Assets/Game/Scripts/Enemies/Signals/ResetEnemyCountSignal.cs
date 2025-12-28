@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Enemies.Signals
 {
-    public class ResetEnemyCountSignal
+    public struct ResetEnemyCountSignal
     {
     }
 }
