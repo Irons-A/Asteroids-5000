@@ -38,7 +38,7 @@ namespace Enemies.Logic
             
             CollisionHandler = collisionHandler;
             CollisionHandler.Configure(Settings.SmallAsteroidDamage, EntityAffiliation.Enemy, 
-                EntityDurability.Piercing, shouldCauseRicochet: true);
+                EntityDurability.Piercing, shouldCauseRicochet: true, customPhysics: Physics);
             CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
             CollisionHandler.OnDestructionCalled += GetDestroyed;
             CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;

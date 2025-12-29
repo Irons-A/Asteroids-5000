@@ -10,30 +10,30 @@ namespace Core.Physics
 {
     public class CustomPhysics
     {
-        public const float BaseFriction = 0;
-        public const float BaseObjectMass = 0; // Возвращаем 0
-
-        private float _friction;
-        private float _objectMass;
+        private const float BaseFriction = 0;
+        private const float BaseObjectMass = 1;
+        private const float BaseRestitution = 0.7f;
 
         private Transform _movableObjectTransform;
-        private CollisionHandler _collisionHandler;
 
         private Vector2 _currentAcceleration;
-        private Vector2 _currentVelocity;
-
-        public float CurrentSpeed { get; private set; } = 0;
+        
+        public float ObjectMass { get; private set; }
+        public float Friction { get; private set; }
+        public float Restitution { get; private set; }
+        public Vector2 CurrentVelocity { get; private set; }
+        public float CurrentSpeed { get; private set; }
 
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
-            float objectMass = BaseObjectMass, CollisionHandler collisionHandler = null)
+            float objectMass = BaseObjectMass, float restitution = BaseRestitution)
         {
             _movableObjectTransform = movableObject.transform;
-            _friction = friction <= 0 ? BaseFriction : friction;
-            _objectMass = objectMass <= 0 ? BaseObjectMass : objectMass;
-            _collisionHandler = collisionHandler;
+            Friction = friction <= 0 ? BaseFriction : friction;
+            ObjectMass = objectMass <= 0 ? BaseObjectMass : objectMass;
+            Restitution = restitution <= 0 ? BaseRestitution : restitution;
 
             _currentAcceleration = Vector2.zero;
-            _currentVelocity = Vector2.zero;
+            CurrentVelocity = Vector2.zero;
         }
 
         public void ApplyAcceleration(float acceleration, float maxSpeed)
@@ -44,18 +44,18 @@ namespace Core.Physics
 
             float effectiveAcceleration = acceleration;
 
-            if (_objectMass > 0)
+            if (ObjectMass > 0)
             {
-                effectiveAcceleration = acceleration / (1 + _objectMass);
+                effectiveAcceleration = acceleration / (1 + ObjectMass);
             }
 
             _currentAcceleration += direction * effectiveAcceleration;
 
-            float currentSpeed = _currentVelocity.magnitude;
+            float currentSpeed = CurrentVelocity.magnitude;
 
             if (currentSpeed > maxSpeed)
             {
-                _currentVelocity = _currentVelocity.normalized * maxSpeed;
+                CurrentVelocity = CurrentVelocity.normalized * maxSpeed;
             }
         }
 
@@ -65,18 +65,18 @@ namespace Core.Physics
 
             float effectiveDeceleration = deceleration;
 
-            if (_objectMass > 0)
+            if (ObjectMass > 0)
             {
-                effectiveDeceleration = deceleration / (1 + _objectMass);
+                effectiveDeceleration = deceleration / (1 + ObjectMass);
             }
 
-            if (_currentVelocity.magnitude > effectiveDeceleration)
+            if (CurrentVelocity.magnitude > effectiveDeceleration)
             {
-                _currentVelocity -= _currentVelocity.normalized * effectiveDeceleration;
+                CurrentVelocity -= CurrentVelocity.normalized * effectiveDeceleration;
             }
             else
             {
-                _currentVelocity = Vector2.zero;
+                CurrentVelocity = Vector2.zero;
             }
         }
         
@@ -84,82 +84,61 @@ namespace Core.Physics
         {
             if (_movableObjectTransform == null) return;
             
-            _currentVelocity += _currentAcceleration * Time.fixedDeltaTime;
+            CurrentVelocity += _currentAcceleration * Time.fixedDeltaTime;
             _currentAcceleration = Vector2.zero;
             
-            CurrentSpeed = _currentVelocity.magnitude;
+            CurrentSpeed = CurrentVelocity.magnitude;
             
-            if (_friction > 0)
+            if (Friction > 0)
             {
                 ApplyFriction();
             }
             
-            Vector2 movement = _currentVelocity * Time.fixedDeltaTime;
+            Vector2 movement = CurrentVelocity * Time.fixedDeltaTime;
             
             _movableObjectTransform.position += new Vector3(movement.x, movement.y, 0);
-        }
-
-        public Vector2 GetVelocity()
-        {
-            return _currentVelocity;
         }
         
         public void ApplyRicochet(CollisionData collisionData)
         {
-            // Нормаль должна быть направлена ОТ поверхности столкновения
             Vector2 normal = collisionData.normal.normalized;
-            Vector2 velocity = _currentVelocity;
+            Vector2 velocity = CurrentVelocity;
             Vector2 otherVelocity = collisionData.otherVelocity;
             
-            // Рассчитываем относительную скорость
             Vector2 relativeVelocity = velocity - otherVelocity;
             
-            // Проекция относительной скорости на нормаль
             float normalRelativeSpeed = Vector2.Dot(relativeVelocity, normal);
             
-            // Если объекты удаляются друг от друга, не обрабатываем столкновение
             if (normalRelativeSpeed > 0)
             {
                 return;
             }
             
-            // Получаем коэффициенты восстановления и трения
-            float restitution1 = _collisionHandler != null ? _collisionHandler.Restitution : 0.8f;
+            float restitution1 = Restitution;
             float restitution2 = collisionData.otherRestitution;
-            float effectiveRestitution = Mathf.Min(restitution1, restitution2); // Используем меньший коэффициент
+            float effectiveRestitution = Mathf.Min(restitution1, restitution2);
             
-            // Коэффициенты трения
-            float friction1 = _collisionHandler != null ? _collisionHandler.Friction : 0.1f;
+            float friction1 = Friction;
             float friction2 = collisionData.otherFriction;
             float effectiveFriction = (friction1 + friction2) * 0.5f;
             
-            // Разлагаем скорость на нормальную и тангенциальную составляющие
             float normalSpeed = Vector2.Dot(velocity, normal);
             Vector2 normalVelocity = normal * normalSpeed;
             Vector2 tangentVelocity = velocity - normalVelocity;
             
-            // Рассчитываем новую нормальную скорость с учетом другого объекта
             float impulseMagnitude = -(1 + effectiveRestitution) * normalRelativeSpeed;
             
-            // Если у объектов есть масса, учитываем ее, но пока будем считать массы равными
-            // (можно добавить поле массы в CollisionHandler)
-            float thisMass = _objectMass > 0 ? _objectMass : 1;
-            float otherMass = 1; // Предполагаем массу другого объекта = 1
+            float thisMass = ObjectMass > 0 ? ObjectMass : 1;
             
-            // Импульс
             Vector2 impulse = normal * impulseMagnitude;
             
-            // Новая скорость = старая скорость + импульс/масса
             Vector2 newVelocity = velocity + impulse / thisMass;
             
-            // Применяем трение к тангенциальной составляющей
             Vector2 newTangentVelocity = tangentVelocity * (1f - effectiveFriction);
             Vector2 newNormalVelocity = newVelocity - tangentVelocity + newTangentVelocity;
             
-            // Устанавливаем новую скорость
-            _currentVelocity = newNormalVelocity;
+            CurrentVelocity = newNormalVelocity;
             
-            // Поворачиваем объект в направлении движения
             if (newNormalVelocity.magnitude > 0.1f)
             {
                 float angle = Mathf.Atan2(newNormalVelocity.y, newNormalVelocity.x) * Mathf.Rad2Deg;
@@ -175,43 +154,43 @@ namespace Core.Physics
             
             direction = _movableObjectTransform.right;
             
-            _currentVelocity = direction * speed;
+            CurrentVelocity = direction * speed;
         }
 
         public void AddImpulse(Vector2 impulse)
         {
-            if (_objectMass > 0)
+            if (ObjectMass > 0)
             {
-                _currentVelocity += impulse / _objectMass;
+                CurrentVelocity += impulse / ObjectMass;
             }
             else
             {
-                _currentVelocity += impulse;
+                CurrentVelocity += impulse;
             }
         }
         
         public void Stop()
         {
-            _currentVelocity = Vector2.zero;
+            CurrentVelocity = Vector2.zero;
             _currentAcceleration = Vector2.zero;
         }
         
         private void ApplyFriction()
         {
-            float effectiveFriction = _friction;
+            float effectiveFriction = Friction;
 
-            if (_objectMass > 0)
+            if (ObjectMass > 0)
             {
-                effectiveFriction = _friction / (1 + _objectMass);
+                effectiveFriction = Friction / (1 + ObjectMass);
             }
 
-            if (_currentVelocity.magnitude > effectiveFriction)
+            if (CurrentVelocity.magnitude > effectiveFriction)
             {
-                _currentVelocity -= _currentVelocity.normalized * effectiveFriction;
+                CurrentVelocity -= CurrentVelocity.normalized * effectiveFriction;
             }
             else
             {
-                _currentVelocity = Vector2.zero;
+                CurrentVelocity = Vector2.zero;
             }
         }
     }

@@ -80,6 +80,8 @@ namespace Player.Logic
             _playerTransform = playerPresentation.transform;
             
             _playerCollisionHandler = _playerPresentation.GetComponent<CollisionHandler>();
+            _playerCollisionHandler.Configure(0, EntityAffiliation.Ally, EntityDurability.Undestructable,
+                shouldCauseRicochet: true, customPhysics: _playerPhysics);
             _playerCollisionHandler.OnRicochetCalled += _playerPhysics.ApplyRicochet;
             _playerCollisionHandler.OnDamageReceived += TakeDamage;
             
