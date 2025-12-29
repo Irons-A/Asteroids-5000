@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Configuration;
+using Core.Saves;
 using Core.Signal;
 using Core.Signals;
 using Gameplay.Signals;
@@ -27,7 +28,7 @@ namespace Gameplay.Systems
         [Header("ScoreDisplayer")]
         [SerializeField] private ScoreDisplayer _scoreDisplayer;
         
-        private JsonConfigProvider _jsonConfigProvider;
+        private SaveSystem _saveSystem;
         private SignalBus _signalBus;
         private ScoreCounter _scoreCounter;
         private InputDetector _inputDetector;
@@ -36,10 +37,10 @@ namespace Gameplay.Systems
         private GameState _currentGameState = GameState.Menu;
         
         [Inject]
-        private void Construct(JsonConfigProvider jsonConfigProvider, SignalBus signalBus, ScoreCounter scoreCounter,
+        private void Construct(SaveSystem saveSystem, SignalBus signalBus, ScoreCounter scoreCounter,
             InputDetector inputDetector)
         {
-            _jsonConfigProvider = jsonConfigProvider;
+            _saveSystem = saveSystem;
             _signalBus = signalBus;
             _scoreCounter = scoreCounter;
             _inputDetector = inputDetector;
@@ -55,7 +56,7 @@ namespace Gameplay.Systems
             _signalBus.Subscribe<StartGameSignal>(StartGame);
             _signalBus.Subscribe<EndGameSignal>(DisplayGameOverCanvas);
             
-            _scoreDisplayer.DisplayHighScore(_jsonConfigProvider.HighScore);
+            _scoreDisplayer.DisplayHighScore(_saveSystem.HighScore);
         }
 
         private void TogglePause()
@@ -101,8 +102,8 @@ namespace Gameplay.Systems
             _gameOverCanvas.gameObject.SetActive(false);
             _menuCanvas.gameObject.SetActive(true);
             
-            _jsonConfigProvider.TryUpdatingHighScore(_scoreCounter.CurrentScore);
-            _scoreDisplayer.DisplayHighScore(_jsonConfigProvider.HighScore);
+            _saveSystem.TryUpdatingHighScore(_scoreCounter.CurrentScore);
+            _scoreDisplayer.DisplayHighScore(_saveSystem.HighScore);
         }
         
         private void RestartGame()
@@ -130,8 +131,8 @@ namespace Gameplay.Systems
             
             _currentGameState = GameState.GameOver;
 
-            _jsonConfigProvider.TryUpdatingHighScore(_scoreCounter.CurrentScore);
-            _scoreDisplayer.RefreshScores((_jsonConfigProvider).HighScore, _scoreCounter.CurrentScore);
+            _saveSystem.TryUpdatingHighScore(_scoreCounter.CurrentScore);
+            _scoreDisplayer.RefreshScores((_saveSystem).HighScore, _scoreCounter.CurrentScore);
         }
 
         private void ResetGame()

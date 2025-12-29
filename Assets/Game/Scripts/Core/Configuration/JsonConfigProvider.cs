@@ -8,38 +8,23 @@ using Zenject;
 
 namespace Core.Configuration
 {
-    public class JsonConfigProvider : IInitializable
+    public class JsonConfigProvider
     {
         private const string UserInputConfigPath = "Configs/UserInputConfig";
         private const string PlayerConfigPath = "Configs/PlayerConfig";
         private const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
         private const string EnemyConfigPath = "Configs/EnemyConfig";
-
-        private const string SaveDataFileName = "saveData.json";
         
         private UserInputSettings _userInputSettings;
         private PlayerSettings _playerSettings;
         private EnvironmentSettings _environmentSettings;
         private EnemySettings _enemySettings;
         
-        private PlayerSaveData _playerSaveData;
-        private string _saveDataFilePath;
-
         public bool IsInitialized { get; private set; } = false;
-
-        public int HighScore => _playerSaveData?.HighScore ?? 0;
         
-        [Inject]
-        private void Construct()
+        public JsonConfigProvider()
         {
             EnsureInitialized();
-        }
-        
-        public void Initialize()
-        {
-            _saveDataFilePath = Path.Combine(Application.persistentDataPath, SaveDataFileName );
-            
-            LoadHighScore();
         }
 
         public UserInputSettings InputSettingsRef
@@ -75,20 +60,6 @@ namespace Core.Configuration
             {
                 EnsureInitialized();
                 return _enemySettings;
-            }
-        }
-        
-        public void TryUpdatingHighScore(int newScore)
-        {
-            EnsureInitialized();
-            
-            PlayerSaveData newSaveData = _playerSaveData.WithUpdatedHighScore(newScore);
-            
-            if (ReferenceEquals(newSaveData, _playerSaveData) == false)
-            {
-                _playerSaveData = newSaveData;
-                
-                SaveHighScore();
             }
         }
 
@@ -128,49 +99,6 @@ namespace Core.Configuration
                 Debug.LogError($"Failed to parse JSON config {configPath}: {ex.Message}");
 
                 return null;
-            }
-        }
-        
-        private void LoadHighScore()
-        {
-            if (File.Exists(_saveDataFilePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(_saveDataFilePath);
-                    _playerSaveData = JsonConvert.DeserializeObject<PlayerSaveData>(json);
-                
-                    if (_playerSaveData == null)
-                    {
-                        _playerSaveData = PlayerSaveData.CreateDefault();
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"Failed to load high score: {ex.Message}");
-                    
-                    _playerSaveData = PlayerSaveData.CreateDefault();
-                }
-            }
-            else
-            {
-                _playerSaveData = PlayerSaveData.CreateDefault();
-                
-                SaveHighScore();
-            }
-        }
-        
-        private void SaveHighScore()
-        {
-            try
-            {
-                string json = JsonConvert.SerializeObject(_playerSaveData, Formatting.Indented);
-                
-                File.WriteAllText(_saveDataFilePath, json);
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Failed to save high score: {ex.Message}");
             }
         }
     }

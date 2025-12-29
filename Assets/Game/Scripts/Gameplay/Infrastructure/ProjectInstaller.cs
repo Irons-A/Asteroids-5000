@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Core.Components;
 using Core.Logic;
 using Core.Physics;
+using Core.Saves;
 using Core.Signal;
 using Core.Signals;
 using Enemies.Logic;
@@ -32,7 +33,8 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
+            Container.Bind<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
+            Container.Bind<SaveSystem>().FromNew().AsSingle().NonLazy();
             
             InstallSignals();
             BindPoolAccessProvider();
