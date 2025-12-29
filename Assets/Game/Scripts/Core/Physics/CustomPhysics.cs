@@ -2,6 +2,7 @@ using Codice.Client.Common.GameUI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Core.Components;
 using UnityEngine;
 using Zenject;
 
@@ -10,12 +11,13 @@ namespace Core.Physics
     public class CustomPhysics
     {
         public const float BaseFriction = 0;
-        public const float BaseObjectMass = 0;
+        public const float BaseObjectMass = 0; // Возвращаем 0
 
         private float _friction;
         private float _objectMass;
 
         private Transform _movableObjectTransform;
+        private CollisionHandler _collisionHandler;
 
         private Vector2 _currentAcceleration;
         private Vector2 _currentVelocity;
@@ -23,11 +25,12 @@ namespace Core.Physics
         public float CurrentSpeed { get; private set; } = 0;
 
         public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
-            float objectMass = BaseObjectMass)
+            float objectMass = BaseObjectMass, CollisionHandler collisionHandler = null)
         {
             _movableObjectTransform = movableObject.transform;
             _friction = friction <= 0 ? BaseFriction : friction;
             _objectMass = objectMass <= 0 ? BaseObjectMass : objectMass;
+            _collisionHandler = collisionHandler;
 
             _currentAcceleration = Vector2.zero;
             _currentVelocity = Vector2.zero;
@@ -96,10 +99,72 @@ namespace Core.Physics
             _movableObjectTransform.position += new Vector3(movement.x, movement.y, 0);
         }
 
-        public void ApplyRicochet()
+        public Vector2 GetVelocity()
         {
-            _currentVelocity = -_currentVelocity;
-            _movableObjectTransform.Rotate(0f, 0f, 180f, Space.Self);
+            return _currentVelocity;
+        }
+        
+        public void ApplyRicochet(CollisionData collisionData)
+        {
+            // Нормаль должна быть направлена ОТ поверхности столкновения
+            Vector2 normal = collisionData.normal.normalized;
+            Vector2 velocity = _currentVelocity;
+            Vector2 otherVelocity = collisionData.otherVelocity;
+            
+            // Рассчитываем относительную скорость
+            Vector2 relativeVelocity = velocity - otherVelocity;
+            
+            // Проекция относительной скорости на нормаль
+            float normalRelativeSpeed = Vector2.Dot(relativeVelocity, normal);
+            
+            // Если объекты удаляются друг от друга, не обрабатываем столкновение
+            if (normalRelativeSpeed > 0)
+            {
+                return;
+            }
+            
+            // Получаем коэффициенты восстановления и трения
+            float restitution1 = _collisionHandler != null ? _collisionHandler.Restitution : 0.8f;
+            float restitution2 = collisionData.otherRestitution;
+            float effectiveRestitution = Mathf.Min(restitution1, restitution2); // Используем меньший коэффициент
+            
+            // Коэффициенты трения
+            float friction1 = _collisionHandler != null ? _collisionHandler.Friction : 0.1f;
+            float friction2 = collisionData.otherFriction;
+            float effectiveFriction = (friction1 + friction2) * 0.5f;
+            
+            // Разлагаем скорость на нормальную и тангенциальную составляющие
+            float normalSpeed = Vector2.Dot(velocity, normal);
+            Vector2 normalVelocity = normal * normalSpeed;
+            Vector2 tangentVelocity = velocity - normalVelocity;
+            
+            // Рассчитываем новую нормальную скорость с учетом другого объекта
+            float impulseMagnitude = -(1 + effectiveRestitution) * normalRelativeSpeed;
+            
+            // Если у объектов есть масса, учитываем ее, но пока будем считать массы равными
+            // (можно добавить поле массы в CollisionHandler)
+            float thisMass = _objectMass > 0 ? _objectMass : 1;
+            float otherMass = 1; // Предполагаем массу другого объекта = 1
+            
+            // Импульс
+            Vector2 impulse = normal * impulseMagnitude;
+            
+            // Новая скорость = старая скорость + импульс/масса
+            Vector2 newVelocity = velocity + impulse / thisMass;
+            
+            // Применяем трение к тангенциальной составляющей
+            Vector2 newTangentVelocity = tangentVelocity * (1f - effectiveFriction);
+            Vector2 newNormalVelocity = newVelocity - tangentVelocity + newTangentVelocity;
+            
+            // Устанавливаем новую скорость
+            _currentVelocity = newNormalVelocity;
+            
+            // Поворачиваем объект в направлении движения
+            if (newNormalVelocity.magnitude > 0.1f)
+            {
+                float angle = Mathf.Atan2(newNormalVelocity.y, newNormalVelocity.x) * Mathf.Rad2Deg;
+                _movableObjectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
         }
 
         public void SetInstantVelocity(float speed)

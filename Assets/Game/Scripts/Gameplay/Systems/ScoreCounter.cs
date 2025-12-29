@@ -61,6 +61,7 @@ namespace Gameplay.Systems
         private void ResetScore()
         {
             CurrentScore = 0;
+            _playerUIModel.SetScore(CurrentScore);
         }
 
         public void Dispose()
