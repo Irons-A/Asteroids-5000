@@ -14,9 +14,10 @@ namespace Enemies.Logic
 {
     public class UFOLogic : BaseEnemyLogic, IDisposable
     {
+        private readonly EnemyShootingSystem _shootingSystem;
+        
         private UFOPresentation _presentation;
         private Transform _targetTransform;
-        private EnemyShootingSystem _shootingSystem;
         
         protected override EnemyType Type => EnemyType.UFO;
         

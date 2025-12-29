@@ -13,11 +13,11 @@ namespace Player.Logic.Weapons
 {
     public class UniversalPlayerWeaponSystem : ITickable, IDisposable
     {
+        private readonly PlayerShootingSubsystem _shootingSubsystem;
+        private readonly PlayerReloadingSubsystem _reloadingSubsystem;
+        private readonly PlayerAmmoSubsystem _ammoManager;
+        
         private PlayerWeaponConfig _config;
-
-        private PlayerShootingSubsystem _shootingSubsystem;
-        private PlayerReloadingSubsystem _reloadingSubsystem;
-        private PlayerAmmoSubsystem _ammoManager;
 
         private bool _shouldShoot = false;
         private bool _isInitialized = false;

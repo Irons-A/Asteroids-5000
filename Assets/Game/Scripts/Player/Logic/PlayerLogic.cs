@@ -22,22 +22,23 @@ namespace Player.Logic
 {
     public class PlayerLogic : ITickable, IFixedTickable, IDisposable
     {
+        private readonly PlayerSettings _playerSettings; 
+        private readonly CustomPhysics _playerPhysics;
+        private readonly UniversalPlayerWeaponSystem _bulletWeaponSystem;
+        private readonly PlayerWeaponConfig _bulletWeaponConfig;
+        private readonly UniversalPlayerWeaponSystem _laserWeaponSystem;
+        private readonly PlayerWeaponConfig _laserWeaponConfig;
+        private readonly HealthSystem _healthSystem;
+        private readonly InvulnerabilityLogic _invulnerabilityLogic;
+        private readonly PlayerUIModel _playerUIModel;
+        private readonly SignalBus _signalBus;
+        
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
-        private PlayerSettings _playerSettings; 
-        private CustomPhysics _playerPhysics;
         private PoolAccessProvider _objectPool;
-        private UniversalPlayerWeaponSystem _bulletWeaponSystem;
-        private PlayerWeaponConfig _bulletWeaponConfig;
-        private UniversalPlayerWeaponSystem _laserWeaponSystem;
-        private PlayerWeaponConfig _laserWeaponConfig;
         private CollisionHandler _playerCollisionHandler;
-        private HealthSystem _healthSystem;
-        private InvulnerabilityLogic _invulnerabilityLogic;
         private SpriteRenderer _playerSpriteRenderer;
         private UncontrollabilityLogic _UncontrollabilityLogic;
-        private PlayerUIModel _playerUIModel;
-        private SignalBus _signalBus;
 
         private bool _isConfigured = false;
         

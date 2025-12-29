@@ -10,8 +10,8 @@ namespace Gameplay.Environment
         private readonly SceneBorder _borderPrefab;
         private readonly DiContainer _container;
 
-        private Transform _borderParent;
-        private Vector3 _spawnPosition = new Vector3(0, -100, 0);
+        private readonly Transform _borderParent;
+        private readonly Vector3 _spawnPosition = new Vector3(0, -100, 0);
 
         public SceneBorderFactory(SceneBorder borderPrefab, DiContainer container)
         {

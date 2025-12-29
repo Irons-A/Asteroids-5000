@@ -15,27 +15,24 @@ namespace Gameplay.Systems
 {
     public class ScoreCounter : IInitializable, IDisposable
     {
-        private PlayerUIModel _playerUIModel;
-        private JsonConfigProvider _jsonConfigProvider;
-        private SignalBus _signalBus;
+        private readonly PlayerUIModel _playerUIModel;
+        private readonly SignalBus _signalBus;
 
-        private EnemySettings _enemySettings;
-        private Dictionary<EnemyType, int> _enemyRewards = new()
+        private readonly EnemySettings _enemySettings;
+        private readonly Dictionary<EnemyType, int> _enemyRewards = new()
         {
             { EnemyType.BigAsteroid, 0},
             { EnemyType.SmallAsteroid, 0},
             { EnemyType.UFO, 0}
         };
-
-        public int HighScore { get; }
+        
         public int CurrentScore { get; private set; } = 0;
         
         public ScoreCounter(PlayerUIModel playerUIModel, JsonConfigProvider jsonConfigProvider, SignalBus signalBus)
         {
             _playerUIModel = playerUIModel;
             
-            _jsonConfigProvider = jsonConfigProvider;
-            _enemySettings = _jsonConfigProvider.EnemySettingsRef;
+            _enemySettings = jsonConfigProvider.EnemySettingsRef;
             
             _signalBus = signalBus;
         }
@@ -43,7 +40,6 @@ namespace Gameplay.Systems
         public void Initialize()
         {
             _signalBus.Subscribe<EnemyDestroyedSignal>(AddScore);
-            _signalBus.Subscribe<EndGameSignal>(TrySavingScore);
             _signalBus.Subscribe<ResetScoreSignal>(ResetScore);
             
             SetRewards();
@@ -62,11 +58,6 @@ namespace Gameplay.Systems
             _playerUIModel.SetScore(CurrentScore);
         }
 
-        private void TrySavingScore()
-        {
-            
-        }
-
         private void ResetScore()
         {
             CurrentScore = 0;
@@ -75,7 +66,6 @@ namespace Gameplay.Systems
         public void Dispose()
         {
             _signalBus.Unsubscribe<EnemyDestroyedSignal>(AddScore);
-            _signalBus.Unsubscribe<EndGameSignal>(TrySavingScore);
             _signalBus.Unsubscribe<ResetScoreSignal>(ResetScore);
         }
     }

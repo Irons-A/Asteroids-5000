@@ -10,22 +10,21 @@ namespace Gameplay.Environment
 {
     public class EnvironmentLogic : IInitializable
     {
-        private EnvironmentSettings _environmentSettings;
-        private SceneBorderFactory _sceneBorderFactory;
-        private EnemySpawner _enemySpawner;
+        private readonly SceneBorderFactory _sceneBorderFactory;
+        private readonly EnemySpawner _enemySpawner;
 
         private readonly Vector2 _fieldCenter = Vector2.zero;
-        private Vector2 _fieldSize;
+        private readonly Vector2 _fieldSize;
 
         public Bounds Bounds => new Bounds(_fieldCenter, _fieldSize);
         
         public EnvironmentLogic(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory,
             EnemySpawner enemySpawner)
         {
-            _environmentSettings = configProvider.EnvironmentSettingsRef;
+            EnvironmentSettings environmentSettings = configProvider.EnvironmentSettingsRef;
 
-            float fieldWidth = Math.Max(_environmentSettings.GameFieldWidth, _environmentSettings.MinimalFieldWidth);
-            float fieldHeight = Math.Max(_environmentSettings.GameFieldHeight, _environmentSettings.MinimalFieldHeight);
+            float fieldWidth = Math.Max(environmentSettings.GameFieldWidth, environmentSettings.MinimalFieldWidth);
+            float fieldHeight = Math.Max(environmentSettings.GameFieldHeight, environmentSettings.MinimalFieldHeight);
             _fieldSize = new Vector2(fieldWidth, fieldHeight);
 
             _enemySpawner = enemySpawner;

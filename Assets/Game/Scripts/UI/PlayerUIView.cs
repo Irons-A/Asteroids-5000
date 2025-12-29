@@ -10,6 +10,8 @@ namespace UI
 {
     public class PlayerUIView : MonoBehaviour
     {
+        private readonly CompositeDisposable _disposables = new();
+        
         [SerializeField] private TMP_Text _coordinatesText;
         [SerializeField] private TMP_Text _angleText;
         [SerializeField] private Image _angleIndicator;
@@ -22,7 +24,6 @@ namespace UI
         [SerializeField] private Image[] _lives;
 
         private PlayerUIViewModel _viewModel;
-        private CompositeDisposable _disposables = new CompositeDisposable();
 
         [Inject]
         private void Construct(PlayerUIViewModel viewModel)

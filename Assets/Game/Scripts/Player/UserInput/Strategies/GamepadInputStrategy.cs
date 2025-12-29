@@ -29,7 +29,7 @@ namespace Player.UserInput.Strategies
             {
                 return PlayerMovementState.Accelerating;
             }
-            else if (movementInput <= _inputSettings.GamepadDecelrationAxisValue)
+            else if (movementInput <= _inputSettings.GamepadDecelerationAxisValue)
             {
                 return PlayerMovementState.Decelerating;
             }

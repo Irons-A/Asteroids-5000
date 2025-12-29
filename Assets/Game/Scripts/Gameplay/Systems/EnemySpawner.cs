@@ -18,10 +18,10 @@ namespace Gameplay.Environment.Systems
 {
     public class EnemySpawner : IInitializable, IDisposable
     {
-        private EnvironmentSettings _environmentSettings;
-        private PoolAccessProvider _objectPool;
-        private Transform _playerTransform;
-        private SignalBus _signalBus;
+        private readonly EnvironmentSettings _environmentSettings;
+        private readonly PoolAccessProvider _objectPool;
+        private readonly Transform _playerTransform;
+        private readonly SignalBus _signalBus;
 
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;

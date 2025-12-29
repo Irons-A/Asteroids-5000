@@ -15,9 +15,10 @@ namespace Enemies.Logic
 {
     public class EnemyShootingSystem : IDisposable
     {
-        private PoolableObjectType _projectile;
-        private PoolAccessProvider _objectPool;
+        private readonly PoolAccessProvider _objectPool;
+        
         private Transform[] _firepoints;
+        private PoolableObjectType _projectile;
         private Transform _targetTransform;
         private Transform _selfTransform;
         private EnemyPresentation _selfPresentation;

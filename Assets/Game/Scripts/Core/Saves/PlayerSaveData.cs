@@ -7,6 +7,6 @@ namespace Core.Saves
     [System.Serializable]
     public class PlayerSaveData
     {
-        public int HighScore = 0;
+        public int HighScore { get; set; } = 0;
     }
 }

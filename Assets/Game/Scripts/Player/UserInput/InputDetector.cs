@@ -11,12 +11,13 @@ namespace Player.UserInput
 {
     public class InputDetector : ITickable
     {
+        private readonly KeyboardMouseInputStrategy _pcStrategy;
+        private readonly GamepadInputStrategy _gamepadStrategy;
+        private readonly SignalBus _signalBus;
+        
         private IInputStrategy _currentStrategy;
-        private KeyboardMouseInputStrategy _pcStrategy;
-        private GamepadInputStrategy _gamepadStrategy;
 
         private PlayerLogic _playerLogic;
-        private SignalBus _signalBus;
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;

@@ -13,7 +13,8 @@ namespace Player.Logic.Weapons
 {
     public class PlayerShootingSubsystem : ITickable
     {
-        private PoolAccessProvider _objectPool;
+        private readonly PoolAccessProvider _objectPool;
+        
         private PlayerWeaponConfig _config;
 
         private WeaponState _weaponState = WeaponState.Idle;

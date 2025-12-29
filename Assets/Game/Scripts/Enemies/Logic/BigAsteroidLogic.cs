@@ -16,7 +16,8 @@ namespace Enemies.Logic
 {
     public class BigAsteroidLogic : BaseEnemyLogic, IDisposable
     {
-        private PoolAccessProvider _objectPool;
+        private readonly PoolAccessProvider _objectPool;
+        
         private BigAsteroidPresentation _presentation;
 
         private int _minSmallAsteroidSpawnAmount;
