@@ -81,13 +81,14 @@ namespace Core.Configuration
         public void TryUpdatingHighScore(int newScore)
         {
             EnsureInitialized();
-        
-            if (newScore > HighScore)
-            {
-                _playerSaveData.HighScore = newScore;
-                SaveHighScore();
             
-                Debug.Log($"New high score: {newScore}");
+            PlayerSaveData newSaveData = _playerSaveData.WithUpdatedHighScore(newScore);
+            
+            if (ReferenceEquals(newSaveData, _playerSaveData) == false)
+            {
+                _playerSaveData = newSaveData;
+                
+                SaveHighScore();
             }
         }
 
@@ -141,22 +142,21 @@ namespace Core.Configuration
                 
                     if (_playerSaveData == null)
                     {
-                        _playerSaveData = new PlayerSaveData();
+                        _playerSaveData = PlayerSaveData.CreateDefault();
                     }
-                
-                    Debug.Log($"Loaded high score: {_playerSaveData.HighScore}");
                 }
                 catch (System.Exception ex)
                 {
                     Debug.LogError($"Failed to load high score: {ex.Message}");
-                    _playerSaveData = new PlayerSaveData();
+                    
+                    _playerSaveData = PlayerSaveData.CreateDefault();
                 }
             }
             else
             {
-                _playerSaveData = new PlayerSaveData();
+                _playerSaveData = PlayerSaveData.CreateDefault();
+                
                 SaveHighScore();
-                Debug.Log("High score file created with default value");
             }
         }
         
@@ -165,9 +165,8 @@ namespace Core.Configuration
             try
             {
                 string json = JsonConvert.SerializeObject(_playerSaveData, Formatting.Indented);
+                
                 File.WriteAllText(_saveDataFilePath, json);
-            
-                Debug.Log($"High score saved: {_playerSaveData.HighScore}");
             }
             catch (System.Exception ex)
             {
