@@ -21,7 +21,7 @@ namespace Core.Saves
             return new PlayerSaveData(0, DateTime.Now);
         }
         
-        public PlayerSaveData WithUpdatedHighScore(int newHighScore)
+        public PlayerSaveData CreateWithUpdatedHighScore(int newHighScore)
         {
             if (newHighScore <= HighScore) return this;
             

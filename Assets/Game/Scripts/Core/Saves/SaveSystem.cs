@@ -25,7 +25,7 @@ namespace Core.Saves
         
         public void TryUpdatingHighScore(int newScore)
         {
-            PlayerSaveData newSaveData = _playerSaveData.WithUpdatedHighScore(newScore);
+            PlayerSaveData newSaveData = _playerSaveData.CreateWithUpdatedHighScore(newScore);
             
             if (ReferenceEquals(newSaveData, _playerSaveData) == false)
             {

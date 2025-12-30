@@ -184,6 +184,8 @@ MonoBehaviour:
   <Affiliation>k__BackingField: 1
   <Durability>k__BackingField: 0
   <ShouldCauseRicochet>k__BackingField: 0
+  <ShouldReceiveRicochet>k__BackingField: 0
+  <ShouldProcessCollisions>k__BackingField: 1
 --- !u!114 &-153965948387451894
 MonoBehaviour:
   m_ObjectHideFlags: 0

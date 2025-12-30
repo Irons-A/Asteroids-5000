@@ -1,6 +1,6 @@
 {
   "PCAccelerationKey": "W",
-  "PCDecelrationKey": "S",
+  "PCDecelerationKey": "S",
   "PCShootBulletKey": "Mouse0",
   "PCShootlaserKey": "Mouse1",
   "PCPauseKey": "Escape",

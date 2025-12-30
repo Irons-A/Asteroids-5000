@@ -11,6 +11,9 @@ namespace Core.Systems.ObjectPools
         UFOBullet,
         BigAsteroid,
         SmallAsteroid,
-        UFO
+        UFO,
+        CollisionParticles,
+        ExplosionParticles,
+        ProjectileHitParticles
     }
 }

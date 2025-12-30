@@ -62,7 +62,7 @@ namespace Core.Physics
         public void ApplyDeceleration(float deceleration)
         {
             if (_movableObjectTransform == null) return;
-
+            
             float effectiveDeceleration = deceleration;
 
             if (ObjectMass > 0)

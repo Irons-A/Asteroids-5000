@@ -6,6 +6,7 @@ using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Components
 {
@@ -20,6 +21,7 @@ namespace Core.Components
         [field: SerializeField] public bool ShouldProcessCollisions { get; private set; } = true;
 
         private CustomPhysics _customPhysics;
+        private PoolAccessProvider _poolAccessProvider;
 
         public event Action<int> OnDamageReceived;
         public event Action OnDestructionCalled;
@@ -30,6 +32,12 @@ namespace Core.Components
         public Vector2 CurrentVelocity => _customPhysics != null ? _customPhysics.CurrentVelocity : Vector2.zero;
         public float Mass => _customPhysics != null ? _customPhysics.ObjectMass : 1;
 
+        [Inject]
+        private void Construct(PoolAccessProvider poolAccessProvider)
+        {
+            _poolAccessProvider = poolAccessProvider;
+        }
+        
         public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability, 
             bool shouldCauseRicochet = false, CustomPhysics customPhysics = null)
         {
@@ -63,16 +71,16 @@ namespace Core.Components
             OnRicochetCalled?.Invoke(collisionData);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D otherCollider)
         {
-            if (other.TryGetComponent(out CollisionHandler otherHandler) == false) return;
+            if (otherCollider.TryGetComponent(out CollisionHandler otherHandler) == false) return;
 
             if (ShouldProcessCollisions && otherHandler.ShouldProcessCollisions)
             {
                 if (otherHandler.Affiliation != this.Affiliation && 
                     ShouldHandleCollision(otherHandler))
                 {
-                    HandleCollision(otherHandler, other);
+                    HandleCollision(otherHandler, otherCollider);
                 }
             }
         }
@@ -85,7 +93,6 @@ namespace Core.Components
         private void HandleCollision(CollisionHandler otherHandler, Collider2D otherCollider)
         {
             Vector2 collisionNormal = CalculateCollisionNormal(otherCollider);
-            Vector2 collisionPoint = CalculateCollisionPoint(otherCollider); //for VFX
         
             var collisionDataForThis = new CollisionData(
                 collisionNormal * -1,
@@ -105,15 +112,27 @@ namespace Core.Components
         
             otherHandler.DealDamage(Damage);
             this.DealDamage(otherHandler.Damage);
+
+            bool shouldSpawnCollisionParticles = false;
             
             if (otherHandler.ShouldCauseRicochet && this.ShouldReceiveRicochet)
             {
                 CallForRicochet(collisionDataForThis);
+                shouldSpawnCollisionParticles = true;
             }
             
             if (ShouldCauseRicochet && otherHandler.ShouldReceiveRicochet)
             {
                 otherHandler.CallForRicochet(collisionDataForOther);
+                shouldSpawnCollisionParticles = true;
+            }
+
+            if (shouldSpawnCollisionParticles)
+            {
+                Vector2 collisionPoint = CalculateCollisionPoint(otherCollider);
+
+                PoolableObject collisionParticles = _poolAccessProvider.GetFromPool(PoolableObjectType.CollisionParticles);
+                collisionParticles.transform.position = collisionPoint;
             }
         
             if (otherHandler.Durability == EntityDurability.Fragile)
