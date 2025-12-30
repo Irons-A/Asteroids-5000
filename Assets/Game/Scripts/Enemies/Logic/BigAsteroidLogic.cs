@@ -40,7 +40,7 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            Physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation, Settings.BigAsteroidMass);
             
             PoolableObject = presentationPoolableObject;
             

@@ -88,7 +88,7 @@ namespace Player.Logic
             _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
             _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
             
-            _playerPhysics.SetMovableObject(_playerPresentation);
+            _playerPhysics.SetMovableObject(_playerPresentation, _playerSettings.PlayerMass);
             
             ConfigureBulletWeaponSystem();
             ConfigureLaserWeaponSystem();

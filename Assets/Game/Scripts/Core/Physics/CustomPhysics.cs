@@ -13,9 +13,9 @@ namespace Core.Physics
         private const float BaseFriction = 0;
         private const float BaseObjectMass = 1;
         private const float BaseRestitution = 0.7f;
-
+        private const float RicochetMagnitudeThreshold = 0.1f;
+        
         private Transform _movableObjectTransform;
-
         private Vector2 _currentAcceleration;
         
         public float ObjectMass { get; private set; }
@@ -24,12 +24,12 @@ namespace Core.Physics
         public Vector2 CurrentVelocity { get; private set; }
         public float CurrentSpeed { get; private set; }
 
-        public void SetMovableObject(MovableObject movableObject, float friction = BaseFriction,
-            float objectMass = BaseObjectMass, float restitution = BaseRestitution)
+        public void SetMovableObject(MovableObject movableObject, float objectMass = BaseObjectMass, 
+            float friction = BaseFriction, float restitution = BaseRestitution)
         {
             _movableObjectTransform = movableObject.transform;
-            Friction = friction <= 0 ? BaseFriction : friction;
             ObjectMass = objectMass <= 0 ? BaseObjectMass : objectMass;
+            Friction = friction <= 0 ? BaseFriction : friction;
             Restitution = restitution <= 0 ? BaseRestitution : restitution;
 
             _currentAcceleration = Vector2.zero;
@@ -101,94 +101,53 @@ namespace Core.Physics
         
         public void ApplyRicochet(CollisionData collisionData)
         {
-            // Если у другого объекта нет физики (снаряд), используем упрощённый расчёт
-            if (collisionData.otherMass <= 0) // Проверка на снаряд без массы
-            {
-                ApplySimplifiedRicochet(collisionData);
-                return;
-            }
-            
-            Vector2 normal = collisionData.normal.normalized;
+            Vector2 normal = collisionData.Normal.normalized;
             Vector2 velocity = CurrentVelocity;
-            Vector2 otherVelocity = collisionData.otherVelocity;
+            Vector2 otherVelocity = collisionData.OtherVelocity;
             
             Vector2 relativeVelocity = velocity - otherVelocity;
             
             float normalRelativeSpeed = Vector2.Dot(relativeVelocity, normal);
             
-            // Если объекты удаляются друг от друга, не обрабатываем столкновение
             if (normalRelativeSpeed > 0)
             {
                 return;
             }
             
             float restitution1 = Restitution;
-            float restitution2 = collisionData.otherRestitution;
+            float restitution2 = collisionData.OtherRestitution;
             float effectiveRestitution = Mathf.Min(restitution1, restitution2);
             
             float friction1 = Friction;
-            float friction2 = collisionData.otherFriction;
+            float friction2 = collisionData.OtherFriction;
             float effectiveFriction = (friction1 + friction2) * 0.5f;
             
-            // ПРАВИЛЬНЫЙ РАСЧЁТ ИМПУЛЬСА С УЧЁТОМ ОБЕИХ МАСС
-            float thisMass = ObjectMass > 0 ? ObjectMass : 1;
-            float otherMass = collisionData.otherMass > 0 ? collisionData.otherMass : 1;
+            float thisMass = ObjectMass;
+            float otherMass = collisionData.OtherMass;
             float totalMass = thisMass + otherMass;
             
-            // Формула для столкновения двух тел
             float impulseMagnitude = -(1 + effectiveRestitution) * normalRelativeSpeed;
-            impulseMagnitude *= (thisMass * otherMass) / totalMass; // Учитываем обе массы
+            impulseMagnitude *= (thisMass * otherMass) / totalMass;
             
             Vector2 impulse = normal * impulseMagnitude;
             
-            // Новая скорость с правильным расчётом
             Vector2 newVelocity = velocity + impulse / thisMass;
             
-            // Применяем трение только если есть движение
-            if (newVelocity.magnitude > 0.1f)
+            if (newVelocity.magnitude > RicochetMagnitudeThreshold)
             {
-                // Разлагаем на нормальную и тангенциальную составляющие
                 float normalSpeed = Vector2.Dot(newVelocity, normal);
                 Vector2 normalVel = normal * normalSpeed;
                 Vector2 tangentVel = newVelocity - normalVel;
                 
-                // Применяем трение к тангенциальной составляющей
                 tangentVel *= (1f - effectiveFriction);
                 newVelocity = normalVel + tangentVel;
             }
             
             CurrentVelocity = newVelocity;
             
-            // Поворачиваем объект в направлении движения
-            if (newVelocity.magnitude > 0.1f)
+            if (newVelocity.magnitude > RicochetMagnitudeThreshold)
             {
                 float angle = Mathf.Atan2(newVelocity.y, newVelocity.x) * Mathf.Rad2Deg;
-                _movableObjectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
-            }
-        }
-        
-        private void ApplySimplifiedRicochet(CollisionData collisionData)
-        {
-            Vector2 normal = collisionData.normal.normalized;
-            Vector2 velocity = CurrentVelocity;
-        
-            // Простое отражение с учётом restitution
-            float normalSpeed = Vector2.Dot(velocity, normal);
-            Vector2 normalVel = normal * normalSpeed;
-            Vector2 tangentVel = velocity - normalVel;
-        
-            // Отражение нормальной составляющей
-            Vector2 newNormalVel = -normalVel * collisionData.otherRestitution;
-        
-            // Применяем трение к тангенциальной составляющей
-            tangentVel *= (1f - collisionData.otherFriction);
-        
-            CurrentVelocity = newNormalVel + tangentVel;
-        
-            // Поворачиваем объект
-            if (CurrentVelocity.magnitude > 0.1f)
-            {
-                float angle = Mathf.Atan2(CurrentVelocity.y, CurrentVelocity.x) * Mathf.Rad2Deg;
                 _movableObjectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
         }
@@ -196,10 +155,8 @@ namespace Core.Physics
         public void SetInstantVelocity(float speed)
         {
             if (_movableObjectTransform == null) return;
-
-            Vector2 direction;
             
-            direction = _movableObjectTransform.right;
+            Vector2 direction = _movableObjectTransform.right;
             
             CurrentVelocity = direction * speed;
         }

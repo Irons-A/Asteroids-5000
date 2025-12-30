@@ -37,7 +37,7 @@ namespace Enemies.Logic
             _presentation = presentation;
             _presentation.OnTargetTransformChanged += SetTargetTransform;
             
-            Physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation, Settings.UFOMass);
             
             PoolableObject = presentationPoolableObject;
             

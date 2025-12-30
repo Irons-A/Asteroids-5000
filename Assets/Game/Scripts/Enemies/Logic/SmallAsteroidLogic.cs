@@ -32,7 +32,7 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            Physics.SetMovableObject(_presentation);
+            Physics.SetMovableObject(_presentation, Settings.SmallAsteroidMass);
             
             PoolableObject = presentationPoolableObject;
             

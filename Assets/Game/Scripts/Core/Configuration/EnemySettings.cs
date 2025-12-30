@@ -7,33 +7,37 @@ namespace Core.Configuration
 {
     public class EnemySettings
     {
-        public float BigAsteroidSpeed { get; private set; }
-        public int BigAsteroidHealth { get; private set; }
-        public int BigAsteroidDamage { get; private set; }
-        public int MinSmallAsteroidSpawnAmount { get; private set; }
-        public int MaxSmallAsteroidSpawnAmount { get; private set; }
-        public int BigAsteroidReward { get; private set; }
-        
-        public float SmallAsteroidSpeed { get; private set; }
-        public int SmallAsteroidHealth { get; private set; }
-        public int SmallAsteroidDamage { get; private set; }
-        public int SmallAsteroidReward { get; private set; }
+        public readonly float BigAsteroidSpeed;
+        public readonly int BigAsteroidHealth;
+        public readonly int BigAsteroidDamage;
+        public readonly int MinSmallAsteroidSpawnAmount;
+        public readonly int MaxSmallAsteroidSpawnAmount;
+        public readonly int BigAsteroidReward;
+        public readonly float BigAsteroidMass;
 
-        public float UFOSpeed { get; private set; }
-        public int UFOHealth { get; private set; }
-        public int UFODamage { get; private set; }
-        public int UFOProjectileDamage { get; private set; }
-        public float UFOProjectileSpeed { get; private set; }
-        public float UFORotationSpeed { get; private set; }
-        public float UFOFireRateInterval { get; private set; }
-        public int UFOReward { get; private set; }
+        public readonly float SmallAsteroidSpeed;
+        public readonly int SmallAsteroidHealth;
+        public readonly int SmallAsteroidDamage;
+        public readonly int SmallAsteroidReward;
+        public readonly float SmallAsteroidMass;
+
+        public readonly float UFOSpeed;
+        public readonly int UFOHealth;
+        public readonly int UFODamage;
+        public readonly int UFOProjectileDamage;
+        public readonly float UFOProjectileSpeed;
+        public readonly float UFORotationSpeed;
+        public readonly float UFOFireRateInterval;
+        public readonly int UFOReward;
+        public readonly float UFOMass;
 
         [JsonConstructor]
         public EnemySettings(float bigAsteroidSpeed, int bigAsteroidHealth, int bigAsteroidDamage,
             int minSmallAsteroidSpawnAmount, int maxSmallAsteroidSpawnAmount, int bigAsteroidReward,
-            float smallAsteroidSpeed, int smallAsteroidHealth, int smallAsteroidDamage, int smallAsteroidReward,
-            float uFOSpeed, int uFOHealth, int uFODamage, int uFOProjectileDamage, float uFOProjectileSpeed,
-            float uFORotationSpeed, float uFOFireRateInterval, int uFOReward)
+            float bigAsteroidMass, float smallAsteroidSpeed, int smallAsteroidHealth, int smallAsteroidDamage, 
+            int smallAsteroidReward, float smallAsteroidMass, float uFOSpeed, int uFOHealth, int uFODamage, 
+            int uFOProjectileDamage, float uFOProjectileSpeed, float uFORotationSpeed, float uFOFireRateInterval,
+            int uFOReward, float uFOMass)
         {
             BigAsteroidSpeed = bigAsteroidSpeed;
             BigAsteroidHealth = bigAsteroidHealth;
@@ -41,11 +45,13 @@ namespace Core.Configuration
             MinSmallAsteroidSpawnAmount = minSmallAsteroidSpawnAmount;
             MaxSmallAsteroidSpawnAmount = maxSmallAsteroidSpawnAmount;
             BigAsteroidReward = bigAsteroidReward;
+            BigAsteroidMass = bigAsteroidMass;
             
             SmallAsteroidSpeed = smallAsteroidSpeed;
             SmallAsteroidHealth = smallAsteroidHealth;
             SmallAsteroidDamage = smallAsteroidDamage;
             SmallAsteroidReward = smallAsteroidReward;
+            SmallAsteroidMass = smallAsteroidMass;
             
             UFOSpeed = uFOSpeed;
             UFOHealth = uFOHealth;
@@ -55,6 +61,7 @@ namespace Core.Configuration
             UFORotationSpeed = uFORotationSpeed;
             UFOFireRateInterval = uFOFireRateInterval;
             UFOReward = uFOReward;
+            UFOMass = uFOMass;
         }
     }
 }

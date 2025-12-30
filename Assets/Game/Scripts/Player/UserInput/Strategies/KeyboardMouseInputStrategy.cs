@@ -26,7 +26,7 @@ namespace Player.UserInput.Strategies
             {
                 return PlayerMovementState.Accelerating;
             }
-            else if (Input.GetKey(_inputSettings.PCDecelrationKey))
+            else if (Input.GetKey(_inputSettings.PCDecelerationKey))
             {
                 return PlayerMovementState.Decelerating;
             }

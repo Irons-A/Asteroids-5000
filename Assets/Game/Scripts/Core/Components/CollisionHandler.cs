@@ -16,6 +16,7 @@ namespace Core.Components
         [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
         [field: SerializeField] public EntityDurability Durability { get; private set; }
         [field: SerializeField] public bool ShouldCauseRicochet { get; private set; } = false;
+        [field: SerializeField] public bool ShouldReceiveRicochet { get; private set; } = true;
         [field: SerializeField] public bool ShouldProcessCollisions { get; private set; } = true;
 
         private CustomPhysics _customPhysics;
@@ -84,31 +85,33 @@ namespace Core.Components
         private void HandleCollision(CollisionHandler otherHandler, Collider2D otherCollider)
         {
             Vector2 collisionNormal = CalculateCollisionNormal(otherCollider);
-            Vector2 collisionPoint = CalculateCollisionPoint(otherCollider);
+            Vector2 collisionPoint = CalculateCollisionPoint(otherCollider); //for VFX
         
             var collisionDataForThis = new CollisionData(
-                collisionPoint, 
-                -collisionNormal,
+                collisionNormal * -1,
                 otherHandler.Restitution,
                 otherHandler.Friction,
-                otherHandler.Mass, // Передаём массу
+                otherHandler.Mass,
                 otherHandler.CurrentVelocity
             );
         
             var collisionDataForOther = new CollisionData(
-                collisionPoint, 
                 collisionNormal,
                 Restitution,
                 Friction,
-                Mass, // Передаём свою массу
+                Mass,
                 CurrentVelocity
             );
         
             otherHandler.DealDamage(Damage);
             this.DealDamage(otherHandler.Damage);
-        
-            // ИСПРАВЛЕНИЕ: Проверяем оба условия!
-            if (otherHandler.ShouldCauseRicochet && this.ShouldCauseRicochet)
+            
+            if (otherHandler.ShouldCauseRicochet && this.ShouldReceiveRicochet)
+            {
+                CallForRicochet(collisionDataForThis);
+            }
+            
+            if (ShouldCauseRicochet && otherHandler.ShouldReceiveRicochet)
             {
                 otherHandler.CallForRicochet(collisionDataForOther);
             }
@@ -116,12 +119,6 @@ namespace Core.Components
             if (otherHandler.Durability == EntityDurability.Fragile)
             {
                 otherHandler.CallForDestruction();
-            }
-        
-            // ИСПРАВЛЕНИЕ: Проверяем оба условия!
-            if (ShouldCauseRicochet && otherHandler.ShouldCauseRicochet)
-            {
-                CallForRicochet(collisionDataForThis);
             }
         
             if (Durability == EntityDurability.Fragile)
@@ -163,7 +160,8 @@ namespace Core.Components
             if (thisCircle != null && otherCircle != null)
             {
                 float thisRadius = thisCircle.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y);
-                float otherRadius = otherCircle.radius * Mathf.Max(otherCollider.transform.lossyScale.x, otherCollider.transform.lossyScale.y);
+                float otherRadius = otherCircle.radius * Mathf.Max(otherCollider.transform.lossyScale.x,
+                    otherCollider.transform.lossyScale.y);
                 float totalRadius = thisRadius + otherRadius;
                 float ratio = thisRadius / totalRadius;
                 

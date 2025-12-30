@@ -7,15 +7,15 @@ namespace Core.Configuration
 {
     public class EnvironmentSettings
     {
-        public float GameFieldWidth { get; private set; }
-        public float GameFieldHeight { get; private set; }
-        public float MinimalFieldWidth { get; private set; }
-        public float MinimalFieldHeight { get; private set; }
+        public readonly float GameFieldWidth;
+        public readonly float GameFieldHeight;
+        public readonly float MinimalFieldWidth;
+        public readonly float MinimalFieldHeight;
 
-        public int MaxEnemiesOnMap { get; private set; }
-        public float EnemySpawnRate { get; private set; }
-        public float EnemySpawnOffset { get; private set; }
-        public float UFOSpawnChance { get; private set; }
+        public readonly int MaxEnemiesOnMap;
+        public readonly float EnemySpawnRate;
+        public readonly float EnemySpawnOffset;
+        public readonly float UFOSpawnChance;
         
         [JsonConstructor]
         public EnvironmentSettings(float gameFieldWidth, float gameFieldHeight, float minimalFieldWidth, 

@@ -7,22 +7,22 @@ namespace Core.Configuration
 {
     public class UserInputSettings
     {
-        public KeyCode PCAccelerationKey;
-        public KeyCode PCDecelrationKey;
-        public KeyCode PCShootBulletKey;
-        public KeyCode PCShootLaserKey;
-        public KeyCode PCPauseKey;
+        public readonly KeyCode PCAccelerationKey;
+        public readonly KeyCode PCDecelerationKey;
+        public readonly KeyCode PCShootBulletKey;
+        public readonly KeyCode PCShootLaserKey;
+        public readonly KeyCode PCPauseKey;
 
-        public string GamepadHorizontalRotationAxis;
-        public string GamepadVerticalRotationAxis;
-        public string GamepadMovementAxisName;
-        public float GamepadAccelerationAxisValue;
-        public float GamepadDecelerationAxisValue;
-        public string GamepadShootBulletKey;
-        public string GamepadShootLaserKey;
-        public KeyCode GamepadPauseKey;
+        public readonly string GamepadHorizontalRotationAxis;
+        public readonly string GamepadVerticalRotationAxis;
+        public readonly string GamepadMovementAxisName;
+        public readonly float GamepadAccelerationAxisValue;
+        public readonly float GamepadDecelerationAxisValue;
+        public readonly string GamepadShootBulletKey;
+        public readonly string GamepadShootLaserKey;
+        public readonly KeyCode GamepadPauseKey;
 
-        public float InputDeadzone;
+        public readonly float InputDeadzone;
 
         [JsonConstructor]
         public UserInputSettings(KeyCode pCAccelerationKey, KeyCode pCDecelerationKey, KeyCode pCShootBulletKey,
@@ -32,7 +32,7 @@ namespace Core.Configuration
             KeyCode gamepadPauseKey, float inputDeadzone)
         {
             PCAccelerationKey = pCAccelerationKey;
-            PCDecelrationKey = pCDecelerationKey;
+            PCDecelerationKey = pCDecelerationKey;
             PCShootBulletKey = pCShootBulletKey;
             PCShootLaserKey = pCShootLaserKey;
             PCPauseKey = pCPauseKey;
