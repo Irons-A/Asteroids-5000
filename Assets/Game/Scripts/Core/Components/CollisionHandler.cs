@@ -27,6 +27,7 @@ namespace Core.Components
         public float Restitution => _customPhysics != null ? _customPhysics.Restitution : 0;
         public float Friction => _customPhysics != null ? _customPhysics.Friction : 0;
         public Vector2 CurrentVelocity => _customPhysics != null ? _customPhysics.CurrentVelocity : Vector2.zero;
+        public float Mass => _customPhysics != null ? _customPhysics.ObjectMass : 1;
 
         public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability, 
             bool shouldCauseRicochet = false, CustomPhysics customPhysics = null)
@@ -84,41 +85,45 @@ namespace Core.Components
         {
             Vector2 collisionNormal = CalculateCollisionNormal(otherCollider);
             Vector2 collisionPoint = CalculateCollisionPoint(otherCollider);
-            
+        
             var collisionDataForThis = new CollisionData(
                 collisionPoint, 
                 -collisionNormal,
                 otherHandler.Restitution,
                 otherHandler.Friction,
+                otherHandler.Mass, // Передаём массу
                 otherHandler.CurrentVelocity
             );
-            
+        
             var collisionDataForOther = new CollisionData(
                 collisionPoint, 
                 collisionNormal,
                 Restitution,
                 Friction,
+                Mass, // Передаём свою массу
                 CurrentVelocity
             );
-            
+        
             otherHandler.DealDamage(Damage);
             this.DealDamage(otherHandler.Damage);
-            
-            if (otherHandler.ShouldCauseRicochet)
+        
+            // ИСПРАВЛЕНИЕ: Проверяем оба условия!
+            if (otherHandler.ShouldCauseRicochet && this.ShouldCauseRicochet)
             {
                 otherHandler.CallForRicochet(collisionDataForOther);
             }
-            
+        
             if (otherHandler.Durability == EntityDurability.Fragile)
             {
                 otherHandler.CallForDestruction();
             }
-            
-            if (ShouldCauseRicochet)
+        
+            // ИСПРАВЛЕНИЕ: Проверяем оба условия!
+            if (ShouldCauseRicochet && otherHandler.ShouldCauseRicochet)
             {
                 CallForRicochet(collisionDataForThis);
             }
-            
+        
             if (Durability == EntityDurability.Fragile)
             {
                 CallForDestruction();

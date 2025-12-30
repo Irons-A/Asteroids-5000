@@ -101,6 +101,13 @@ namespace Core.Physics
         
         public void ApplyRicochet(CollisionData collisionData)
         {
+            // Если у другого объекта нет физики (снаряд), используем упрощённый расчёт
+            if (collisionData.otherMass <= 0) // Проверка на снаряд без массы
+            {
+                ApplySimplifiedRicochet(collisionData);
+                return;
+            }
+            
             Vector2 normal = collisionData.normal.normalized;
             Vector2 velocity = CurrentVelocity;
             Vector2 otherVelocity = collisionData.otherVelocity;
@@ -109,6 +116,7 @@ namespace Core.Physics
             
             float normalRelativeSpeed = Vector2.Dot(relativeVelocity, normal);
             
+            // Если объекты удаляются друг от друга, не обрабатываем столкновение
             if (normalRelativeSpeed > 0)
             {
                 return;
@@ -122,26 +130,65 @@ namespace Core.Physics
             float friction2 = collisionData.otherFriction;
             float effectiveFriction = (friction1 + friction2) * 0.5f;
             
-            float normalSpeed = Vector2.Dot(velocity, normal);
-            Vector2 normalVelocity = normal * normalSpeed;
-            Vector2 tangentVelocity = velocity - normalVelocity;
-            
-            float impulseMagnitude = -(1 + effectiveRestitution) * normalRelativeSpeed;
-            
+            // ПРАВИЛЬНЫЙ РАСЧЁТ ИМПУЛЬСА С УЧЁТОМ ОБЕИХ МАСС
             float thisMass = ObjectMass > 0 ? ObjectMass : 1;
+            float otherMass = collisionData.otherMass > 0 ? collisionData.otherMass : 1;
+            float totalMass = thisMass + otherMass;
+            
+            // Формула для столкновения двух тел
+            float impulseMagnitude = -(1 + effectiveRestitution) * normalRelativeSpeed;
+            impulseMagnitude *= (thisMass * otherMass) / totalMass; // Учитываем обе массы
             
             Vector2 impulse = normal * impulseMagnitude;
             
+            // Новая скорость с правильным расчётом
             Vector2 newVelocity = velocity + impulse / thisMass;
             
-            Vector2 newTangentVelocity = tangentVelocity * (1f - effectiveFriction);
-            Vector2 newNormalVelocity = newVelocity - tangentVelocity + newTangentVelocity;
-            
-            CurrentVelocity = newNormalVelocity;
-            
-            if (newNormalVelocity.magnitude > 0.1f)
+            // Применяем трение только если есть движение
+            if (newVelocity.magnitude > 0.1f)
             {
-                float angle = Mathf.Atan2(newNormalVelocity.y, newNormalVelocity.x) * Mathf.Rad2Deg;
+                // Разлагаем на нормальную и тангенциальную составляющие
+                float normalSpeed = Vector2.Dot(newVelocity, normal);
+                Vector2 normalVel = normal * normalSpeed;
+                Vector2 tangentVel = newVelocity - normalVel;
+                
+                // Применяем трение к тангенциальной составляющей
+                tangentVel *= (1f - effectiveFriction);
+                newVelocity = normalVel + tangentVel;
+            }
+            
+            CurrentVelocity = newVelocity;
+            
+            // Поворачиваем объект в направлении движения
+            if (newVelocity.magnitude > 0.1f)
+            {
+                float angle = Mathf.Atan2(newVelocity.y, newVelocity.x) * Mathf.Rad2Deg;
+                _movableObjectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+        }
+        
+        private void ApplySimplifiedRicochet(CollisionData collisionData)
+        {
+            Vector2 normal = collisionData.normal.normalized;
+            Vector2 velocity = CurrentVelocity;
+        
+            // Простое отражение с учётом restitution
+            float normalSpeed = Vector2.Dot(velocity, normal);
+            Vector2 normalVel = normal * normalSpeed;
+            Vector2 tangentVel = velocity - normalVel;
+        
+            // Отражение нормальной составляющей
+            Vector2 newNormalVel = -normalVel * collisionData.otherRestitution;
+        
+            // Применяем трение к тангенциальной составляющей
+            tangentVel *= (1f - collisionData.otherFriction);
+        
+            CurrentVelocity = newNormalVel + tangentVel;
+        
+            // Поворачиваем объект
+            if (CurrentVelocity.magnitude > 0.1f)
+            {
+                float angle = Mathf.Atan2(CurrentVelocity.y, CurrentVelocity.x) * Mathf.Rad2Deg;
                 _movableObjectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
         }
