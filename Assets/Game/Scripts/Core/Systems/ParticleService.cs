@@ -1,0 +1,30 @@
+using System.Collections;
+using System.Collections.Generic;
+using Core.Systems.ObjectPools;
+using UnityEngine;
+using Zenject;
+
+namespace Core.Systems
+{
+    public class ParticleService
+    {
+        private readonly PoolAccessProvider _poolAccessProvider;
+        
+        public ParticleService(PoolAccessProvider poolAccessProvider)
+        {
+            _poolAccessProvider = poolAccessProvider;
+        }
+        
+        public void SpawnParticles(PoolableObjectType particleType, Vector3 position)
+        {
+            PoolableObject particle = _poolAccessProvider.GetFromPool(particleType);
+            
+            if (particle.TryGetComponent(out ParticleSystem particleSystem) == false)
+            {
+                particle.Despawn();
+            }
+            
+            particle.transform.position = position;
+        }
+    }
+}

@@ -19,6 +19,7 @@ namespace Enemies.Logic
         protected HealthSystem HealthSystem; 
         protected CollisionHandler CollisionHandler;
         protected SignalBus SignalBus;
+        protected ParticleService ParticleService;
         
         protected abstract EnemyType Type { get; }
 

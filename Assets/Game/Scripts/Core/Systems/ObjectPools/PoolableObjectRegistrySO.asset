@@ -42,10 +42,10 @@ MonoBehaviour:
     <InitialSize>k__BackingField: 5
     <MaxSize>k__BackingField: 10
   - <Type>k__BackingField: 7
-    <Prefab>k__BackingField: {fileID: 0}
+    <Prefab>k__BackingField: {fileID: -5946251185381800995, guid: 1f142c579447b12418225f79468b44eb, type: 3}
     <InitialSize>k__BackingField: 20
     <MaxSize>k__BackingField: 50
   - <Type>k__BackingField: 8
-    <Prefab>k__BackingField: {fileID: 0}
+    <Prefab>k__BackingField: {fileID: 2830086917588780248, guid: d4e46656e22ea374c95f26c94c65dba6, type: 3}
     <InitialSize>k__BackingField: 50
     <MaxSize>k__BackingField: 150

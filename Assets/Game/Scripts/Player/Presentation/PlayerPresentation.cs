@@ -16,6 +16,7 @@ namespace Player.Presentation
         
         [field: SerializeField] public Transform[] BulletFirepoints { get; private set; }
         [field: SerializeField] public Transform[] LaserFirepoints { get; private set; }
+        [field: SerializeField] public ParticleSystem EngineParticles { get; private set; }
 
         [Inject]
         private void Construct(PlayerLogic playerLogic, InputDetector inputDetector)

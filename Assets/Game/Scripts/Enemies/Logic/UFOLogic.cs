@@ -22,13 +22,14 @@ namespace Enemies.Logic
         protected override EnemyType Type => EnemyType.UFO;
         
         public UFOLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
-            SignalBus signalBus, EnemyShootingSystem shootingSystem)
+            SignalBus signalBus, EnemyShootingSystem shootingSystem, ParticleService  particleService)
         {
             Settings = configProvider.EnemySettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             SignalBus = signalBus;
             _shootingSystem = shootingSystem;
+            ParticleService  = particleService;
         }
         
         public void Configure(UFOPresentation presentation, PoolableObject presentationPoolableObject,
@@ -86,6 +87,9 @@ namespace Enemies.Logic
         protected override void GetDestroyed()
         {
             _shootingSystem.StopShooting();
+            
+            ParticleService.SpawnParticles(PoolableObjectType.ExplosionParticles, _presentation.transform.position);
+            
             base.GetDestroyed();
         }
 

@@ -32,27 +32,26 @@ namespace Player.Logic
         private readonly InvulnerabilityLogic _invulnerabilityLogic;
         private readonly PlayerUIModel _playerUIModel;
         private readonly SignalBus _signalBus;
+        private readonly ParticleService _particleService;
         
         private PlayerPresentation _playerPresentation;
         private Transform _playerTransform;
-        private PoolAccessProvider _objectPool;
         private CollisionHandler _playerCollisionHandler;
         private SpriteRenderer _playerSpriteRenderer;
         private UncontrollabilityLogic _UncontrollabilityLogic;
+        private ParticleSystem _playerEngineParticles;
 
         private bool _isConfigured = false;
         
-        public PlayerLogic(JsonConfigProvider configProvider,
-            CustomPhysics playerPhysics, PoolAccessProvider objectPool, UniversalPlayerWeaponSystem bulletWeapon,
-            PlayerWeaponConfig bulletWeaponConfig, UniversalPlayerWeaponSystem laserWeapon,
-            PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem, InvulnerabilityLogic invulnerabilityLogic,
-            UncontrollabilityLogic  uncontrollabilityLogic, PlayerUIModel playerUIModel, SignalBus signalBus)
+        public PlayerLogic(JsonConfigProvider configProvider, CustomPhysics playerPhysics,
+            UniversalPlayerWeaponSystem bulletWeapon, PlayerWeaponConfig bulletWeaponConfig,
+            UniversalPlayerWeaponSystem laserWeapon, PlayerWeaponConfig laserWeaponConfig, HealthSystem  healthSystem,
+            InvulnerabilityLogic invulnerabilityLogic, UncontrollabilityLogic  uncontrollabilityLogic,
+            PlayerUIModel playerUIModel, SignalBus signalBus, ParticleService particleService)
         {
             _playerSettings = configProvider.PlayerSettingsRef;
 
             _playerPhysics = playerPhysics;
-
-            _objectPool = objectPool;
 
             _bulletWeaponSystem = bulletWeapon;
             _bulletWeaponConfig = bulletWeaponConfig;
@@ -72,6 +71,8 @@ namespace Player.Logic
             _signalBus = signalBus;
             _signalBus.Subscribe<ResetPlayerSignal>(ResetPlayer);
             _signalBus.Subscribe<DisablePlayerSignal>(DisablePlayer);
+
+            _particleService = particleService;
         }
 
         public void Configure(PlayerPresentation playerPresentation)
@@ -95,6 +96,9 @@ namespace Player.Logic
             
             _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
             _UncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
+
+            _playerEngineParticles = _playerPresentation.EngineParticles;
+            _playerEngineParticles.Stop();
             
             _playerPresentation.gameObject.SetActive(false);
             _playerPhysics.Stop();
@@ -133,10 +137,21 @@ namespace Player.Logic
             if (movementState == PlayerMovementState.Accelerating)
             {
                 _playerPhysics.ApplyAcceleration(_playerSettings.AccelerationSpeed, _playerSettings.MaxSpeed);
+                
             }
             else if (movementState == PlayerMovementState.Decelerating)
             {
                 _playerPhysics.ApplyDeceleration(_playerSettings.DecelerationSpeed);
+
+            }
+
+            if (movementState == PlayerMovementState.Accelerating)
+            {
+                _playerEngineParticles.Play();
+            }
+            else
+            {
+                _playerEngineParticles.Stop();
             }
         }
 
@@ -213,7 +228,10 @@ namespace Player.Logic
 
         private void DefeatPlayer()
         {
+            _particleService.SpawnParticles(PoolableObjectType.ExplosionParticles, _playerTransform.position);
+            
             DisablePlayer();
+            
             _signalBus.TryFire(new EndGameSignal());
         }
 

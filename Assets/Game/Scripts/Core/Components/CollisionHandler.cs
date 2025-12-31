@@ -21,7 +21,7 @@ namespace Core.Components
         [field: SerializeField] public bool ShouldProcessCollisions { get; private set; } = true;
 
         private CustomPhysics _customPhysics;
-        private PoolAccessProvider _poolAccessProvider;
+        private ParticleService _particleService;
 
         public event Action<int> OnDamageReceived;
         public event Action OnDestructionCalled;
@@ -33,9 +33,9 @@ namespace Core.Components
         public float Mass => _customPhysics != null ? _customPhysics.ObjectMass : 1;
 
         [Inject]
-        private void Construct(PoolAccessProvider poolAccessProvider)
+        private void Construct(ParticleService particleService)
         {
-            _poolAccessProvider = poolAccessProvider;
+            _particleService = particleService;
         }
         
         public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability, 
@@ -131,8 +131,7 @@ namespace Core.Components
             {
                 Vector2 collisionPoint = CalculateCollisionPoint(otherCollider);
 
-                PoolableObject collisionParticles = _poolAccessProvider.GetFromPool(PoolableObjectType.CollisionParticles);
-                collisionParticles.transform.position = collisionPoint;
+                _particleService.SpawnParticles(PoolableObjectType.CollisionParticles, collisionPoint);
             }
         
             if (otherHandler.Durability == EntityDurability.Fragile)

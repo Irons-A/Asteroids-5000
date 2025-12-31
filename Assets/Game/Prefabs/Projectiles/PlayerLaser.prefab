@@ -84,6 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b465288afd2cf4e8ada745113ebc30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _shouldSpawnHitParticles: 0
 --- !u!114 &1350767124494073880
 MonoBehaviour:
   m_ObjectHideFlags: 0

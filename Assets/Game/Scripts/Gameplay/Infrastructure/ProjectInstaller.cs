@@ -38,10 +38,14 @@ namespace Gameplay.Infrastructure
             
             InstallSignals();
             BindPoolAccessProvider();
+            
+            Container.Bind<ParticleService>().FromNew().AsSingle().NonLazy();
+            
             BindLogicSystems();
             BindObjectPool();
             BindUserInput();
             BindGameUI();
+            
 
             _poolAccessProvider.SetPool(_objectPool);
         }

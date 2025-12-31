@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Logic;
+using Core.Systems;
 using UnityEngine;
 using Zenject;
 
@@ -13,16 +14,21 @@ namespace Core.Components
     [RequireComponent(typeof(CollisionHandler))]
     public class Projectile : MonoBehaviour
     {
+        [SerializeField] private bool _shouldSpawnHitParticles = true;
+        
         private PoolableObject _poolableObject;
         private ProjectileLogic _logic;
         private CollisionHandler _collisionHandler;
+        private ParticleService _particleService;
 
         [Inject]
-        private void Construct(ProjectileLogic logic)
+        private void Construct(ProjectileLogic logic, ParticleService particleService)
         {
             _logic = logic;
             _logic.SetPresentationTransform(transform);
             _logic.OnDelayedDestructionCalled += CallDespawn;
+            
+            _particleService = particleService;
         }
         
         private void Awake()
@@ -50,6 +56,11 @@ namespace Core.Components
         {
             _logic.CancelDelayedDestruction();
 
+            if (_shouldSpawnHitParticles)
+            {
+                _particleService.SpawnParticles(PoolableObjectType.ProjectileHitParticles, transform.position);
+            }
+            
             if (_poolableObject != null)
             {
                 _poolableObject.Despawn();

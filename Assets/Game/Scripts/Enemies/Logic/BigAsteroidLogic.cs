@@ -26,13 +26,14 @@ namespace Enemies.Logic
         protected override EnemyType Type => EnemyType.BigAsteroid;
         
         public BigAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
-            PoolAccessProvider accessProvider, SignalBus signalBus)
+            PoolAccessProvider accessProvider, SignalBus signalBus, ParticleService  particleService)
         {
             Settings = configProvider.EnemySettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             _objectPool = accessProvider;
             SignalBus = signalBus;
+            ParticleService = particleService;
         }
         
         public void Configure(BigAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -64,6 +65,8 @@ namespace Enemies.Logic
         protected override void GetDestroyed()
         {
             SpawnSmallAsteroids();
+            
+            ParticleService.SpawnParticles(PoolableObjectType.ExplosionParticles, _presentation.transform.position);
             
             base.GetDestroyed();
         }

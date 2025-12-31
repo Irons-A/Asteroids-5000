@@ -19,12 +19,13 @@ namespace Enemies.Logic
         protected override EnemyType Type => EnemyType.SmallAsteroid;
         
         public SmallAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
-            SignalBus signalBus)
+            SignalBus signalBus, ParticleService  particleService)
         {
             Settings = configProvider.EnemySettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             SignalBus = signalBus;
+            ParticleService = particleService;
         }
         
         public void Configure(SmallAsteroidPresentation presentation, PoolableObject presentationPoolableObject,
@@ -56,7 +57,15 @@ namespace Enemies.Logic
         public override void OnPresentationEnabled()
         {
             base.OnPresentationEnabled();
+            
             _presentation.SetAngle(0, shouldRandomize: true);
+        }
+
+        protected override void GetDestroyed()
+        {
+            ParticleService.SpawnParticles(PoolableObjectType.ExplosionParticles, _presentation.transform.position);
+            
+            base.GetDestroyed();
         }
         
         public void Dispose()
