@@ -22,6 +22,8 @@ namespace Player.Logic
 {
     public class PlayerLogic : ITickable, IFixedTickable, IDisposable
     {
+        private const float MinEngineParticlesToggleDelay = 0.1f;
+        
         private readonly PlayerSettings _playerSettings; 
         private readonly CustomPhysics _playerPhysics;
         private readonly UniversalPlayerWeaponSystem _bulletWeaponSystem;
@@ -41,6 +43,7 @@ namespace Player.Logic
         private UncontrollabilityLogic _UncontrollabilityLogic;
         private ParticleSystem _playerEngineParticles;
 
+        private float _lastParticleToggleTime = 0f;
         private bool _isConfigured = false;
         
         public PlayerLogic(JsonConfigProvider configProvider, CustomPhysics playerPhysics,
@@ -138,6 +141,11 @@ namespace Player.Logic
             {
                 _playerPhysics.ApplyAcceleration(_playerSettings.AccelerationSpeed, _playerSettings.MaxSpeed);
                 
+                if (Time.time - _lastParticleToggleTime > MinEngineParticlesToggleDelay)
+                {
+                    _playerEngineParticles.Play();
+                    _lastParticleToggleTime = Time.time;
+                }
             }
             else if (movementState == PlayerMovementState.Decelerating)
             {
@@ -145,13 +153,13 @@ namespace Player.Logic
 
             }
 
-            if (movementState == PlayerMovementState.Accelerating)
+            if (movementState != PlayerMovementState.Accelerating)
             {
-                _playerEngineParticles.Play();
-            }
-            else
-            {
-                _playerEngineParticles.Stop();
+                if (Time.time - _lastParticleToggleTime > MinEngineParticlesToggleDelay)
+                {
+                    _playerEngineParticles.Stop();
+                    _lastParticleToggleTime = Time.time;
+                }
             }
         }
 

@@ -4915,7 +4915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633b906c443081a49936c24243ab356e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolKey: 0
+  _poolKey: 6
   _despawnCondition: 0
 --- !u!114 &3602655163595302270
 MonoBehaviour:

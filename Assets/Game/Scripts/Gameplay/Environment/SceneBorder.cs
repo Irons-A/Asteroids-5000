@@ -27,6 +27,13 @@ namespace Gameplay.Environment
 
             SetupBorder();
         }
+        
+        public void OnDrawGizmos()
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireCube(transform.position,
+                new Vector2(transform.localScale.x, transform.localScale.y));
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {

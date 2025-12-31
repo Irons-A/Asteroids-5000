@@ -113,6 +113,7 @@ MonoBehaviour:
   <Affiliation>k__BackingField: 1
   <Durability>k__BackingField: 1
   <ShouldCauseRicochet>k__BackingField: 1
+  <ShouldReceiveRicochet>k__BackingField: 1
   <ShouldProcessCollisions>k__BackingField: 1
 --- !u!114 &-9028290898076873946
 MonoBehaviour:

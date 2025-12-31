@@ -214,7 +214,7 @@ namespace Player.Logic.Weapons
             {
                 Debug.LogError("Projectile does not have CollisionHandler component!");
             }
-
+            
             projectile.transform.SetPositionAndRotation(firepoint.position, firepoint.rotation);
 
             if (_config.ShouldSetFirepointAsProjectileParent)
