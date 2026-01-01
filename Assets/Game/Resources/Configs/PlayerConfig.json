@@ -15,7 +15,7 @@
   "MaxLaserCharges": 3,
   "LaserAmmoPerShot": 1,
   "LaserAmmoPerReload": 1,
-  "LaserCooldown": 2,
+  "LaserCooldown": 5,
   "LaserDuration": 0.5,
   "LaserDamage": 5
 }

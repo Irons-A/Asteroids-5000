@@ -13,6 +13,7 @@ namespace Player.UserInput
     {
         private readonly KeyboardMouseInputStrategy _pcStrategy;
         private readonly GamepadInputStrategy _gamepadStrategy;
+        private readonly  MobileInputStrategy _mobileStrategy;
         private readonly SignalBus _signalBus;
         
         private IInputStrategy _currentStrategy;
@@ -23,13 +24,14 @@ namespace Player.UserInput
         private UserInputSettings _inputSettings;
         
         public InputDetector(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
-            GamepadInputStrategy gamepadStrategy, SignalBus signalBus)
+            GamepadInputStrategy gamepadStrategy, MobileInputStrategy mobileStrategy, SignalBus signalBus)
         {
             _configProvider = configProvider;
             _inputSettings = _configProvider.InputSettingsRef;
 
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;
+            _mobileStrategy = mobileStrategy;
             _currentStrategy = pcStrategy;
             
             _signalBus = signalBus;
