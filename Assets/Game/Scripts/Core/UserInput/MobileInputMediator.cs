@@ -7,23 +7,53 @@ namespace Core.UserInput
 {
     public class MobileInputMediator
     {
-        public event Action<JoystickData> OnJoystickChanged;
-        public event Action<VirtualButtonType> OnButtonPressed;
-        public event Action<VirtualButtonType> OnButtonReleased;
+        public Vector2 StickDirection { get; private set; }
+        public bool IsDecelerationButtonDown { get; private set; }
+        public bool IsShootBulletsButtonDown { get; private set; }
+        public bool IsShootLaserButtonDown { get; private set; }
+        public bool IsPauseButtonPressed { get; private set; }
         
-        public void ReportJoystick(JoystickData data)
+        private const float STICK_DEADZONE = 0.2f;
+        
+        public void SetStickDirection(Vector2 direction, float magnitude)
         {
-            OnJoystickChanged?.Invoke(data);
+            if (magnitude < STICK_DEADZONE)
+            {
+                StickDirection = Vector2.zero;
+            }
+            else
+            {
+                StickDirection = direction;
+            }
+        }
+
+        public void SetIsDecelerationButtonDown(bool value)
+        {
+            IsDecelerationButtonDown = value;
+        }
+
+        public void SetIsShootBulletsButtonDown(bool value)
+        {
+            IsShootBulletsButtonDown = value;
         }
         
-        public void ReportButtonDown(VirtualButtonType buttonId)
+        public void SetIsShootLaserButtonDown(bool value)
         {
-            OnButtonPressed?.Invoke(buttonId);
+            IsShootLaserButtonDown = value;
         }
         
-        public void ReportButtonUp(VirtualButtonType buttonId)
+        public void SetIsPauseButtonPressed(bool value)
         {
-            OnButtonReleased?.Invoke(buttonId);
+            IsPauseButtonPressed = value;
+        }
+        
+        public void ResetAll()
+        {
+            StickDirection = Vector2.zero;
+            IsDecelerationButtonDown = false;
+            IsShootBulletsButtonDown = false;
+            IsShootLaserButtonDown = false;
+            //_pauseButtonPressedThisFrame = false;
         }
     }
 }

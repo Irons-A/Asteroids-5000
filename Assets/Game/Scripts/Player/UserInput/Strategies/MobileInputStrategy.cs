@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Player.UserInput.Strategies
 {
-    public class MobileInputStrategy //: IInputStrategy
+    public class MobileInputStrategy : IInputStrategy
     {
         private MobileInputMediator _mediator;
 
@@ -14,29 +14,40 @@ namespace Player.UserInput.Strategies
             _mediator = mediator;
         }
 
-        // public Vector2 GetRotationInput()
-        // {
-        //     если есть ввод со стика, то значение. Если нет то нуль
-        // }
-        //
-        // public PlayerMovementState GetPlayerMovementState()
-        // {
-        //     //если есть вращение стика - ускорение. Если нажата кнопка тормоза, тормоз
-        // }
-        //
-        // public bool IsShootingBullets()
-        // {
-        //     нужно считывать пока кнопка нажата
-        // }
-        //
-        // public bool IsShootingLaser()
-        // {
-        //     нужно считывать пока кнопка нажата
-        // }
-        //
-        // public bool IsPausePressed()
-        // {
-        //     нужно считывать только момент нажатия
-        // }
+        public Vector2 GetRotationInput()
+        {
+            return _mediator.StickDirection;
+        }
+        
+        public PlayerMovementState GetPlayerMovementState()
+        {
+            if (_mediator.StickDirection != Vector2.zero)
+            {
+                return PlayerMovementState.Accelerating;
+            }
+            else if (_mediator.IsDecelerationButtonDown)
+            {
+                return PlayerMovementState.Decelerating;
+            }
+            else
+            {
+                return PlayerMovementState.Idle;
+            }
+        }
+        
+        public bool IsShootingBullets()
+        {
+            return _mediator.IsShootBulletsButtonDown;
+        }
+        
+        public bool IsShootingLaser()
+        {
+            return _mediator.IsShootLaserButtonDown;
+        }
+        
+        public bool IsPausePressed()
+        {
+            return _mediator.IsPauseButtonPressed;
+        }
     }
 }

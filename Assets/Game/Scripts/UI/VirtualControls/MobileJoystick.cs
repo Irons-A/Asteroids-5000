@@ -6,17 +6,15 @@ using UnityEngine.EventSystems;
 
 namespace UI.VirtualControls
 {
-        public class MobileJoystick : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class MobileJoystick : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField] private RectTransform _background;
         [SerializeField] private RectTransform _handle;
         [SerializeField] private float _maxRadius = 100f;
-        [SerializeField] private float _deadZone = 0.2f;
         
         private Vector2 _originalPosition;
-        private bool _isActive;
         
-        public event Action<Vector2, float> OnValueChanged;
+        public event System.Action<Vector2, float> OnValueChanged;
         
         private void Awake()
         {
@@ -26,7 +24,6 @@ namespace UI.VirtualControls
         
         public void OnBeginDrag(PointerEventData eventData)
         {
-            _isActive = true;
             UpdateJoystick(eventData.position);
         }
         
@@ -59,19 +56,11 @@ namespace UI.VirtualControls
             float magnitude = distance / _maxRadius;
             Vector2 normalizedDirection = direction.normalized;
             
-            // Apply deadzone
-            if (magnitude < _deadZone)
-            {
-                normalizedDirection = Vector2.zero;
-                magnitude = 0;
-            }
-            
             OnValueChanged?.Invoke(normalizedDirection, magnitude);
         }
         
         private void ResetJoystick()
         {
-            _isActive = false;
             _handle.anchoredPosition = Vector2.zero;
             OnValueChanged?.Invoke(Vector2.zero, 0);
         }

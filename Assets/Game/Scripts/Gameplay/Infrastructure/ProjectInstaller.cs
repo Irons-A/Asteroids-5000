@@ -9,6 +9,7 @@ using Core.Physics;
 using Core.Saves;
 using Core.Signal;
 using Core.Signals;
+using Core.UserInput;
 using Enemies.Logic;
 using Enemies.Signals;
 using Gameplay.Signals;
@@ -89,6 +90,8 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<KeyboardMouseInputStrategy>().AsSingle();
             Container.Bind<GamepadInputStrategy>().AsSingle();
+            Container.Bind<MobileInputMediator>().AsSingle();
+            Container.Bind<MobileInputStrategy>().AsSingle();
             Container.BindInterfacesAndSelfTo<InputDetector>().FromNew().AsSingle().NonLazy();
         }
 

@@ -10,15 +10,23 @@ namespace UI.VirtualControls
 {
     public class MobileButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
-        [SerializeField] private VirtualButtonType _buttonId;
+        public enum ButtonType
+        {
+            Hold,   // Кнопка с удержанием
+            Press   // Кнопка с моментальным нажатием
+        }
+        
+        [SerializeField] private string _buttonId = "Fire";
+        [SerializeField] private ButtonType _buttonType = ButtonType.Hold;
         [SerializeField] private Image _buttonImage;
         [SerializeField] private Color _pressedColor = new Color(0.8f, 0.8f, 0.8f);
         
         private Color _originalColor;
         private bool _isPressed;
         
-        public event Action<VirtualButtonType> OnButtonDown;
-        public event Action<VirtualButtonType> OnButtonUp;
+        // События для разных типов кнопок
+        public event System.Action<string> OnButtonStateChanged; // Для Hold кнопок (состояние)
+        public event System.Action<string> OnButtonPressed;      // Для Press кнопок (момент нажатия)
         
         private void Awake()
         {
@@ -31,7 +39,15 @@ namespace UI.VirtualControls
             
             _isPressed = true;
             _buttonImage.color = _pressedColor;
-            OnButtonDown?.Invoke(_buttonId);
+            
+            if (_buttonType == ButtonType.Hold)
+            {
+                OnButtonStateChanged?.Invoke(_buttonId);
+            }
+            else if (_buttonType == ButtonType.Press)
+            {
+                OnButtonPressed?.Invoke(_buttonId);
+            }
         }
         
         public void OnPointerUp(PointerEventData eventData)
@@ -40,7 +56,13 @@ namespace UI.VirtualControls
             
             _isPressed = false;
             _buttonImage.color = _originalColor;
-            OnButtonUp?.Invoke(_buttonId);
+            
+            // Для Hold кнопок отправляем отжатое состояние
+            if (_buttonType == ButtonType.Hold)
+            {
+                OnButtonStateChanged?.Invoke(_buttonId + "_up");
+            }
+            // Для Press кнопок не нужно отправлять ничего при отпускании
         }
     }
 }
