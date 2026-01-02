@@ -57,6 +57,8 @@ namespace Player.UserInput
         private void DefineInputStrategy()
         {
             CurrentStrategy = _mobileStrategy; //TEMP
+
+            return; //TEMP
             
             bool gamepadInput = CheckIfGamepadConnected() && CheckIfGamepadInput();
             bool pcInput = CheckIfPCInput();
