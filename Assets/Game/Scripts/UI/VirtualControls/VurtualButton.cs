@@ -9,22 +9,25 @@ using UnityEngine.UI;
 namespace UI.VirtualControls
 {
     [RequireComponent(typeof(Button))]
+    [RequireComponent(typeof(EventTrigger))]
     public class VirtualButton : MonoBehaviour
     {
         [SerializeField] private VirtualButtonType _buttonType = VirtualButtonType.ShootBullets;
 
         private Button _button;
+        private EventTrigger _eventTrigger;
         private bool _isPressed;
         
         [field: SerializeField] public bool IsHoldableButton { get; private set; } = true;
         
-        // События
-        public System.Action<VirtualButtonType, bool> OnButtonStateChanged; // Для Hold кнопок
-        public System.Action<VirtualButtonType> OnButtonPressed; // Для Press кнопок
+        public Action<VirtualButtonType, bool> OnButtonStateChanged;
+        public Action<VirtualButtonType> OnButtonPressed;
         
         private void Awake()
         {
             _button = GetComponent<Button>();
+            _eventTrigger = GetComponent<EventTrigger>();
+            
             SetupButtonListeners();
         }
         
@@ -32,28 +35,17 @@ namespace UI.VirtualControls
         {
             if (_button == null) return;
             
-            // Используем EventTrigger для отслеживания нажатия и отпускания
-            var eventTrigger = gameObject.AddComponent<EventTrigger>();
-            
-            // Нажатие
-            var pointerDown = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
-            pointerDown.callback.AddListener((data) => OnPointerDown());
-            eventTrigger.triggers.Add(pointerDown);
-            
-            // Отпускание (только для удерживаемых кнопок)
             if (IsHoldableButton)
             {
+                var pointerDown = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+                pointerDown.callback.AddListener((data) => OnPointerDown());
+                _eventTrigger.triggers.Add(pointerDown);
+                
                 var pointerUp = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
                 pointerUp.callback.AddListener((data) => OnPointerUp());
-                eventTrigger.triggers.Add(pointerUp);
-                
-                var pointerExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-                pointerExit.callback.AddListener((data) => OnPointerUp());
-                eventTrigger.triggers.Add(pointerExit);
+                _eventTrigger.triggers.Add(pointerUp);
             }
-            
-            // Для однократных кнопок используем стандартный onClick
-            if (!IsHoldableButton)
+            else
             {
                 _button.onClick.AddListener(OnClick);
             }
@@ -69,15 +61,11 @@ namespace UI.VirtualControls
             {
                 OnButtonStateChanged?.Invoke(_buttonType, true);
             }
-            else
-            {
-                OnButtonPressed?.Invoke(_buttonType);
-            }
         }
         
         private void OnPointerUp()
         {
-            if (!_isPressed || !IsHoldableButton) return;
+            if (_isPressed == false || IsHoldableButton == false) return;
             
             _isPressed = false;
             OnButtonStateChanged?.Invoke(_buttonType, false);
@@ -85,38 +73,15 @@ namespace UI.VirtualControls
         
         private void OnClick()
         {
-            // Для однократных кнопок, обрабатываемых через стандартный onClick
-            if (!IsHoldableButton)
+            if (IsHoldableButton == false)
             {
                 OnButtonPressed?.Invoke(_buttonType);
             }
         }
         
-        // Публичный метод для программного нажатия
-        public void SimulatePress()
-        {
-            if (IsHoldableButton)
-            {
-                OnPointerDown();
-            }
-            else
-            {
-                OnClick();
-            }
-        }
-        
-        // Публичный метод для программного отпускания
-        public void SimulateRelease()
-        {
-            if (IsHoldableButton)
-            {
-                OnPointerUp();
-            }
-        }
-        
         private void OnDestroy()
         {
-            if (_button != null && !IsHoldableButton)
+            if (_button != null && IsHoldableButton == false)
             {
                 _button.onClick.RemoveListener(OnClick);
             }
