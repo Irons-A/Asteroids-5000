@@ -9,6 +9,7 @@ using Gameplay.Signals;
 using Player.Presentation;
 using Player.Signals;
 using Player.UserInput;
+using Player.UserInput.Strategies;
 using UI;
 using UI.Signals;
 using UnityEngine;
@@ -32,7 +33,6 @@ namespace Gameplay.Systems
         private SignalBus _signalBus;
         private ScoreCounter _scoreCounter;
         private InputDetector _inputDetector;
-        private IInputStrategy _currentInputStrategy;
         
         private GameState _currentGameState = GameState.Menu;
         
@@ -116,9 +116,11 @@ namespace Gameplay.Systems
         {
             _menuCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(true);
-            
-            //if (_currentInputStrategy is MobileInputStrategy)
-            //_mobileControlsCanvas.gameObject.SetActive(true);
+
+            if (_inputDetector.CurrentStrategy is MobileInputStrategy)
+            {
+                _mobileControlsCanvas.gameObject.SetActive(true);
+            }
             
             ResetGame();
         }

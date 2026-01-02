@@ -16,13 +16,13 @@ namespace Player.UserInput
         private readonly  MobileInputStrategy _mobileStrategy;
         private readonly SignalBus _signalBus;
         
-        private IInputStrategy _currentStrategy;
-
         private PlayerLogic _playerLogic;
 
         private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
-        
+
+        public IInputStrategy CurrentStrategy { get; private set; }
+
         public InputDetector(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
             GamepadInputStrategy gamepadStrategy, MobileInputStrategy mobileStrategy, SignalBus signalBus)
         {
@@ -32,7 +32,7 @@ namespace Player.UserInput
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;
             _mobileStrategy = mobileStrategy;
-            _currentStrategy = pcStrategy;
+            CurrentStrategy = pcStrategy;
             
             _signalBus = signalBus;
         }
@@ -56,21 +56,23 @@ namespace Player.UserInput
 
         private void DefineInputStrategy()
         {
+            CurrentStrategy = _mobileStrategy; //TEMP
+            
             bool gamepadInput = CheckIfGamepadConnected() && CheckIfGamepadInput();
             bool pcInput = CheckIfPCInput();
 
             if (CheckIfMobileInput())
             {
-
+                CurrentStrategy = _mobileStrategy;
             }
             else if (pcInput)
             {
-                _currentStrategy = _pcStrategy;
+                CurrentStrategy = _pcStrategy;
             }
             else if (gamepadInput)
             {
                 //May not work due to Unity bug: always gets input from axis, even when there is none.
-                _currentStrategy = _gamepadStrategy;
+                CurrentStrategy = _gamepadStrategy;
             }
         }
 
@@ -156,23 +158,23 @@ namespace Player.UserInput
 
             if (Time.timeScale > 0)
             {
-                if (_currentStrategy is KeyboardMouseInputStrategy)
+                if (CurrentStrategy is KeyboardMouseInputStrategy)
                 {
-                    _playerLogic.RotatePlayerWithMouse(_currentStrategy.GetRotationInput());
+                    _playerLogic.RotatePlayerWithMouse(CurrentStrategy.GetRotationInput());
                 }
                 else
                 {
-                    _playerLogic.RotatePlayerTowardsStick(_currentStrategy.GetRotationInput());
+                    _playerLogic.RotatePlayerTowardsStick(CurrentStrategy.GetRotationInput());
                 }
 
-                _playerLogic.MovePlayer(_currentStrategy.GetPlayerMovementState());
+                _playerLogic.MovePlayer(CurrentStrategy.GetPlayerMovementState());
 
-                _playerLogic.ShootBullets(_currentStrategy.IsShootingBullets());
+                _playerLogic.ShootBullets(CurrentStrategy.IsShootingBullets());
 
-                _playerLogic.ShootLaser(_currentStrategy.IsShootingLaser());
+                _playerLogic.ShootLaser(CurrentStrategy.IsShootingLaser());
             }
 
-            if (_currentStrategy.IsPausePressed())
+            if (CurrentStrategy.IsPausePressed())
             {
                 _signalBus.TryFire(new PauseGameSignal());
             }

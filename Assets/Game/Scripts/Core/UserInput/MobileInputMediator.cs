@@ -11,7 +11,10 @@ namespace Core.UserInput
         public bool IsDecelerationButtonDown { get; private set; }
         public bool IsShootBulletsButtonDown { get; private set; }
         public bool IsShootLaserButtonDown { get; private set; }
-        public bool IsPauseButtonPressed { get; private set; }
+        //public bool IsPauseButtonPressed { get; private set; }
+        
+        private bool _pauseButtonPressedThisFrame;
+        public bool IsPauseButtonPressed => ConsumePauseButtonPress();
         
         private const float STICK_DEADZONE = 0.2f;
         
@@ -42,9 +45,16 @@ namespace Core.UserInput
             IsShootLaserButtonDown = value;
         }
         
-        public void SetIsPauseButtonPressed(bool value)
+        public void SetPauseButtonPressed()
         {
-            IsPauseButtonPressed = value;
+            _pauseButtonPressedThisFrame = true;
+        }
+        
+        private bool ConsumePauseButtonPress()
+        {
+            bool value = _pauseButtonPressedThisFrame;
+            _pauseButtonPressedThisFrame = false;
+            return value;
         }
         
         public void ResetAll()
@@ -53,7 +63,7 @@ namespace Core.UserInput
             IsDecelerationButtonDown = false;
             IsShootBulletsButtonDown = false;
             IsShootLaserButtonDown = false;
-            //_pauseButtonPressedThisFrame = false;
+            _pauseButtonPressedThisFrame = false;
         }
     }
 }

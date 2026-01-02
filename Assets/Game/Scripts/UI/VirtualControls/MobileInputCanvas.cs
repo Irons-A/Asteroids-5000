@@ -9,10 +9,12 @@ namespace UI.VirtualControls
     public class MobileInputCanvas : MonoBehaviour
     {
         [SerializeField] private MobileJoystick _joystick;
-        [SerializeField] private MobileButton _decelerationButton;
-        [SerializeField] private MobileButton _shootBulletsButton;
-        [SerializeField] private MobileButton _shootLaserButton;
-        [SerializeField] private MobileButton _pauseButton;
+        
+        // Ссылки на кнопки через VirtualButton компонент
+        [SerializeField] private VirtualButton _shootBulletsButton;
+        [SerializeField] private VirtualButton _shootLaserButton;
+        [SerializeField] private VirtualButton _decelerationButton;
+        [SerializeField] private VirtualButton _pauseButton;
         
         private MobileInputMediator _mediator;
         
@@ -34,41 +36,69 @@ namespace UI.VirtualControls
                 };
             }
             
-            // Настройка кнопок с удержанием
-            if (_decelerationButton != null)
+            // Настройка виртуальных кнопок
+            SetupVirtualButton(_shootBulletsButton, VirtualButtonType.ShootBullets);
+            SetupVirtualButton(_shootLaserButton, VirtualButtonType.ShootLaser);
+            SetupVirtualButton(_decelerationButton, VirtualButtonType.Decelerate);
+            SetupVirtualButton(_pauseButton, VirtualButtonType.Pause);
+        }
+        
+        private void SetupVirtualButton(VirtualButton virtualButton, VirtualButtonType expectedType)
+        {
+            if (virtualButton == null) return;
+            
+            // Подписываемся на события кнопки
+            if (virtualButton.IsHoldableButton)
             {
-                _decelerationButton.OnButtonStateChanged += (buttonId) =>
+                // Для удерживаемых кнопок
+                virtualButton.OnButtonStateChanged += (buttonType, isPressed) =>
                 {
-                    bool isPressed = !buttonId.EndsWith("_up");
-                    _mediator.SetIsDecelerationButtonDown(isPressed);
+                    HandleHoldButton(buttonType, isPressed);
                 };
             }
-            
-            if (_shootBulletsButton != null)
+            else
             {
-                _shootBulletsButton.OnButtonStateChanged += (buttonId) =>
+                // Для однократных кнопок
+                virtualButton.OnButtonPressed += (buttonType) =>
                 {
-                    bool isPressed = !buttonId.EndsWith("_up");
+                    HandlePressButton(buttonType);
+                };
+            }
+        }
+        
+        private void HandleHoldButton(VirtualButtonType buttonType, bool isPressed)
+        {
+            switch (buttonType)
+            {
+                case VirtualButtonType.ShootBullets:
                     _mediator.SetIsShootBulletsButtonDown(isPressed);
-                };
-            }
-            
-            if (_shootLaserButton != null)
-            {
-                _shootLaserButton.OnButtonStateChanged += (buttonId) =>
-                {
-                    bool isPressed = !buttonId.EndsWith("_up");
+                    break;
+                    
+                case VirtualButtonType.ShootLaser:
                     _mediator.SetIsShootLaserButtonDown(isPressed);
-                };
+                    break;
+                    
+                case VirtualButtonType.Decelerate:
+                    _mediator.SetIsDecelerationButtonDown(isPressed);
+                    break;
+                    
+                default:
+                    Debug.LogWarning($"Unhandled hold button type: {buttonType}");
+                    break;
             }
-            
-            // Настройка кнопки с моментальным нажатием
-            if (_pauseButton != null)
+        }
+        
+        private void HandlePressButton(VirtualButtonType buttonType)
+        {
+            switch (buttonType)
             {
-                _pauseButton.OnButtonPressed += (buttonId) =>
-                {
-                    //_mediator.SetIsPauseButtonPressed();
-                };
+                case VirtualButtonType.Pause:
+                    _mediator.SetPauseButtonPressed();
+                    break;
+                    
+                default:
+                    Debug.LogWarning($"Unhandled press button type: {buttonType}");
+                    break;
             }
         }
         
@@ -80,16 +110,14 @@ namespace UI.VirtualControls
                 //_joystick.OnValueChanged = null;
             }
             
-            // Можно также отписаться от кнопок, но при уничтожении канваса это не обязательно
+            // Можно отписаться от кнопок, но при уничтожении объекта это не обязательно
         }
         
-        // Метод для включения/отключения управления
         public void SetActive(bool active)
         {
             gameObject.SetActive(active);
             if (!active)
             {
-                // При отключении сбрасываем все состояния
                 _mediator?.ResetAll();
             }
         }

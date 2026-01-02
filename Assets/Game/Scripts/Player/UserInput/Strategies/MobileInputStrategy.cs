@@ -7,7 +7,7 @@ namespace Player.UserInput.Strategies
 {
     public class MobileInputStrategy : IInputStrategy
     {
-        private MobileInputMediator _mediator;
+        private readonly MobileInputMediator _mediator;
 
         public MobileInputStrategy(MobileInputMediator mediator)
         {

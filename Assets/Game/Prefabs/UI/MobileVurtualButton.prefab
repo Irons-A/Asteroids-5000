@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2433372037457924689}
   - component: {fileID: 5166281848816660261}
-  - component: {fileID: 8173624908738722783}
+  - component: {fileID: 2734805619675302825}
   - component: {fileID: 2420792614008599222}
   - component: {fileID: 3258233129012984192}
   m_Layer: 5
@@ -48,7 +48,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5293601612208418819}
   m_CullTransparentMesh: 1
---- !u!114 &8173624908738722783
+--- !u!114 &2734805619675302825
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,9 +60,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efe8c6609f3fbe24f8876b108029d5ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buttonId: Fire
-  _buttonImage: {fileID: 0}
-  _pressedColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  _buttonType: 0
+  <IsHoldableButton>k__BackingField: 1
 --- !u!114 &2420792614008599222
 MonoBehaviour:
   m_ObjectHideFlags: 0
