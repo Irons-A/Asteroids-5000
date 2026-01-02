@@ -8,7 +8,7 @@ namespace UI.VirtualControls
 {
     public class MobileInputCanvas : MonoBehaviour
     {
-        [SerializeField] private MobileJoystick _joystick;
+        [SerializeField] private VirtualJoystick _joystick;
         
         // Ссылки на кнопки через VirtualButton компонент
         [SerializeField] private VirtualButton _shootBulletsButton;
