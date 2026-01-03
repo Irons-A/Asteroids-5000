@@ -8,15 +8,12 @@ namespace Player.UserInput.Strategies
 {
     public class KeyboardMouseInputStrategy : IInputStrategy
     {
-        private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
         private Camera _mainCamera;
 
         [Inject]
         private void Construct(JsonConfigProvider configProvider)
         {
-            _configProvider = configProvider;
-
             _inputSettings = configProvider.InputSettingsRef;
         }
 

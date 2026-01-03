@@ -12,7 +12,7 @@ namespace UI.VirtualControls
     [RequireComponent(typeof(EventTrigger))]
     public class VirtualButton : MonoBehaviour
     {
-        [SerializeField] private VirtualButtonType _buttonType = VirtualButtonType.ShootBullets;
+        [SerializeField] private VirtualButtonFunctionType buttonFunctionType = VirtualButtonFunctionType.ShootBullets;
 
         private Button _button;
         private EventTrigger _eventTrigger;
@@ -20,8 +20,8 @@ namespace UI.VirtualControls
         
         [field: SerializeField] public bool IsHoldableButton { get; private set; } = true;
         
-        public Action<VirtualButtonType, bool> OnButtonStateChanged;
-        public Action<VirtualButtonType> OnButtonPressed;
+        public Action<VirtualButtonFunctionType, bool> OnButtonStateChanged;
+        public Action<VirtualButtonFunctionType> OnButtonPressed;
         
         private void Awake()
         {
@@ -37,11 +37,11 @@ namespace UI.VirtualControls
             
             if (IsHoldableButton)
             {
-                var pointerDown = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+                EventTrigger.Entry pointerDown = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
                 pointerDown.callback.AddListener((data) => OnPointerDown());
                 _eventTrigger.triggers.Add(pointerDown);
                 
-                var pointerUp = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+                EventTrigger.Entry pointerUp = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
                 pointerUp.callback.AddListener((data) => OnPointerUp());
                 _eventTrigger.triggers.Add(pointerUp);
             }
@@ -59,7 +59,7 @@ namespace UI.VirtualControls
             
             if (IsHoldableButton)
             {
-                OnButtonStateChanged?.Invoke(_buttonType, true);
+                OnButtonStateChanged?.Invoke(buttonFunctionType, true);
             }
         }
         
@@ -68,14 +68,15 @@ namespace UI.VirtualControls
             if (_isPressed == false || IsHoldableButton == false) return;
             
             _isPressed = false;
-            OnButtonStateChanged?.Invoke(_buttonType, false);
+            
+            OnButtonStateChanged?.Invoke(buttonFunctionType, false);
         }
         
         private void OnClick()
         {
             if (IsHoldableButton == false)
             {
-                OnButtonPressed?.Invoke(_buttonType);
+                OnButtonPressed?.Invoke(buttonFunctionType);
             }
         }
         

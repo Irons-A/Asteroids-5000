@@ -17,8 +17,6 @@ namespace Player.UserInput
         private readonly SignalBus _signalBus;
         
         private PlayerLogic _playerLogic;
-
-        private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
 
         public IInputStrategy CurrentStrategy { get; private set; }
@@ -26,8 +24,7 @@ namespace Player.UserInput
         public InputDetector(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
             GamepadInputStrategy gamepadStrategy, MobileInputStrategy mobileStrategy, SignalBus signalBus)
         {
-            _configProvider = configProvider;
-            _inputSettings = _configProvider.InputSettingsRef;
+            _inputSettings = configProvider.InputSettingsRef;
 
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;

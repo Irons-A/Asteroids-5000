@@ -16,18 +16,9 @@ namespace Core.UserInput
         private bool _pauseButtonPressedThisFrame;
         public bool IsPauseButtonPressed => ConsumePauseButtonPress();
         
-        private const float STICK_DEADZONE = 0.2f;
-        
-        public void SetStickDirection(Vector2 direction, float magnitude)
+        public void SetStickDirection(Vector2 direction)
         {
-            if (magnitude < STICK_DEADZONE)
-            {
-                StickDirection = Vector2.zero;
-            }
-            else
-            {
-                StickDirection = direction;
-            }
+            StickDirection = direction;
         }
 
         public void SetIsDecelerationButtonDown(bool value)

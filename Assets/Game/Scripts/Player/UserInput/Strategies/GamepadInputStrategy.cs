@@ -8,7 +8,6 @@ namespace Player.UserInput.Strategies
 {
     public class GamepadInputStrategy : IInputStrategy
     {
-        private JsonConfigProvider _configProvider;
         private UserInputSettings _inputSettings;
 
         private Vector2 _rotation = new Vector2(1, 0);
@@ -16,8 +15,6 @@ namespace Player.UserInput.Strategies
         [Inject]
         private void Construct(JsonConfigProvider configProvider)
         {
-            _configProvider = configProvider;
-
             _inputSettings = configProvider.InputSettingsRef;
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.UserInput;
@@ -9,8 +10,6 @@ namespace UI.VirtualControls
     public class MobileInputCanvas : MonoBehaviour
     {
         [SerializeField] private VirtualJoystick _joystick;
-        
-        // Ссылки на кнопки через VirtualButton компонент
         [SerializeField] private VirtualButton _shootBulletsButton;
         [SerializeField] private VirtualButton _shootLaserButton;
         [SerializeField] private VirtualButton _decelerationButton;
@@ -24,33 +23,39 @@ namespace UI.VirtualControls
             _mediator = mediator;
             SetupControls();
         }
-        
-        private void SetupControls()
+
+        private void OnEnable()
         {
-            // Настройка джойстика
             if (_joystick != null)
             {
-                _joystick.OnValueChanged += (direction, magnitude) =>
-                {
-                    _mediator.SetStickDirection(direction, magnitude);
-                };
+                _joystick.OnValueChanged += SetStickDirection;
             }
-            
-            // Настройка виртуальных кнопок
-            SetupVirtualButton(_shootBulletsButton, VirtualButtonType.ShootBullets);
-            SetupVirtualButton(_shootLaserButton, VirtualButtonType.ShootLaser);
-            SetupVirtualButton(_decelerationButton, VirtualButtonType.Decelerate);
-            SetupVirtualButton(_pauseButton, VirtualButtonType.Pause);
         }
         
-        private void SetupVirtualButton(VirtualButton virtualButton, VirtualButtonType expectedType)
+        private void OnDisable()
+        {
+            if (_joystick != null)
+            {
+                _joystick.OnValueChanged -= SetStickDirection;
+            }
+            
+            _mediator?.ResetAll();
+        }
+
+        private void SetupControls()
+        {
+            SetupVirtualButton(_shootBulletsButton, VirtualButtonFunctionType.ShootBullets);
+            SetupVirtualButton(_shootLaserButton, VirtualButtonFunctionType.ShootLaser);
+            SetupVirtualButton(_decelerationButton, VirtualButtonFunctionType.Decelerate);
+            SetupVirtualButton(_pauseButton, VirtualButtonFunctionType.Pause);
+        }
+        
+        private void SetupVirtualButton(VirtualButton virtualButton, VirtualButtonFunctionType expectedFunctionType)
         {
             if (virtualButton == null) return;
             
-            // Подписываемся на события кнопки
             if (virtualButton.IsHoldableButton)
             {
-                // Для удерживаемых кнопок
                 virtualButton.OnButtonStateChanged += (buttonType, isPressed) =>
                 {
                     HandleHoldButton(buttonType, isPressed);
@@ -58,67 +63,51 @@ namespace UI.VirtualControls
             }
             else
             {
-                // Для однократных кнопок
                 virtualButton.OnButtonPressed += (buttonType) =>
                 {
                     HandlePressButton(buttonType);
                 };
             }
         }
-        
-        private void HandleHoldButton(VirtualButtonType buttonType, bool isPressed)
+
+        private void SetStickDirection(Vector2 direction)
         {
-            switch (buttonType)
+            _mediator.SetStickDirection(direction);
+        }
+        
+        private void HandleHoldButton(VirtualButtonFunctionType buttonFunctionType, bool isPressed)
+        {
+            switch (buttonFunctionType)
             {
-                case VirtualButtonType.ShootBullets:
+                case VirtualButtonFunctionType.ShootBullets:
                     _mediator.SetIsShootBulletsButtonDown(isPressed);
                     break;
                     
-                case VirtualButtonType.ShootLaser:
+                case VirtualButtonFunctionType.ShootLaser:
                     _mediator.SetIsShootLaserButtonDown(isPressed);
                     break;
                     
-                case VirtualButtonType.Decelerate:
+                case VirtualButtonFunctionType.Decelerate:
                     _mediator.SetIsDecelerationButtonDown(isPressed);
                     break;
                     
                 default:
-                    Debug.LogWarning($"Unhandled hold button type: {buttonType}");
+                    Debug.LogWarning($"Unhandled hold button type: {buttonFunctionType}");
                     break;
             }
         }
         
-        private void HandlePressButton(VirtualButtonType buttonType)
+        private void HandlePressButton(VirtualButtonFunctionType buttonFunctionType)
         {
-            switch (buttonType)
+            switch (buttonFunctionType)
             {
-                case VirtualButtonType.Pause:
+                case VirtualButtonFunctionType.Pause:
                     _mediator.SetPauseButtonPressed();
                     break;
                     
                 default:
-                    Debug.LogWarning($"Unhandled press button type: {buttonType}");
+                    Debug.LogWarning($"Unhandled press button type: {buttonFunctionType}");
                     break;
-            }
-        }
-        
-        private void OnDestroy()
-        {
-            // Отписываемся от событий
-            if (_joystick != null)
-            {
-                //_joystick.OnValueChanged = null;
-            }
-            
-            // Можно отписаться от кнопок, но при уничтожении объекта это не обязательно
-        }
-        
-        public void SetActive(bool active)
-        {
-            gameObject.SetActive(active);
-            if (!active)
-            {
-                _mediator?.ResetAll();
             }
         }
     }

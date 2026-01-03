@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.UserInput
 {
-    public enum VirtualButtonType
+    public enum VirtualButtonFunctionType
     {
         ShootBullets,
         ShootLaser,

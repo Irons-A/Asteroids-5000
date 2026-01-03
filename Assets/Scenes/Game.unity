@@ -1883,6 +1883,10 @@ PrefabInstance:
       propertyPath: _buttonType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
+      propertyPath: buttonFunctionType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5293601612208418819, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
       propertyPath: m_Name
       value: LaserVurtualButton
@@ -2150,6 +2154,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
       propertyPath: _buttonType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
+      propertyPath: buttonFunctionType
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5293601612208418819, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
@@ -2472,6 +2480,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
       propertyPath: _buttonType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
+      propertyPath: buttonFunctionType
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
@@ -4628,9 +4640,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _background: {fileID: 1936757489}
   _handle: {fileID: 34523292}
+  _mobileControlsCanvas: {fileID: 1331325245}
   _maxRadius: 100
-  _useManualCenter: 1
-  _manualCenterLocal: {x: 678, y: -55}
 --- !u!1001 &1954845740
 PrefabInstance:
   m_ObjectHideFlags: 0
