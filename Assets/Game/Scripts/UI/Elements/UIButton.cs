@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace UI
+namespace UI.Elements
 {
     [RequireComponent(typeof(Button))]
     public class UIButton : MonoBehaviour

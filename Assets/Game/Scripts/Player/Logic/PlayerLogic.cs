@@ -14,6 +14,7 @@ using Core.Systems;
 using Cysharp.Threading.Tasks;
 using Player.Signals;
 using UI;
+using UI.PlayerMVVM;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Zenject;
@@ -214,6 +215,9 @@ namespace Player.Logic
             
             _UncontrollabilityLogic.StartUncontrollabilityPeriod();
             _invulnerabilityLogic.StartInvulnerabilityPeriod();
+            
+            _playerEngineParticles.Stop();
+            _lastParticleToggleTime = Time.time;
         }
 
         private void RotatePlayerAtSpeed(Vector2 targetDirection)

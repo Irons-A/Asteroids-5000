@@ -4,7 +4,7 @@ using UniRx;
 using UnityEngine;
 using Zenject;
 
-namespace UI
+namespace UI.PlayerMVVM
 {
     public class PlayerUIViewModel
     {

@@ -7,13 +7,13 @@ namespace Core.UserInput
 {
     public class MobileInputMediator
     {
+        private bool _pauseButtonPressedThisFrame;
+        
         public Vector2 StickDirection { get; private set; }
         public bool IsDecelerationButtonDown { get; private set; }
         public bool IsShootBulletsButtonDown { get; private set; }
         public bool IsShootLaserButtonDown { get; private set; }
-        //public bool IsPauseButtonPressed { get; private set; }
         
-        private bool _pauseButtonPressedThisFrame;
         public bool IsPauseButtonPressed => ConsumePauseButtonPress();
         
         public void SetStickDirection(Vector2 direction)

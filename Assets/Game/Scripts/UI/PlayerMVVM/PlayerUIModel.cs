@@ -5,7 +5,7 @@ using Core.Configuration;
 using UnityEngine;
 using UniRx;
 
-namespace UI
+namespace UI.PlayerMVVM
 {
     public class PlayerUIModel
     {

@@ -18,6 +18,7 @@ using Player.Signals;
 using Player.UserInput;
 using Player.UserInput.Strategies;
 using UI;
+using UI.PlayerMVVM;
 using UI.Signals;
 using UnityEngine;
 using Zenject;

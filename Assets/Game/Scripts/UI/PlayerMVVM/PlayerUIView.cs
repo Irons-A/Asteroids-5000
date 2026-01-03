@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace UI
+namespace UI.PlayerMVVM
 {
     public class PlayerUIView : MonoBehaviour
     {

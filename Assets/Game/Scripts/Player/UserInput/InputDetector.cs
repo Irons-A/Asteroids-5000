@@ -11,6 +11,9 @@ namespace Player.UserInput
 {
     public class InputDetector : ITickable
     {
+        private const string MouseXAxis = "Mouse X";
+        private const string MouseYAxis = "Mouse Y";
+        
         private readonly KeyboardMouseInputStrategy _pcStrategy;
         private readonly GamepadInputStrategy _gamepadStrategy;
         private readonly  MobileInputStrategy _mobileStrategy;
@@ -53,18 +56,17 @@ namespace Player.UserInput
 
         private void DefineInputStrategy()
         {
-            CurrentStrategy = _mobileStrategy; //TEMP
-
-            return; //TEMP
+            if (CheckIfMobileInput())
+            {
+                CurrentStrategy = _mobileStrategy;
+                
+                return;
+            }
             
             bool gamepadInput = CheckIfGamepadConnected() && CheckIfGamepadInput();
             bool pcInput = CheckIfPCInput();
 
-            if (CheckIfMobileInput())
-            {
-                CurrentStrategy = _mobileStrategy;
-            }
-            else if (pcInput)
+            if (pcInput)
             {
                 CurrentStrategy = _pcStrategy;
             }
@@ -90,8 +92,8 @@ namespace Player.UserInput
         {
             bool hasKeyInput = Input.anyKeyDown;
 
-            bool hasMouseMovement = Mathf.Abs(Input.GetAxis("Mouse X")) > 0.1f ||
-                                   Mathf.Abs(Input.GetAxis("Mouse Y")) > 0.1f;
+            bool hasMouseMovement = Mathf.Abs(Input.GetAxis(MouseXAxis)) > 0.1f ||
+                                   Mathf.Abs(Input.GetAxis(MouseYAxis)) > 0.1f;
 
             bool hasMouseClick = Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2);
 
