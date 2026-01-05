@@ -1,0 +1,21 @@
+{
+    "name": "Advertisement",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285",
+        "GUID:13ed6e9593eac764aae21d34b1391e37",
+        "GUID:cbb42e4cfd9484f52972c8f05e1c3252",
+        "GUID:52c707f16c2f341429d02a3d19eb544b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

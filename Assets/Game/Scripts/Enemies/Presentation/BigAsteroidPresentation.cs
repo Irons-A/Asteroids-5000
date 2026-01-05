@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Core.Components;
 using Core.Systems.ObjectPools;
 using Enemies.Logic;
-using UnityEngine;
 using Zenject;
 
 namespace Enemies.Presentation

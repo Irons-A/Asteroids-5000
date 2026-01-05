@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Core.Components;
 using UnityEngine;
 
 namespace Core.Physics

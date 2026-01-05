@@ -1,15 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
-using Codice.Client.Common;
 using Core.Components;
-using Core.Configuration;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Zenject;
 
 namespace Enemies.Logic
 {

@@ -1,8 +1,6 @@
 using Core.Configuration;
 using Gameplay.Environment.Systems;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 

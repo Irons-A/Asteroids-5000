@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Core.Configuration;
@@ -15,7 +13,7 @@ namespace Gameplay.Infrastructure
     public class BootstrapLoader : MonoBehaviour, IInitializable, IDisposable
     {
         private const string GameSceneName = "Game";
-        private const float MinLoadingDelay = 0.5f;
+        private const float MinLoadingDelay = 1f;
         
         private JsonConfigProvider _configProvider;
         private CancellationTokenSource _cancellationTokenSource;

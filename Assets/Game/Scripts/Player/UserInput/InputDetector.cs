@@ -1,8 +1,6 @@
 using Core.Configuration;
 using Player.Logic;
 using Player.UserInput.Strategies;
-using System.Collections;
-using System.Collections.Generic;
 using Core.Signals;
 using UnityEngine;
 using Zenject;

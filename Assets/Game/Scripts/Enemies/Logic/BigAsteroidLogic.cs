@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Core.Components;
 using Core.Configuration;
 using Core.Physics;
@@ -8,7 +6,6 @@ using Core.Systems;
 using Core.Systems.ObjectPools;
 using Enemies.Presentation;
 using Enemies.Signals;
-using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
 

@@ -1,12 +1,6 @@
-using Core.Physics;
 using Player.Logic;
 using Player.Logic.Weapons;
 using Player.Presentation;
-using Player.UserInput;
-using Player.UserInput.Strategies;
-using System.Collections;
-using System.Collections.Generic;
-using UI;
 using UnityEngine;
 using Zenject;
 

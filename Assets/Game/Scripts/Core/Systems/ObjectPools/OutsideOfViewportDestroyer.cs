@@ -1,9 +1,5 @@
-using Core.Systems.ObjectPools;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Zenject;
 
 namespace Core.Systems
 {

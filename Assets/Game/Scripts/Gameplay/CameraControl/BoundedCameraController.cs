@@ -1,7 +1,5 @@
 using Gameplay.Environment;
 using Player.Presentation;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 

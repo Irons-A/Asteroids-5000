@@ -1,7 +1,4 @@
 using Core.Physics;
-using Core.Systems.ObjectPools;
-using System.Collections;
-using System.Collections.Generic;
 using Player.Logic;
 using Player.UserInput;
 using UnityEngine;

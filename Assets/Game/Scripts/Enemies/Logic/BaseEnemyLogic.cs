@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using Core.Components;
 using Core.Configuration;
 using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using Enemies.Signals;
-using UnityEngine;
 using Zenject;
 
 namespace Enemies.Logic

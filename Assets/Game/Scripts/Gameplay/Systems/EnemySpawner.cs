@@ -2,8 +2,6 @@ using Core.Configuration;
 using Cysharp.Threading.Tasks;
 using Enemies;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Core.Signal;
 using Core.Systems.ObjectPools;

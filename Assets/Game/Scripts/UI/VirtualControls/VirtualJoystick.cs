@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Core.Configuration;
-using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -21,6 +19,8 @@ namespace UI.VirtualControls
         private RectTransform _parentCanvas;
         private float _deadZone;
         
+        private bool _isInitialized = false;
+        
         public event Action<Vector2> OnValueChanged;
 
         [Inject]
@@ -33,9 +33,34 @@ namespace UI.VirtualControls
         {
             _parentCanvas = _background.parent as RectTransform;
             _mobileControlsCanvas = GetComponentInParent<Canvas>();
+        }
+        
+        private void Start()
+        {
+            InitializeAfterLayout().Forget();
+        }
+
+        private void OnEnable()
+        {
+            if (_isInitialized)
+            {
+                ForceUpdateCenterPosition();
+                ResetJoystick();
+            }
+        }
+        
+        public void ForceUpdateCenterPosition()
+        {
+            Canvas.ForceUpdateCanvases();
             
+            if (_parentCanvas == null) _parentCanvas = _background.parent as RectTransform;
+            if (_mobileControlsCanvas == null) _mobileControlsCanvas = GetComponentInParent<Canvas>();
+        
             UpdateCenterPosition();
-            ResetJoystick();
+            
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
+#endif
         }
         
         public void OnBeginDrag(PointerEventData eventData)
@@ -53,8 +78,27 @@ namespace UI.VirtualControls
             ResetJoystick();
         }
         
+        private async UniTaskVoid InitializeAfterLayout()
+        {
+            await UniTask.Yield(PlayerLoopTiming.LastUpdate);
+
+            ForceUpdateCenterPosition();
+            ResetJoystick();
+            _isInitialized = true;
+        }
+        
+        private void OnRectTransformDimensionsChange()
+        {
+            if (_isInitialized)
+            {
+                ForceUpdateCenterPosition();
+            }
+        }
+        
         private void UpdateJoystick(Vector2 screenPosition)
         {
+            if (!_isInitialized) return;
+            
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 _parentCanvas,
                 screenPosition,

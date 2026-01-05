@@ -1,10 +1,4 @@
-using Codice.Client.Common.GameUI;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Core.Components;
 using UnityEngine;
-using Zenject;
 
 namespace Core.Physics
 {

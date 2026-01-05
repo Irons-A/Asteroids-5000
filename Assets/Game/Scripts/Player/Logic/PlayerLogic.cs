@@ -5,17 +5,11 @@ using Core.Systems.ObjectPools;
 using Player.Logic.Weapons;
 using Player.Presentation;
 using Player.UserInput;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using Core.Components;
 using Core.Signals;
 using Core.Systems;
-using Cysharp.Threading.Tasks;
 using Player.Signals;
-using UI;
 using UI.PlayerMVVM;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Zenject;
 

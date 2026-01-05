@@ -1,12 +1,4 @@
-using Core.Components;
-using Core.Systems.ObjectPools;
-using Core.Weapons;
-using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using UnityEngine;
 using Zenject;
 
 namespace Player.Logic.Weapons

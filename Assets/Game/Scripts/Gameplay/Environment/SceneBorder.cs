@@ -1,7 +1,5 @@
 using Core.Physics;
 using Core.Systems.ObjectPools;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Gameplay.Environment

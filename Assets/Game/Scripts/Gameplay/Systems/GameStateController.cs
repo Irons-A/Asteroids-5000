@@ -1,16 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Core.Configuration;
+using Advertisement;
+using Analytics;
 using Core.Saves;
 using Core.Signal;
 using Core.Signals;
 using Gameplay.Signals;
-using Player.Presentation;
 using Player.Signals;
 using Player.UserInput;
 using Player.UserInput.Strategies;
-using UI;
 using UI.Elements;
 using UI.Signals;
 using UnityEngine;
@@ -34,17 +30,22 @@ namespace Gameplay.Systems
         private SignalBus _signalBus;
         private ScoreCounter _scoreCounter;
         private InputDetector _inputDetector;
+        private AdvertisementDisplayer _advertisementDisplayer;
+        private AnalyticsService _analyticsService;
         
         private GameState _currentGameState = GameState.Menu;
         
         [Inject]
         private void Construct(SaveSystem saveSystem, SignalBus signalBus, ScoreCounter scoreCounter,
-            InputDetector inputDetector)
+            InputDetector inputDetector, AdvertisementDisplayer advertisementDisplayer,
+            AnalyticsService analyticsService)
         {
             _saveSystem = saveSystem;
             _signalBus = signalBus;
             _scoreCounter = scoreCounter;
             _inputDetector = inputDetector;
+            _advertisementDisplayer  = advertisementDisplayer;
+            _analyticsService = analyticsService;
         }
 
         private void OnEnable()
@@ -58,6 +59,11 @@ namespace Gameplay.Systems
             _signalBus.Subscribe<EndGameSignal>(DisplayGameOverCanvas);
             
             _scoreDisplayer.DisplayHighScore(_saveSystem.HighScore);
+
+            if (_advertisementDisplayer.IsBannerVisible() == false)
+            {
+                _advertisementDisplayer.ShowBanner();
+            }
         }
 
         private void TogglePause()
@@ -105,6 +111,9 @@ namespace Gameplay.Systems
             
             _saveSystem.TryUpdatingHighScore(_scoreCounter.CurrentScore);
             _scoreDisplayer.DisplayHighScore(_saveSystem.HighScore);
+            
+            _advertisementDisplayer.ShowBanner();
+            _advertisementDisplayer.ShowInterstitialAd();
         }
         
         private void RestartGame()
@@ -115,6 +124,7 @@ namespace Gameplay.Systems
 
         private void StartGame()
         {
+            _advertisementDisplayer.HideBanner();
             _menuCanvas.gameObject.SetActive(false);
             _gameUICanvas.gameObject.SetActive(true);
 
@@ -124,6 +134,8 @@ namespace Gameplay.Systems
             }
             
             ResetGame();
+            
+            _analyticsService.LogGameStartEvent();
         }
 
         private void DisplayGameOverCanvas()
@@ -136,6 +148,8 @@ namespace Gameplay.Systems
 
             _saveSystem.TryUpdatingHighScore(_scoreCounter.CurrentScore);
             _scoreDisplayer.RefreshScores((_saveSystem).HighScore, _scoreCounter.CurrentScore);
+            
+            _analyticsService.LogGameOverEventWithScore(_scoreCounter.CurrentScore);
         }
 
         private void ResetGame()

@@ -1,9 +1,8 @@
 using Core.Configuration;
 using Core.Systems;
 using Core.Systems.ObjectPools;
-using System.Collections;
-using System.Collections.Generic;
-using Core.Components;
+using Advertisement;
+using Analytics;
 using Core.Logic;
 using Core.Physics;
 using Core.Saves;
@@ -17,7 +16,6 @@ using Gameplay.Systems;
 using Player.Signals;
 using Player.UserInput;
 using Player.UserInput.Strategies;
-using UI;
 using UI.PlayerMVVM;
 using UI.Signals;
 using UnityEngine;
@@ -37,6 +35,8 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
             Container.Bind<SaveSystem>().FromNew().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AnalyticsService>().FromNew().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AdvertisementDisplayer>().FromNew().AsSingle().NonLazy();
             
             InstallSignals();
             BindPoolAccessProvider();
