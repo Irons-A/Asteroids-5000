@@ -8,7 +8,7 @@ Key features
 -Zenject(Extenject) for dependency injection.
 -Extenject’s SignalBus for communication.
 -Custom Physics for movement and collisions.
--MVVM pattern for player’s UI.
+-MVVM pattern for player’s UI with UniRx Reactive Properties.
 -Universal Object Pool with prewarm and max amount restriction functionality for different kinds of objects.
 -UniTask instead of synchronous coroutines.
 -Strategy pattern for user input, supporting Keyboard & Mouse, touchscreen and x-box type gamepad.
