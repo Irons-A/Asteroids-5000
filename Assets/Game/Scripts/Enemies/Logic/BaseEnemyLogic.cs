@@ -10,7 +10,6 @@ namespace Enemies.Logic
 {
     public abstract class BaseEnemyLogic
     {
-        protected EnemySettings Settings;
         protected CustomPhysics Physics;
         protected PoolableObject PoolableObject;
         protected HealthSystem HealthSystem; 

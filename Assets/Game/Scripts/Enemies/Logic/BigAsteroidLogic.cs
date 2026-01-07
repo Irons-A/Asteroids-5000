@@ -1,6 +1,7 @@
 using System;
 using Core.Components;
 using Core.Configuration;
+using Core.Configuration.Enemies;
 using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
@@ -14,6 +15,7 @@ namespace Enemies.Logic
     public class BigAsteroidLogic : BaseEnemyLogic, IDisposable
     {
         private readonly PoolAccessProvider _objectPool;
+        private readonly BigAsteroidSettings _settings;
         
         private BigAsteroidPresentation _presentation;
 
@@ -25,7 +27,7 @@ namespace Enemies.Logic
         public BigAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             PoolAccessProvider accessProvider, SignalBus signalBus, ParticleService  particleService)
         {
-            Settings = configProvider.EnemySettingsRef;
+            _settings = configProvider.BigAsteroidSettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             _objectPool = accessProvider;
@@ -38,24 +40,24 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            Physics.SetMovableObject(_presentation, Settings.BigAsteroidMass);
+            Physics.SetMovableObject(_presentation, _settings.Mass);
             
             PoolableObject = presentationPoolableObject;
             
             CollisionHandler = collisionHandler;
-            CollisionHandler.Configure(Settings.BigAsteroidDamage, EntityAffiliation.Enemy, 
+            CollisionHandler.Configure(_settings.Damage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true, customPhysics: Physics);
             CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
             CollisionHandler.OnDestructionCalled += GetDestroyed;
             CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            HealthSystem.Configure(Settings.BigAsteroidHealth, true);
+            HealthSystem.Configure(_settings.Health, true);
             HealthSystem.OnHealthDepleted += GetDestroyed;
         }
 
         public override void Move()
         {
-            Physics.SetInstantVelocity(Settings.BigAsteroidSpeed);
+            Physics.SetInstantVelocity(_settings.Speed);
             Physics.ProcessPhysics();
         }
 
@@ -70,8 +72,8 @@ namespace Enemies.Logic
 
         private void SpawnSmallAsteroids()
         {
-            int asteroidsToSpawn = Random.Range(Settings.MinSmallAsteroidSpawnAmount,
-                Settings.MaxSmallAsteroidSpawnAmount + 1);
+            int asteroidsToSpawn = Random.Range(_settings.MinSmallAsteroidSpawnAmount,
+                _settings.MaxSmallAsteroidSpawnAmount + 1);
             
             for (int i = 0; i < asteroidsToSpawn; i++)
             {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core.Configuration;
+using Core.Configuration.Enemies;
 using Enemies;
 using Enemies.Signals;
 using Gameplay.Signals;
@@ -14,7 +15,7 @@ namespace Gameplay.Systems
         private readonly PlayerUIModel _playerUIModel;
         private readonly SignalBus _signalBus;
 
-        private readonly EnemySettings _enemySettings;
+        private readonly EnemyRewardsSettings _rewardSettings;
         private readonly Dictionary<EnemyType, int> _enemyRewards = new()
         {
             { EnemyType.BigAsteroid, 0},
@@ -28,7 +29,7 @@ namespace Gameplay.Systems
         {
             _playerUIModel = playerUIModel;
             
-            _enemySettings = jsonConfigProvider.EnemySettingsRef;
+            _rewardSettings = jsonConfigProvider.enemyRewardsSettingsRef;
             
             _signalBus = signalBus;
         }
@@ -43,9 +44,9 @@ namespace Gameplay.Systems
 
         private void SetRewards()
         {
-            _enemyRewards[EnemyType.BigAsteroid] = _enemySettings.BigAsteroidReward;
-            _enemyRewards[EnemyType.SmallAsteroid] = _enemySettings.SmallAsteroidReward;
-            _enemyRewards[EnemyType.UFO] = _enemySettings.UFOReward;
+            _enemyRewards[EnemyType.BigAsteroid] = _rewardSettings.BigAsteroidReward;
+            _enemyRewards[EnemyType.SmallAsteroid] = _rewardSettings.SmallAsteroidReward;
+            _enemyRewards[EnemyType.UFO] = _rewardSettings.UFOReward;
         }
 
         private void AddScore(EnemyDestroyedSignal signal)

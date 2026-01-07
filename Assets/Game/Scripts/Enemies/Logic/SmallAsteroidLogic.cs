@@ -1,6 +1,7 @@
 using System;
 using Core.Components;
 using Core.Configuration;
+using Core.Configuration.Enemies;
 using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
@@ -11,6 +12,8 @@ namespace Enemies.Logic
 {
     public class SmallAsteroidLogic : BaseEnemyLogic, IDisposable
     {
+        private readonly SmallAsteroidSettings _settings;
+        
         private SmallAsteroidPresentation _presentation;
         
         protected override EnemyType Type => EnemyType.SmallAsteroid;
@@ -18,7 +21,7 @@ namespace Enemies.Logic
         public SmallAsteroidLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             SignalBus signalBus, ParticleService  particleService)
         {
-            Settings = configProvider.EnemySettingsRef;
+            _settings = configProvider.SmallAsteroidSettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             SignalBus = signalBus;
@@ -30,24 +33,24 @@ namespace Enemies.Logic
         {
             _presentation = presentation;
             
-            Physics.SetMovableObject(_presentation, Settings.SmallAsteroidMass);
+            Physics.SetMovableObject(_presentation, _settings.Mass);
             
             PoolableObject = presentationPoolableObject;
             
             CollisionHandler = collisionHandler;
-            CollisionHandler.Configure(Settings.SmallAsteroidDamage, EntityAffiliation.Enemy, 
+            CollisionHandler.Configure(_settings.Damage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true, customPhysics: Physics);
             CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
             CollisionHandler.OnDestructionCalled += GetDestroyed;
             CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            HealthSystem.Configure(Settings.SmallAsteroidHealth, true);
+            HealthSystem.Configure(_settings.Health, true);
             HealthSystem.OnHealthDepleted += GetDestroyed;
         }
         
         public override void Move()
         {
-            Physics.SetInstantVelocity(Settings.SmallAsteroidSpeed);
+            Physics.SetInstantVelocity(_settings.Speed);
             Physics.ProcessPhysics();
         }
 

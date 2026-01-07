@@ -1,0 +1,11 @@
+{
+  "Speed": 6,
+  "Health": 2,
+  "Damage": 1,
+  "MinSmallAsteroidSpawnAmount": 2,
+  "MaxSmallAsteroidSpawnAmount": 3,
+  "Reward": 100,
+  "Mass": 2,
+  "MinSpriteRotationSpeed": 60,
+  "MaxSpriteRotationSpeed": 150
+}

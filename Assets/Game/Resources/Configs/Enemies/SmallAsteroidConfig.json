@@ -1,0 +1,9 @@
+{
+  "Speed": 9,
+  "Health": 1,
+  "Damage": 1,
+  "Reward": 50,
+  "Mass": 0.5,
+  "MinSpriteRotationSpeed": 60,
+  "MaxSpriteRotationSpeed": 150
+}

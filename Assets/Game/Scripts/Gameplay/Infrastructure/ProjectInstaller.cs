@@ -47,7 +47,6 @@ namespace Gameplay.Infrastructure
             BindObjectPool();
             BindUserInput();
             BindGameUI();
-            
 
             _poolAccessProvider.SetPool(_objectPool);
         }
@@ -55,7 +54,7 @@ namespace Gameplay.Infrastructure
         private void BindAnalytics()
         {
             Container.Bind<AnalyticsLogger>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<AnalyticsLogger>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AnalyticsInitializer>().AsSingle().NonLazy();
         }
 
         private void BindAdvertisement()

@@ -1,6 +1,7 @@
 using System;
 using Core.Components;
 using Core.Configuration;
+using Core.Configuration.Enemies;
 using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;
@@ -13,6 +14,7 @@ namespace Enemies.Logic
     public class UFOLogic : BaseEnemyLogic, IDisposable
     {
         private readonly EnemyShootingSystem _shootingSystem;
+        private readonly UFOSettings _settings;
         
         private UFOPresentation _presentation;
         private Transform _targetTransform;
@@ -22,7 +24,7 @@ namespace Enemies.Logic
         public UFOLogic(JsonConfigProvider configProvider, CustomPhysics physics, HealthSystem healthSystem,
             SignalBus signalBus, EnemyShootingSystem shootingSystem, ParticleService  particleService)
         {
-            Settings = configProvider.EnemySettingsRef;
+            _settings = configProvider.UFOSettingsRef;
             Physics = physics;
             HealthSystem = healthSystem;
             SignalBus = signalBus;
@@ -36,22 +38,22 @@ namespace Enemies.Logic
             _presentation = presentation;
             _presentation.OnTargetTransformChanged += SetTargetTransform;
             
-            Physics.SetMovableObject(_presentation, Settings.UFOMass);
+            Physics.SetMovableObject(_presentation, _settings.Mass);
             
             PoolableObject = presentationPoolableObject;
             
             CollisionHandler = collisionHandler;
-            CollisionHandler.Configure(Settings.UFODamage, EntityAffiliation.Enemy, 
+            CollisionHandler.Configure(_settings.Damage, EntityAffiliation.Enemy, 
                 EntityDurability.Piercing, shouldCauseRicochet: true, customPhysics: Physics);
             CollisionHandler.OnDamageReceived += HealthSystem.TakeDamage;
             CollisionHandler.OnDestructionCalled += GetDestroyed;
             CollisionHandler.OnRicochetCalled += Physics.ApplyRicochet;
             
-            HealthSystem.Configure(Settings.UFOHealth, true);
+            HealthSystem.Configure(_settings.Health, true);
             HealthSystem.OnHealthDepleted += GetDestroyed;
             
-            _shootingSystem.Configure(Settings.UFOProjectileDamage, Settings.UFOFireRateInterval,
-                Settings.UFOProjectileSpeed, _presentation, PoolableObjectType.UFOBullet,
+            _shootingSystem.Configure(_settings.ProjectileDamage, _settings.FireRateInterval,
+                _settings.ProjectileSpeed, _presentation, PoolableObjectType.UFOBullet,
                 _presentation.Firepoints);
         }
 
@@ -66,12 +68,12 @@ namespace Enemies.Logic
             Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
 
             _presentation.transform.rotation = Quaternion.RotateTowards(_presentation.transform.rotation,
-                targetRotation, Settings.UFORotationSpeed * Time.deltaTime);
+                targetRotation, _settings.RotationSpeed * Time.deltaTime);
         }
         
         public override void Move()
         {
-            Physics.SetInstantVelocity(Settings.UFOSpeed);
+            Physics.SetInstantVelocity(_settings.Speed);
             Physics.ProcessPhysics();
         }
 

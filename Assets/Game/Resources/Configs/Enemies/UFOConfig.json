@@ -1,0 +1,13 @@
+{
+  "Speed": 5,
+  "Health": 4,
+  "Damage": 1,
+  "ProjectileDamage": 1,
+  "ProjectileSpeed": 10,
+  "RotationSpeed": 30,
+  "FireRateInterval": 1.5,
+  "Reward": 200,
+  "Mass": 1,
+  "MinSpriteRotationSpeed": 90,
+  "MaxSpriteRotationSpeed": 90
+}
