@@ -35,9 +35,9 @@ namespace Gameplay.Infrastructure
         {
             Container.Bind<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
             Container.Bind<SaveSystem>().FromNew().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<AnalyticsService>().FromNew().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<AdvertisementDisplayer>().FromNew().AsSingle().NonLazy();
-            
+
+            BindAnalytics();
+            BindAdvertisement();
             InstallSignals();
             BindPoolAccessProvider();
             
@@ -50,6 +50,19 @@ namespace Gameplay.Infrastructure
             
 
             _poolAccessProvider.SetPool(_objectPool);
+        }
+
+        private void BindAnalytics()
+        {
+            Container.Bind<AnalyticsLogger>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AnalyticsLogger>().AsSingle().NonLazy();
+        }
+
+        private void BindAdvertisement()
+        {
+            Container.BindInterfacesAndSelfTo<BannerDisplayer>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<InterstitialDisplayer>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AdvertisementInitializer>().AsSingle().NonLazy();
         }
 
         private void BindPoolAccessProvider()
