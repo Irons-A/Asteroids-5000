@@ -1,4 +1,6 @@
 using Core.Components;
+using Core.Configuration;
+using Core.Configuration.Enemies;
 using Core.Systems.ObjectPools;
 using Enemies.Logic;
 using UnityEngine;
@@ -9,13 +11,16 @@ namespace Enemies.Presentation
     public class UFOPresentation : EnemyPresentation
     {
         private UFOLogic _logic;
+        private SpriteRotator _spriteRotator;
+        private UFOSettings _settings;
         
         [field: SerializeField] public Transform[] Firepoints { get; private set; }
         
         [Inject]
-        private void Construct(UFOLogic logic)
+        private void Construct(UFOLogic logic, JsonConfigProvider jsonConfigProvider)
         {
             _logic = logic;
+            _settings = jsonConfigProvider.UFOSettingsRef;
         }
 
         protected override void Awake()
@@ -24,6 +29,9 @@ namespace Enemies.Presentation
             
             PoolableObject = GetComponent<PoolableObject>();
             CollisionHandler = GetComponent<CollisionHandler>();
+            
+            _spriteRotator = GetComponentInChildren<SpriteRotator>();
+            _spriteRotator.SetParameters(_settings.MinSpriteRotationSpeed, _settings.MaxSpriteRotationSpeed);
             
             _logic.Configure(this, PoolableObject, CollisionHandler);
         }

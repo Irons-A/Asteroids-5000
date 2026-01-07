@@ -82,6 +82,8 @@ MonoBehaviour:
   <Affiliation>k__BackingField: 1
   <Durability>k__BackingField: 1
   <ShouldCauseRicochet>k__BackingField: 1
+  <ShouldReceiveRicochet>k__BackingField: 1
+  <ShouldProcessCollisions>k__BackingField: 1
 --- !u!114 &1936271928193517987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,5 +255,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 745939f2b72c3794bb1ba9d7a54e6b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minSpeed: 60
-  _maxSpeed: 150
+  _minSpeed: 0
+  _maxSpeed: 0

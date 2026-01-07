@@ -29,5 +29,11 @@ namespace Core.Components
                 _transform.Rotate(0,0, _speed * Time.deltaTime);
             }
         }
+
+        public void SetParameters(float minSpeed, float maxSpeed)
+        {
+            _minSpeed = minSpeed;
+            _maxSpeed = maxSpeed;
+        }
     }
 }
