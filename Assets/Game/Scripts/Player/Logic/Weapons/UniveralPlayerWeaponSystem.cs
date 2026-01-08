@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Player.Logic.Weapons
 {
-    public class UniversalPlayerWeaponSystem : ITickable, IDisposable
+    public class UniversalPlayerWeaponSystem : IDisposable
     {
         private readonly PlayerShootingSubsystem _shootingSubsystem;
         private readonly PlayerReloadingSubsystem _reloadingSubsystem;
@@ -39,11 +39,12 @@ namespace Player.Logic.Weapons
             _isInitialized = true;
         }
 
-        public void Tick()
+        public void UpdateState()
         {
-            if (_isInitialized == false) return;
-
-            _reloadingSubsystem.ProcessAutoReloading();
+            if (_isInitialized)
+            {
+                _reloadingSubsystem.ProcessAutoReloading();
+            }
         }
 
         public void SetShouldShoot(bool value)

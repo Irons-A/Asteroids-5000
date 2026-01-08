@@ -19,6 +19,9 @@ namespace Gameplay.Infrastructure
             Container.Bind<PlayerReloadingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<PlayerShootingSubsystem>().FromNew().AsTransient();
             Container.BindInterfacesAndSelfTo<UniversalPlayerWeaponSystem>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<PlayerMovementLogic>().FromNew().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerHealthLogic>().FromNew().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerWeaponsLogic>().FromNew().AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerLogic>().FromNew().AsSingle().NonLazy();
             
             Container.BindInterfacesAndSelfTo<PlayerPresentation>() .FromMethod(CreatePlayerWithTransform) .AsSingle();

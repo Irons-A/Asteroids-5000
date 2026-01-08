@@ -1,22 +1,23 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
+using Core.Components;
 using Core.Configuration;
+using Core.Configuration.Player;
 using Core.Physics;
+using Core.Signals;
+using Core.Systems;
 using Core.Systems.ObjectPools;
 using Player.Logic.Weapons;
 using Player.Presentation;
-using Player.UserInput;
-using Core.Components;
-using Core.Configuration.Player;
-using Core.Signals;
-using Core.Systems;
 using Player.Signals;
+using Player.UserInput;
 using UI.PlayerMVVM;
 using UnityEngine;
 using Zenject;
 
 namespace Player.Logic
 {
-    public class PlayerLogic : ITickable, IFixedTickable, IDisposable
+    public class PlayerControlLogic
     {
         //private const float MinEngineParticlesToggleDelay = 0.1f;
         
@@ -47,7 +48,7 @@ namespace Player.Logic
         //private float _lastParticleToggleTime = 0f;
         private bool _isConfigured = false;
         
-        public PlayerLogic(JsonConfigProvider configProvider, PlayerHealthLogic healthLogic, PlayerMovementLogic movementLogic, 
+        public PlayerControlLogic(JsonConfigProvider configProvider, PlayerHealthLogic healthLogic, PlayerMovementLogic movementLogic, 
             PlayerWeaponsLogic weaponsLogic, CustomPhysics playerPhysics, PlayerUIModel playerUIModel, 
             SignalBus signalBus, ParticleService particleService)
         {
@@ -119,10 +120,10 @@ namespace Player.Logic
             UpdateUI();
         }
 
-        public void FixedTick()
-        {
-            //_movementLogic.FixedTick();
-        }
+        // public void FixedTick()
+        // {
+        //     _playerPhysics.ProcessPhysics();
+        // }
 
         public void RotatePlayerWithMouse(Vector2 mouseWorldPosition)
         {
