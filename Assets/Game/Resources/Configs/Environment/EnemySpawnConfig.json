@@ -1,0 +1,6 @@
+{
+  "MaxEnemiesOnMap": 8,
+  "EnemySpawnRate": 3,
+  "EnemySpawnOffset": 6,
+  "UFOSpawnChance": 0.33
+}

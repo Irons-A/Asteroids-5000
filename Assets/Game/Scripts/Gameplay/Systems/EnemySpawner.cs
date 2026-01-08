@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Enemies;
 using System;
 using System.Threading;
+using Core.Configuration.Environment;
 using Core.Signal;
 using Core.Systems.ObjectPools;
 using Enemies.Signals;
@@ -16,7 +17,7 @@ namespace Gameplay.Environment.Systems
 {
     public class EnemySpawner : IInitializable, IDisposable
     {
-        private readonly EnvironmentSettings _environmentSettings;
+        private readonly EnemySpawnSettings _enemySpawnSettings;
         private readonly PoolAccessProvider _objectPool;
         private readonly Transform _playerTransform;
         private readonly SignalBus _signalBus;
@@ -29,7 +30,7 @@ namespace Gameplay.Environment.Systems
         public EnemySpawner(JsonConfigProvider configProvider, PoolAccessProvider  objectPool,
             PlayerPresentation playerPresentation, SignalBus signalBus)
         {
-            _environmentSettings = configProvider.EnvironmentSettingsRef;
+            _enemySpawnSettings = configProvider.EnemySpawnSettingsRef;
             _objectPool = objectPool;
             _playerTransform = playerPresentation.transform;
             _signalBus = signalBus;
@@ -86,10 +87,10 @@ namespace Gameplay.Environment.Systems
             {
                 while (cancellationToken.IsCancellationRequested == false)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_environmentSettings.EnemySpawnRate),
+                    await UniTask.Delay(TimeSpan.FromSeconds(_enemySpawnSettings.EnemySpawnRate),
                         ignoreTimeScale: false, cancellationToken: cancellationToken);
 
-                    if (_livingEnemyCount < _environmentSettings.MaxEnemiesOnMap)
+                    if (_livingEnemyCount < _enemySpawnSettings.MaxEnemiesOnMap)
                     {
                         Vector3 spawnPosition = GetRandomSpawnPosition();
                         PoolableObjectType enemyType = GetEnemyToSpawn();
@@ -125,26 +126,26 @@ namespace Gameplay.Environment.Systems
             switch (side)
             {
                 case 0: //left
-                    spawnPosition.x = _gameFieldBounds.min.x - _environmentSettings.EnemySpawnOffset;
+                    spawnPosition.x = _gameFieldBounds.min.x - _enemySpawnSettings.EnemySpawnOffset;
                     spawnPosition.y = Random.Range(_gameFieldBounds.min.y, _gameFieldBounds.max.y);
 
                     break;
 
                 case 1: //right
-                    spawnPosition.x = _gameFieldBounds.max.x + _environmentSettings.EnemySpawnOffset;
+                    spawnPosition.x = _gameFieldBounds.max.x + _enemySpawnSettings.EnemySpawnOffset;
                     spawnPosition.y = Random.Range(_gameFieldBounds.min.y, _gameFieldBounds.max.y);
 
                     break;
 
                 case 2: //up
                     spawnPosition.x = Random.Range(_gameFieldBounds.min.x, _gameFieldBounds.max.x);
-                    spawnPosition.y = _gameFieldBounds.max.y + _environmentSettings.EnemySpawnOffset;
+                    spawnPosition.y = _gameFieldBounds.max.y + _enemySpawnSettings.EnemySpawnOffset;
 
                     break;
 
                 case 3: //down
                     spawnPosition.x = Random.Range(_gameFieldBounds.min.x, _gameFieldBounds.max.x);
-                    spawnPosition.y = _gameFieldBounds.min.y - _environmentSettings.EnemySpawnOffset;
+                    spawnPosition.y = _gameFieldBounds.min.y - _enemySpawnSettings.EnemySpawnOffset;
 
                     break;
             }
@@ -154,7 +155,7 @@ namespace Gameplay.Environment.Systems
 
         private PoolableObjectType GetEnemyToSpawn()
         {
-            float ufoSpawnChance = Mathf.Clamp01(_environmentSettings.UFOSpawnChance);
+            float ufoSpawnChance = Mathf.Clamp01(_enemySpawnSettings.UFOSpawnChance);
             float randomEnemyType = Random.Range(0f,1f);
 
             if (randomEnemyType <= ufoSpawnChance)

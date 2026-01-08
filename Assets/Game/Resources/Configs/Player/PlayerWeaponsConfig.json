@@ -1,0 +1,21 @@
+{
+  "AccelerationSpeed": 5,
+  "DecelerationSpeed": 0.06,
+  "MaxSpeed": 12,
+  "RotationSpeed": 540,
+  "MaxHealth": 5,
+  "UncontrollabilityDuration": 1.5,
+  "InvulnerabilityDuration": 3,
+  "PlayerMass": 1.5,
+
+  "BulletFireRateInterval": 0.25,
+  "BulletSpeed": 30,
+  "BulletDamage": 1,
+  "LaserFireRateInterval": 0.75,
+  "MaxLaserCharges": 3,
+  "LaserAmmoPerShot": 1,
+  "LaserAmmoPerReload": 1,
+  "LaserCooldown": 5,
+  "LaserDuration": 0.5,
+  "LaserDamage": 5
+}

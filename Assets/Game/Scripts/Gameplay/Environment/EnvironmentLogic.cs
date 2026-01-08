@@ -1,6 +1,7 @@
 using Core.Configuration;
 using Gameplay.Environment.Systems;
 using System;
+using Core.Configuration.Environment;
 using UnityEngine;
 using Zenject;
 
@@ -19,10 +20,10 @@ namespace Gameplay.Environment
         public EnvironmentLogic(JsonConfigProvider configProvider, SceneBorderFactory sceneBorderFactory,
             EnemySpawner enemySpawner)
         {
-            EnvironmentSettings environmentSettings = configProvider.EnvironmentSettingsRef;
+            GameFieldSettings gameFieldSettings = configProvider.GameFieldSettingsRef;
 
-            float fieldWidth = Math.Max(environmentSettings.GameFieldWidth, environmentSettings.MinimalFieldWidth);
-            float fieldHeight = Math.Max(environmentSettings.GameFieldHeight, environmentSettings.MinimalFieldHeight);
+            float fieldWidth = Math.Max(gameFieldSettings.GameFieldWidth, gameFieldSettings.MinimalFieldWidth);
+            float fieldHeight = Math.Max(gameFieldSettings.GameFieldHeight, gameFieldSettings.MinimalFieldHeight);
             _fieldSize = new Vector2(fieldWidth, fieldHeight);
 
             _enemySpawner = enemySpawner;

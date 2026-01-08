@@ -1,4 +1,6 @@
 using Core.Configuration.Enemies;
+using Core.Configuration.Environment;
+using Core.Configuration.Player;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -6,9 +8,12 @@ namespace Core.Configuration
 {
     public class JsonConfigProvider
     {
-        private const string UserInputConfigPath = "Configs/UserInputConfig";
-        private const string PlayerConfigPath = "Configs/PlayerConfig";
-        private const string EnvironmentConfigPath = "Configs/EnvironmentConfig";
+        private const string UserInputConfigPath = "Configs/Player/UserInputConfig";
+        private const string PlayerShipConfigPath = "Configs/Player/PlayerShipConfig";
+        private const string PlayerWeaponsConfigPath = "Configs/Player/PlayerWeaponsConfig";
+        
+        private const string GameFieldConfigPath = "Configs/Environment/GameFieldConfig";
+        private const string EnemySpawnConfigPath = "Configs/Environment/EnemySpawnConfig";
         
         private const string BigAsteroidConfigPath = "Configs/Enemies/BigAsteroidConfig";
         private const string SmallAsteroidConfigPath = "Configs/Enemies/SmallAsteroidConfig";
@@ -16,8 +21,11 @@ namespace Core.Configuration
         private const string EnemyRewardsConfigPath = "Configs/Enemies/EnemyRewardsConfig";
         
         private UserInputSettings _userInputSettings;
-        private PlayerSettings _playerSettings;
-        private EnvironmentSettings _environmentSettings;
+        private PlayerShipSettings _playerShipSettings;
+        private PlayerWeaponsSettings _playerWeaponsSettings;
+        
+        private GameFieldSettings _gameFieldSettings;
+        private EnemySpawnSettings _enemySpawnSettings;
         
         private BigAsteroidSettings _bigAsteroidSettings;
         private SmallAsteroidSettings _smallAsteroidSettings;
@@ -40,21 +48,39 @@ namespace Core.Configuration
             }
         }
 
-        public PlayerSettings PlayerSettingsRef
+        public PlayerShipSettings PlayerShipSettingsRef
         { 
             get
             {
                 EnsureInitialized();
-                return _playerSettings;
+                return _playerShipSettings;
             }
         }
         
-        public EnvironmentSettings EnvironmentSettingsRef 
+        public PlayerWeaponsSettings PlayerWeaponsSettingsRef
+        { 
+            get
+            {
+                EnsureInitialized();
+                return _playerWeaponsSettings;
+            }
+        }
+        
+        public GameFieldSettings GameFieldSettingsRef 
         { 
             get 
             {
                 EnsureInitialized();
-                return _environmentSettings;
+                return _gameFieldSettings;
+            }
+        }
+        
+        public EnemySpawnSettings EnemySpawnSettingsRef 
+        { 
+            get 
+            {
+                EnsureInitialized();
+                return _enemySpawnSettings;
             }
         }
 
@@ -105,8 +131,11 @@ namespace Core.Configuration
         private void LoadSettings()
         {
             _userInputSettings = LoadConfig<UserInputSettings>(UserInputConfigPath);
-            _playerSettings = LoadConfig<PlayerSettings>(PlayerConfigPath);
-            _environmentSettings = LoadConfig<EnvironmentSettings>(EnvironmentConfigPath);
+            _playerShipSettings = LoadConfig<PlayerShipSettings>(PlayerShipConfigPath);
+            _playerWeaponsSettings = LoadConfig<PlayerWeaponsSettings>(PlayerWeaponsConfigPath);
+            
+            _gameFieldSettings = LoadConfig<GameFieldSettings>(GameFieldConfigPath);
+            _enemySpawnSettings = LoadConfig<EnemySpawnSettings>(EnemySpawnConfigPath);
             
             _bigAsteroidSettings = LoadConfig<BigAsteroidSettings>(BigAsteroidConfigPath);
             _smallAsteroidSettings = LoadConfig<SmallAsteroidSettings>(SmallAsteroidConfigPath);

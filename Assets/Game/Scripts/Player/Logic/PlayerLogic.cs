@@ -6,6 +6,7 @@ using Player.Logic.Weapons;
 using Player.Presentation;
 using Player.UserInput;
 using Core.Components;
+using Core.Configuration.Player;
 using Core.Signals;
 using Core.Systems;
 using Player.Signals;
@@ -19,7 +20,8 @@ namespace Player.Logic
     {
         private const float MinEngineParticlesToggleDelay = 0.1f;
         
-        private readonly PlayerSettings _playerSettings; 
+        private readonly PlayerShipSettings _shipSettings;
+        private readonly PlayerWeaponsSettings _weaponsSettings; 
         private readonly CustomPhysics _playerPhysics;
         private readonly UniversalPlayerWeaponSystem _bulletWeaponSystem;
         private readonly PlayerWeaponConfig _bulletWeaponConfig;
@@ -27,6 +29,7 @@ namespace Player.Logic
         private readonly PlayerWeaponConfig _laserWeaponConfig;
         private readonly HealthSystem _healthSystem;
         private readonly InvulnerabilityLogic _invulnerabilityLogic;
+        private readonly UncontrollabilityLogic _uncontrollabilityLogic;
         private readonly PlayerUIModel _playerUIModel;
         private readonly SignalBus _signalBus;
         private readonly ParticleService _particleService;
@@ -35,7 +38,6 @@ namespace Player.Logic
         private Transform _playerTransform;
         private CollisionHandler _playerCollisionHandler;
         private SpriteRenderer _playerSpriteRenderer;
-        private UncontrollabilityLogic _UncontrollabilityLogic;
         private ParticleSystem _playerEngineParticles;
 
         private float _lastParticleToggleTime = 0f;
@@ -47,7 +49,8 @@ namespace Player.Logic
             InvulnerabilityLogic invulnerabilityLogic, UncontrollabilityLogic  uncontrollabilityLogic,
             PlayerUIModel playerUIModel, SignalBus signalBus, ParticleService particleService)
         {
-            _playerSettings = configProvider.PlayerSettingsRef;
+            _shipSettings = configProvider.PlayerShipSettingsRef;
+            _weaponsSettings = configProvider.PlayerWeaponsSettingsRef;
 
             _playerPhysics = playerPhysics;
 
@@ -58,10 +61,10 @@ namespace Player.Logic
             _laserWeaponConfig = laserWeaponConfig;
 
             _healthSystem = healthSystem;
-            _healthSystem.Configure(_playerSettings.MaxHealth, true);
+            _healthSystem.Configure(_shipSettings.MaxHealth, true);
             _healthSystem.OnHealthDepleted += DefeatPlayer;
             
-            _UncontrollabilityLogic = uncontrollabilityLogic;
+            _uncontrollabilityLogic = uncontrollabilityLogic;
             _invulnerabilityLogic = invulnerabilityLogic;
             
             _playerUIModel = playerUIModel;
@@ -87,13 +90,13 @@ namespace Player.Logic
             _playerSpriteRenderer = _playerPresentation.GetComponent<SpriteRenderer>();
             _invulnerabilityLogic.OnInvulnerabilityEnded += EnableCollisions;
             
-            _playerPhysics.SetMovableObject(_playerPresentation, _playerSettings.PlayerMass);
+            _playerPhysics.SetMovableObject(_playerPresentation, _shipSettings.PlayerMass);
             
             ConfigureBulletWeaponSystem();
             ConfigureLaserWeaponSystem();
             
-            _invulnerabilityLogic.Configure(_playerSpriteRenderer, _playerSettings.InvulnerabilityDuration);
-            _UncontrollabilityLogic.Configure(_playerSettings.UncontrollabilityDuration);
+            _invulnerabilityLogic.Configure(_playerSpriteRenderer, _shipSettings.InvulnerabilityDuration);
+            _uncontrollabilityLogic.Configure(_shipSettings.UncontrollabilityDuration);
 
             _playerEngineParticles = _playerPresentation.EngineParticles;
             _playerEngineParticles.Stop();
@@ -130,11 +133,11 @@ namespace Player.Logic
 
         public void MovePlayer(PlayerMovementState movementState)
         {
-            if (_UncontrollabilityLogic.IsUncontrollable) return;
+            if (_uncontrollabilityLogic.IsUncontrollable) return;
             
             if (movementState == PlayerMovementState.Accelerating)
             {
-                _playerPhysics.ApplyAcceleration(_playerSettings.AccelerationSpeed, _playerSettings.MaxSpeed);
+                _playerPhysics.ApplyAcceleration(_shipSettings.AccelerationSpeed, _shipSettings.MaxSpeed);
                 
                 if (Time.time - _lastParticleToggleTime > MinEngineParticlesToggleDelay)
                 {
@@ -144,7 +147,7 @@ namespace Player.Logic
             }
             else if (movementState == PlayerMovementState.Decelerating)
             {
-                _playerPhysics.ApplyDeceleration(_playerSettings.DecelerationSpeed);
+                _playerPhysics.ApplyDeceleration(_shipSettings.DecelerationSpeed);
 
             }
 
@@ -160,7 +163,7 @@ namespace Player.Logic
 
         public void ShootBullets(bool value)
         {
-            if (_UncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
+            if (_uncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
             {
                 value = false;
             }
@@ -170,7 +173,7 @@ namespace Player.Logic
 
         public void ShootLaser(bool value)
         {
-            if (_UncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
+            if (_uncontrollabilityLogic.IsUncontrollable || _playerPresentation.isActiveAndEnabled == false)
             {
                 value = false;
             }
@@ -207,7 +210,7 @@ namespace Player.Logic
             _healthSystem.TakeDamage(damage);
             _playerCollisionHandler.SetShouldProcessCollisions(false);
             
-            _UncontrollabilityLogic.StartUncontrollabilityPeriod();
+            _uncontrollabilityLogic.StartUncontrollabilityPeriod();
             _invulnerabilityLogic.StartInvulnerabilityPeriod();
             
             _playerEngineParticles.Stop();
@@ -216,14 +219,14 @@ namespace Player.Logic
 
         private void RotatePlayerAtSpeed(Vector2 targetDirection)
         {
-            if (_UncontrollabilityLogic.IsUncontrollable) return;
+            if (_uncontrollabilityLogic.IsUncontrollable) return;
             
             targetDirection = targetDirection.normalized;
 
             float targetAngle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
 
             _playerTransform.rotation = Quaternion.RotateTowards(_playerTransform.rotation,
-                Quaternion.Euler(0, 0, targetAngle), _playerSettings.RotationSpeed * Time.deltaTime);
+                Quaternion.Euler(0, 0, targetAngle), _shipSettings.RotationSpeed * Time.deltaTime);
         }
 
         private void DisablePlayer()
@@ -244,10 +247,10 @@ namespace Player.Logic
         private void ResetPlayer()
         {
             _playerPresentation.transform.position = Vector3.zero;
-            _healthSystem.Configure(_playerSettings.MaxHealth, true);
+            _healthSystem.Configure(_shipSettings.MaxHealth, true);
             _bulletWeaponSystem.RefillAmmo();
             _laserWeaponSystem.RefillAmmo();
-            _UncontrollabilityLogic.StopUncontrollabilityPeriod();
+            _uncontrollabilityLogic.StopUncontrollabilityPeriod();
             _invulnerabilityLogic.StopInvulnerabilityPeriod();
             _playerPhysics.Stop();
             _playerPresentation.gameObject.SetActive(true);
@@ -258,14 +261,14 @@ namespace Player.Logic
             _bulletWeaponConfig.Configure(
                 projectileType: PoolableObjectType.PlayerBullet,
                 firepoints: _playerPresentation.BulletFirepoints,
-                projectileSpeed: _playerSettings.BulletSpeed,
+                projectileSpeed: _weaponsSettings.BulletSpeed,
                 projectileDelayedDestruction: false,
                 destroyProjectileAfter: 0,
-                projectileDamage: _playerSettings.BulletDamage,
+                projectileDamage: _weaponsSettings.BulletDamage,
                 projectileAffiliation: EntityAffiliation.Ally,
                 projectileDurability: EntityDurability.Fragile,
                 shouldSetFirepointAsProjectileParent: false,
-                fireRateInterval: _playerSettings.BulletFireRateInterval,
+                fireRateInterval: _weaponsSettings.BulletFireRateInterval,
                 maxAmmo: 0,
                 ammoCostPerShot: 0,
                 hasInfiniteAmmo: true,
@@ -286,17 +289,17 @@ namespace Player.Logic
                 firepoints: _playerPresentation.LaserFirepoints,
                 projectileSpeed: 0,
                 projectileDelayedDestruction: true,
-                destroyProjectileAfter: _playerSettings.LaserDuration,
-                projectileDamage: _playerSettings.LaserDamage,
+                destroyProjectileAfter: _weaponsSettings.LaserDuration,
+                projectileDamage: _weaponsSettings.LaserDamage,
                 projectileAffiliation: EntityAffiliation.Ally,
                 projectileDurability: EntityDurability.Undestructable,
                 shouldSetFirepointAsProjectileParent: true,
-                fireRateInterval: _playerSettings.LaserFireRateInterval,
-                maxAmmo: _playerSettings.MaxLaserCharges,
-                ammoCostPerShot: _playerSettings.LaserAmmoPerShot,
+                fireRateInterval: _weaponsSettings.LaserFireRateInterval,
+                maxAmmo: _weaponsSettings.MaxLaserCharges,
+                ammoCostPerShot: _weaponsSettings.LaserAmmoPerShot,
                 hasInfiniteAmmo: false,
-                reloadLength: _playerSettings.LaserCooldown,
-                ammoPerReload: _playerSettings.LaserAmmoPerReload,
+                reloadLength: _weaponsSettings.LaserCooldown,
+                ammoPerReload: _weaponsSettings.LaserAmmoPerReload,
                 shouldAutoReloadOnLessThanMaxAmmo: true,
                 shouldAutoReloadOnNoAmmo: true,
                 shouldDepleteAmmoOnReload: false,
