@@ -11,12 +11,13 @@ namespace UI.VirtualControls
     public class VirtualButton : MonoBehaviour
     {
         [SerializeField] private VirtualButtonFunctionType buttonFunctionType = VirtualButtonFunctionType.ShootBullets;
+        [SerializeField] private bool _isHoldableButton = true;
 
         private Button _button;
         private EventTrigger _eventTrigger;
         private bool _isPressed;
         
-        [field: SerializeField] public bool IsHoldableButton { get; private set; } = true;
+        public bool IsHoldableButton => _isHoldableButton;
         
         public Action<VirtualButtonFunctionType, bool> OnButtonStateChanged;
         public Action<VirtualButtonFunctionType> OnButtonPressed;

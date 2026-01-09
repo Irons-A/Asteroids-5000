@@ -10,11 +10,13 @@ namespace Enemies.Presentation
 {
     public class UFOPresentation : EnemyPresentation
     {
+        [SerializeField] private Transform[] _firepoints;
+
         private UFOLogic _logic;
         private SpriteRotator _spriteRotator;
         private UFOSettings _settings;
         
-        [field: SerializeField] public Transform[] Firepoints { get; private set; }
+        public Transform[] Firepoints => _firepoints;
         
         [Inject]
         private void Construct(UFOLogic logic, JsonConfigProvider jsonConfigProvider)

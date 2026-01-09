@@ -86,9 +86,6 @@ namespace Enemies.Logic
                     await UniTask.Delay(TimeSpan.FromSeconds(_shotInterval), cancellationToken: token);
                 }
             }
-            catch (OperationCanceledException)
-            {
-            }
             finally
             {
                 StopShooting();

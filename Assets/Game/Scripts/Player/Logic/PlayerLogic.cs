@@ -2,7 +2,6 @@ using System;
 using Core.Configuration;
 using Core.Physics;
 using Core.Systems.ObjectPools;
-using Player.Logic.Weapons;
 using Player.Presentation;
 using Player.UserInput;
 using Core.Components;

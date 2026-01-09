@@ -10,20 +10,27 @@ namespace Core.Components
     [RequireComponent(typeof(Collider2D))]
     public class CollisionHandler : MonoBehaviour
     {
-        [field: SerializeField] public int Damage { get; private set; } = 0;
-        [field: SerializeField] public EntityAffiliation Affiliation { get; private set; }
-        [field: SerializeField] public EntityDurability Durability { get; private set; }
-        [field: SerializeField] public bool ShouldCauseRicochet { get; private set; } = false;
-        [field: SerializeField] public bool ShouldReceiveRicochet { get; private set; } = true;
-        [field: SerializeField] public bool ShouldProcessCollisions { get; private set; } = true;
-
+        [SerializeField] private int _damage = 0;
+        [SerializeField] private EntityAffiliation _affiliation;
+        [SerializeField] private EntityDurability _durability;
+        [SerializeField] private bool _shouldCauseRicochet = false;
+        [SerializeField] private bool _shouldReceiveRicochet = true;
+        [SerializeField] private bool _shouldProcessCollisions = true;
+        
         private CustomPhysics _customPhysics;
         private ParticleService _particleService;
 
         public event Action<int> OnDamageReceived;
         public event Action OnDestructionCalled;
         public event Action<CollisionData> OnRicochetCalled;
-
+        
+        public int Damage => _damage;
+        public EntityAffiliation Affiliation => _affiliation;
+        public EntityDurability Durability =>  _durability;
+        public bool ShouldCauseRicochet => _shouldCauseRicochet;
+        public bool ShouldReceiveRicochet => _shouldReceiveRicochet;
+        public bool ShouldProcessCollisions => _shouldProcessCollisions;
+        
         public float Restitution => _customPhysics != null ? _customPhysics.Restitution : 0;
         public float Friction => _customPhysics != null ? _customPhysics.Friction : 0;
         public Vector2 CurrentVelocity => _customPhysics != null ? _customPhysics.CurrentVelocity : Vector2.zero;
@@ -38,16 +45,16 @@ namespace Core.Components
         public void Configure(int damage, EntityAffiliation affiliation, EntityDurability durability, 
             bool shouldCauseRicochet = false, CustomPhysics customPhysics = null)
         {
-            Damage = damage;
-            Affiliation = affiliation;
-            Durability = durability;
-            ShouldCauseRicochet = shouldCauseRicochet;
+            _damage = damage;
+            _affiliation = affiliation;
+            _durability = durability;
+            _shouldCauseRicochet = shouldCauseRicochet;
             _customPhysics = customPhysics;
         }
         
         public void SetShouldProcessCollisions(bool value)
         {
-            ShouldProcessCollisions = value;
+            _shouldProcessCollisions = value;
         }
 
         private void DealDamage(int damage)
@@ -72,9 +79,9 @@ namespace Core.Components
         {
             if (otherCollider.TryGetComponent(out CollisionHandler otherHandler) == false) return;
 
-            if (ShouldProcessCollisions && otherHandler.ShouldProcessCollisions)
+            if (_shouldProcessCollisions && otherHandler.ShouldProcessCollisions)
             {
-                if (otherHandler.Affiliation != this.Affiliation && 
+                if (otherHandler.Affiliation != _affiliation && 
                     ShouldHandleCollision(otherHandler))
                 {
                     HandleCollision(otherHandler, otherCollider);
@@ -107,18 +114,18 @@ namespace Core.Components
                 CurrentVelocity
             );
         
-            otherHandler.DealDamage(Damage);
-            this.DealDamage(otherHandler.Damage);
+            otherHandler.DealDamage(_damage);
+            DealDamage(otherHandler.Damage);
 
             bool shouldSpawnCollisionParticles = false;
             
-            if (otherHandler.ShouldCauseRicochet && this.ShouldReceiveRicochet)
+            if (otherHandler.ShouldCauseRicochet && _shouldReceiveRicochet)
             {
                 CallForRicochet(collisionDataForThis);
                 shouldSpawnCollisionParticles = true;
             }
             
-            if (ShouldCauseRicochet && otherHandler.ShouldReceiveRicochet)
+            if (_shouldCauseRicochet && otherHandler.ShouldReceiveRicochet)
             {
                 otherHandler.CallForRicochet(collisionDataForOther);
                 shouldSpawnCollisionParticles = true;
@@ -136,7 +143,7 @@ namespace Core.Components
                 otherHandler.CallForDestruction();
             }
         
-            if (Durability == EntityDurability.Fragile)
+            if (_durability == EntityDurability.Fragile)
             {
                 CallForDestruction();
             }

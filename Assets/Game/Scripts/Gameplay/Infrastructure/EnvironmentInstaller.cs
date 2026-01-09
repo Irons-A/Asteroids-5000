@@ -12,9 +12,9 @@ namespace Gameplay.Infrastructure
         public override void InstallBindings()
         {
             Container.Bind<SceneBorder>().FromInstance(_sceneBorderPrefab).AsTransient();
-            Container.Bind<SceneBorderFactory>().FromNew().AsSingle();
-            Container.BindInterfacesAndSelfTo<EnemySpawner>().FromNew().AsSingle();
-            Container.BindInterfacesAndSelfTo<EnvironmentLogic>().FromNew().AsSingle();
+            Container.Bind<SceneBorderFactory>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EnemySpawner>().AsSingle();
+            Container.BindInterfacesAndSelfTo<EnvironmentLogic>().AsSingle();
         }
     }
 }

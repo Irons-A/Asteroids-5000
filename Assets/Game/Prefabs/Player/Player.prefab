@@ -5056,12 +5056,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea1488cfa9233b48ada0938980dfe8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <BulletFirepoints>k__BackingField:
+  _bulletFirepoints:
   - {fileID: 6913295436723000650}
   - {fileID: 6394831848732044998}
-  <LaserFirepoints>k__BackingField:
+  _laserFirepoints:
   - {fileID: 8964495639824136935}
-  <EngineParticles>k__BackingField: {fileID: 8787520525978259345}
+  _engineParticles: {fileID: 8787520525978259345}
 --- !u!114 &5112473622069581258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5074,12 +5074,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df41425646659c4eb0261f8670b9cde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Damage>k__BackingField: 0
-  <Affiliation>k__BackingField: 0
-  <Durability>k__BackingField: 2
-  <ShouldCauseRicochet>k__BackingField: 1
-  <ShouldReceiveRicochet>k__BackingField: 1
-  <ShouldProcessCollisions>k__BackingField: 1
+  _damage: 0
+  _affiliation: 0
+  _durability: 0
+  _shouldCauseRicochet: 0
+  _shouldReceiveRicochet: 1
+  _shouldProcessCollisions: 1
 --- !u!1 &7512897743088913637
 GameObject:
   m_ObjectHideFlags: 0

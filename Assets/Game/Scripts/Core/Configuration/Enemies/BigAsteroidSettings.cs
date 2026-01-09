@@ -9,22 +9,19 @@ namespace Core.Configuration.Enemies
         public readonly int Damage;
         public readonly int MinSmallAsteroidSpawnAmount;
         public readonly int MaxSmallAsteroidSpawnAmount;
-        public readonly int Reward;
         public readonly float Mass;
         public readonly float MinSpriteRotationSpeed;
         public readonly float MaxSpriteRotationSpeed;
         
         [JsonConstructor]
         public BigAsteroidSettings(float speed, int health, int damage, int minSmallAsteroidSpawnAmount,
-            int maxSmallAsteroidSpawnAmount, int reward, float mass, float minSpriteRotationSpeed,
-            float maxSpriteRotationSpeed)
+            int maxSmallAsteroidSpawnAmount,float mass, float minSpriteRotationSpeed, float maxSpriteRotationSpeed)
         {
             Speed = speed;
             Health = health;
             Damage = damage;
             MinSmallAsteroidSpawnAmount = minSmallAsteroidSpawnAmount;
             MaxSmallAsteroidSpawnAmount = maxSmallAsteroidSpawnAmount;
-            Reward = reward;
             Mass = mass;
             MinSpriteRotationSpeed = minSpriteRotationSpeed;
             MaxSpriteRotationSpeed = maxSpriteRotationSpeed;

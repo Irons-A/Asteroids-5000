@@ -36,9 +36,6 @@ namespace Gameplay.Infrastructure
             {
                 await LoadWithTimingControl();
             }
-            catch (OperationCanceledException)
-            {
-            }
             catch (Exception ex)
             {
                 Debug.LogError($"Loading failed: {ex.Message}");

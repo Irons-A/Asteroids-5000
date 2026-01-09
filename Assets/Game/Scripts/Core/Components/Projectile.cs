@@ -21,7 +21,6 @@ namespace Core.Components
         {
             _logic = logic;
             _logic.SetPresentationTransform(transform);
-            _logic.OnDelayedDestructionCalled += CallDespawn;
             
             _particleService = particleService;
         }
@@ -29,12 +28,24 @@ namespace Core.Components
         private void Awake()
         {
             _collisionHandler = GetComponent<CollisionHandler>();
-            _collisionHandler.OnDestructionCalled += CallDespawn;
             
             if (TryGetComponent(out PoolableObject poolableObject))
             {
                 _poolableObject = poolableObject;
             }
+        }
+
+        private void OnEnable()
+        {
+            _logic.OnDelayedDestructionCalled += CallDespawn;
+            _collisionHandler.OnDestructionCalled += CallDespawn;
+        }
+
+        private void OnDisable()
+        {
+            _logic.OnDelayedDestructionCalled -= CallDespawn;
+            _collisionHandler.OnDestructionCalled -= CallDespawn;
+            _logic.CancelDelayedDestruction();
         }
 
         private void Update()
@@ -68,8 +79,6 @@ namespace Core.Components
         
         private void OnDestroy()
         {
-            _logic.OnDelayedDestructionCalled -= CallDespawn;
-            _collisionHandler.OnDestructionCalled -= CallDespawn;
             _logic.CancelDelayedDestruction();
         }
     }

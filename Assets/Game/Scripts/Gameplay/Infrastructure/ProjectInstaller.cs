@@ -33,15 +33,15 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
-            Container.Bind<JsonConfigProvider>().FromNew().AsSingle().NonLazy();
-            Container.Bind<SaveSystem>().FromNew().AsSingle().NonLazy();
+            Container.Bind<JsonConfigProvider>().AsSingle().NonLazy();
+            Container.Bind<SaveSystem>().AsSingle().NonLazy();
 
             BindAnalytics();
             BindAdvertisement();
             InstallSignals();
             BindPoolAccessProvider();
             
-            Container.Bind<ParticleService>().FromNew().AsSingle().NonLazy();
+            Container.Bind<ParticleService>().AsSingle().NonLazy();
             
             BindLogicSystems();
             BindObjectPool();
@@ -72,19 +72,20 @@ namespace Gameplay.Infrastructure
 
         private void BindLogicSystems()
         {
-            Container.BindInterfacesAndSelfTo<ProjectileLogic>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<HealthSystem>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<CustomPhysics>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<SmallAsteroidLogic>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<UFOLogic>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<EnemyShootingSystem>().FromNew().AsTransient();
+            Container.BindInterfacesAndSelfTo<ProjectileLogic>().AsTransient();
+            Container.BindInterfacesAndSelfTo<HealthSystem>().AsTransient();
+            Container.BindInterfacesAndSelfTo<CustomPhysics>().AsTransient();
+            Container.BindInterfacesAndSelfTo<SmallAsteroidSpawner>().AsTransient();
+            Container.BindInterfacesAndSelfTo<BigAsteroidLogic>().AsTransient();
+            Container.BindInterfacesAndSelfTo<SmallAsteroidLogic>().AsTransient();
+            Container.BindInterfacesAndSelfTo<UFOLogic>().AsTransient();
+            Container.BindInterfacesAndSelfTo<EnemyShootingSystem>().AsTransient();
         }
         
         private void BindObjectPool()
         {
             Container.Bind<PoolableObjectRegistry>().FromInstance(_poolableObjectRegistry).AsSingle().NonLazy();
-            Container.Bind<PoolableObjectFactory>().FromNew().AsSingle().NonLazy();
+            Container.Bind<PoolableObjectFactory>().AsSingle().NonLazy();
             _objectPool = CreateUniversalObjectPool();
             Container.Bind<UniversalObjectPool>().FromInstance(_objectPool).AsSingle().NonLazy();
         }
@@ -105,7 +106,7 @@ namespace Gameplay.Infrastructure
             Container.Bind<GamepadInputStrategy>().AsSingle();
             Container.Bind<MobileInputMediator>().AsSingle();
             Container.Bind<MobileInputStrategy>().AsSingle();
-            Container.BindInterfacesAndSelfTo<InputDetector>().FromNew().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<InputDetector>().AsSingle().NonLazy();
         }
 
         private void BindGameUI()

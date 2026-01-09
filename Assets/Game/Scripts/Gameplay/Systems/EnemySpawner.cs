@@ -21,6 +21,7 @@ namespace Gameplay.Environment.Systems
         private readonly PoolAccessProvider _objectPool;
         private readonly Transform _playerTransform;
         private readonly SignalBus _signalBus;
+        private readonly BorderSide[] _borderSides = (BorderSide[])Enum.GetValues(typeof(BorderSide));
 
         private Bounds _gameFieldBounds;
         private CancellationTokenSource _spawnCTS;
@@ -96,7 +97,7 @@ namespace Gameplay.Environment.Systems
                         PoolableObjectType enemyType = GetEnemyToSpawn();
 
                         PoolableObject enemy = _objectPool.GetFromPool(enemyType);
-                        
+
                         enemy.transform.position = spawnPosition;
 
                         if (enemy.TryGetComponent(out EnemyPresentation presentation))
@@ -104,7 +105,7 @@ namespace Gameplay.Environment.Systems
                             presentation.SetTargetTransform(_playerTransform);
                             presentation.SetAngle(0, shouldRandomize: false, setAngleToPlayer: true);
                         }
-                        
+
                         _livingEnemyCount++;
                     }
                 }
@@ -120,30 +121,30 @@ namespace Gameplay.Environment.Systems
 
         private Vector3 GetRandomSpawnPosition()
         {
-            int side = Random.Range(0, 4);
+            BorderSide borderSide = _borderSides[Random.Range(0, _borderSides.Length)];
             Vector3 spawnPosition = Vector3.zero;
 
-            switch (side)
+            switch (borderSide)
             {
-                case 0: //left
+                case BorderSide.Left:
                     spawnPosition.x = _gameFieldBounds.min.x - _enemySpawnSettings.EnemySpawnOffset;
                     spawnPosition.y = Random.Range(_gameFieldBounds.min.y, _gameFieldBounds.max.y);
 
                     break;
 
-                case 1: //right
+                case BorderSide.Right:
                     spawnPosition.x = _gameFieldBounds.max.x + _enemySpawnSettings.EnemySpawnOffset;
                     spawnPosition.y = Random.Range(_gameFieldBounds.min.y, _gameFieldBounds.max.y);
 
                     break;
 
-                case 2: //up
+                case BorderSide.Top:
                     spawnPosition.x = Random.Range(_gameFieldBounds.min.x, _gameFieldBounds.max.x);
                     spawnPosition.y = _gameFieldBounds.max.y + _enemySpawnSettings.EnemySpawnOffset;
 
                     break;
 
-                case 3: //down
+                case BorderSide.Bottom:
                     spawnPosition.x = Random.Range(_gameFieldBounds.min.x, _gameFieldBounds.max.x);
                     spawnPosition.y = _gameFieldBounds.min.y - _enemySpawnSettings.EnemySpawnOffset;
 

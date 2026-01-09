@@ -61,7 +61,7 @@ namespace Core.Logic
             DelayedDeactivationTask(_cancellationTokenSource.Token).Forget();
         }
 
-        private async UniTaskVoid DelayedDeactivationTask(CancellationToken token)
+        private async UniTask DelayedDeactivationTask(CancellationToken token)
         {
             try
             {

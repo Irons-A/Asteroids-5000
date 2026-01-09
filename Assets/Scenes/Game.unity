@@ -2483,6 +2483,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
+      propertyPath: _isHoldableButton
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2734805619675302825, guid: 87a59d74a0c66e546bf373dc34f9fc04, type: 3}
       propertyPath: buttonFunctionType
       value: 3
       objectReference: {fileID: 0}

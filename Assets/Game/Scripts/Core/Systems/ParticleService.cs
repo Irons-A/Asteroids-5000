@@ -16,7 +16,7 @@ namespace Core.Systems
         {
             PoolableObject particle = _poolAccessProvider.GetFromPool(particleType);
             
-            if (particle.TryGetComponent(out ParticleSystem particleSystem) == false)
+            if (particle.TryGetComponent(out ParticleSystem _) == false)
             {
                 particle.Despawn();
             }

@@ -5,6 +5,8 @@ namespace Gameplay.Environment
 {
     public class SceneBorderFactory
     {
+        private const string SceneBordersName = "SceneBordesr";
+        
         private readonly SceneBorder _borderPrefab;
         private readonly DiContainer _container;
 
@@ -16,7 +18,7 @@ namespace Gameplay.Environment
             _borderPrefab = borderPrefab;
             _container = container;
 
-            GameObject parent = new GameObject("SceneBorders");
+            GameObject parent = new GameObject(SceneBordersName);
 
             _borderParent = parent.transform;
         }

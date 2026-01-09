@@ -8,8 +8,9 @@ namespace Core.Saves
     {
         private const string SaveDataFileName = "saveData.json";
         
+        private readonly string _saveDataFilePath;
+        
         private PlayerSaveData _playerSaveData;
-        private string _saveDataFilePath;
         
         public int HighScore => _playerSaveData?.HighScore ?? 0;
 

@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Core.Components;
 using Core.Configuration;
 using Core.Configuration.Player;
 using Core.Systems;
 using UnityEngine;
-using Zenject;
 
 namespace Player.Logic
 {

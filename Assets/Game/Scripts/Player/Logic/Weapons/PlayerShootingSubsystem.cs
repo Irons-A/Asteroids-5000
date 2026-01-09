@@ -23,8 +23,6 @@ namespace Player.Logic.Weapons
         private PlayerAmmoSubsystem _ammoManager;
 
         private bool _isInitialized = false;
-
-        public event Action OnShotFired;
         
         public PlayerShootingSubsystem(PoolAccessProvider objectPool)
         {
@@ -146,9 +144,6 @@ namespace Player.Logic.Weapons
                     await UniTask.Delay(TimeSpan.FromSeconds(_config.FireRateInterval), cancellationToken: token);
                 }
             }
-            catch (OperationCanceledException)
-            {
-            }
             finally
             {
                 if (_weaponState == WeaponState.Shooting)
@@ -187,8 +182,6 @@ namespace Player.Logic.Weapons
 
                 ConfigureProjectile(poolableObject, firepoint);
             }
-
-            OnShotFired?.Invoke();
         }
 
         private void ConfigureProjectile(PoolableObject poolableObject, Transform firepoint)

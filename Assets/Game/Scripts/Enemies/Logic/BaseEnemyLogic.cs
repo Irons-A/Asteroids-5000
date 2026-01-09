@@ -1,5 +1,4 @@
 using Core.Components;
-using Core.Configuration;
 using Core.Physics;
 using Core.Systems;
 using Core.Systems.ObjectPools;

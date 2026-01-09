@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using Core.Configuration;
 using Core.Configuration.Player;
 using Core.Systems;
 using Core.Systems.ObjectPools;
 using Player.Logic.Weapons;
 using Player.Presentation;
-using UnityEngine;
 using Zenject;
 
 namespace Player.Logic

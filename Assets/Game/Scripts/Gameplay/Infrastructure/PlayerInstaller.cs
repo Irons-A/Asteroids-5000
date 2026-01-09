@@ -12,17 +12,17 @@ namespace Gameplay.Infrastructure
 
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<InvulnerabilityLogic>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<UncontrollabilityLogic>().FromNew().AsTransient();
-            Container.Bind<PlayerWeaponConfig>().FromNew().AsTransient();
-            Container.Bind<PlayerAmmoSubsystem>().FromNew().AsTransient();
-            Container.Bind<PlayerReloadingSubsystem>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<PlayerShootingSubsystem>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<UniversalPlayerWeaponSystem>().FromNew().AsTransient();
-            Container.BindInterfacesAndSelfTo<PlayerMovementLogic>().FromNew().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerHealthLogic>().FromNew().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerWeaponsLogic>().FromNew().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerLogic>().FromNew().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<InvulnerabilityLogic>().AsTransient();
+            Container.BindInterfacesAndSelfTo<UncontrollabilityLogic>().AsTransient();
+            Container.Bind<PlayerWeaponConfig>().AsTransient();
+            Container.Bind<PlayerAmmoSubsystem>().AsTransient();
+            Container.Bind<PlayerReloadingSubsystem>().AsTransient();
+            Container.BindInterfacesAndSelfTo<PlayerShootingSubsystem>().AsTransient();
+            Container.BindInterfacesAndSelfTo<UniversalPlayerWeaponSystem>().AsTransient();
+            Container.BindInterfacesAndSelfTo<PlayerMovementLogic>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerHealthLogic>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerWeaponsLogic>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerLogic>().AsSingle().NonLazy();
             
             Container.BindInterfacesAndSelfTo<PlayerPresentation>() .FromMethod(CreatePlayerWithTransform) .AsSingle();
         }

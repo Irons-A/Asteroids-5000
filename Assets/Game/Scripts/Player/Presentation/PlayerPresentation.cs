@@ -8,12 +8,16 @@ namespace Player.Presentation
 {
     public class PlayerPresentation : MovableObject, IInitializable
     {
+        [SerializeField] private Transform[] _bulletFirepoints;
+        [SerializeField] private Transform[] _laserFirepoints;
+        [SerializeField] private ParticleSystem _engineParticles;
+        
         private PlayerLogic _playerLogic;
         private InputDetector _inputDetector;
         
-        [field: SerializeField] public Transform[] BulletFirepoints { get; private set; }
-        [field: SerializeField] public Transform[] LaserFirepoints { get; private set; }
-        [field: SerializeField] public ParticleSystem EngineParticles { get; private set; }
+        public Transform[] BulletFirepoints => _bulletFirepoints;
+        public Transform[] LaserFirepoints => _laserFirepoints;
+        public ParticleSystem EngineParticles => _engineParticles;
 
         [Inject]
         private void Construct(PlayerLogic playerLogic, InputDetector inputDetector)

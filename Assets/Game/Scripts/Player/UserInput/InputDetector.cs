@@ -1,4 +1,3 @@
-using Core.Configuration;
 using Player.Logic;
 using Player.UserInput.Strategies;
 using Core.Signals;
@@ -18,15 +17,12 @@ namespace Player.UserInput
         private readonly SignalBus _signalBus;
         
         private PlayerLogic _playerLogic;
-        private UserInputSettings _inputSettings;
 
         public IInputStrategy CurrentStrategy { get; private set; }
 
-        public InputDetector(JsonConfigProvider configProvider, KeyboardMouseInputStrategy pcStrategy,
-            GamepadInputStrategy gamepadStrategy, MobileInputStrategy mobileStrategy, SignalBus signalBus)
+        public InputDetector(KeyboardMouseInputStrategy pcStrategy, GamepadInputStrategy gamepadStrategy,
+            MobileInputStrategy mobileStrategy, SignalBus signalBus)
         {
-            _inputSettings = configProvider.InputSettingsRef;
-
             _pcStrategy = pcStrategy;
             _gamepadStrategy = gamepadStrategy;
             _mobileStrategy = mobileStrategy;
@@ -108,33 +104,6 @@ namespace Player.UserInput
                    Input.GetKey(KeyCode.JoystickButton5) ||
                    Input.GetKey(KeyCode.JoystickButton6) ||
                    Input.GetKey(KeyCode.JoystickButton7);
-        }
-
-        private void CheckIfGamepadInputWithAxis()
-        {
-            //Disabled because of unity bug
-            
-            //Debug.Log(_currentStrategy);
-
-            //float axisX = Input.GetAxis("RightStickHorizontal");
-            //float axisY = Input.GetAxis("RightStickVertical");
-            //Debug.Log($"Raw Axis Values: X={axisX}, Y={axisY}");
-
-            //string[] joysticks = Input.GetJoystickNames();
-            //for (int i = 0; i < joysticks.Length; i++)
-            //{
-            //    Debug.Log($"Joystick {i}: {joysticks[i]}");
-            //}
-
-            //float axis1 = Input.GetAxis(_inputSettings.GamepadHorizontalRotationAxis);
-            //float axis2 = Input.GetAxis(_inputSettings.GamepadVerticalRotationAxis);
-            //float axis3 = Input.GetAxis(_inputSettings.GamepadShootLaserKey);
-
-            //bool hasInput = Mathf.Abs(axis1) > _inputSettings.InputDeadzone ||
-            //               Mathf.Abs(axis2) > _inputSettings.InputDeadzone ||
-            //               Mathf.Abs(axis3) > _inputSettings.InputDeadzone;
-
-            //return hasInput;
         }
 
         private bool CheckIfGamepadConnected()

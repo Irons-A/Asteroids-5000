@@ -109,12 +109,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df41425646659c4eb0261f8670b9cde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Damage>k__BackingField: 0
-  <Affiliation>k__BackingField: 1
-  <Durability>k__BackingField: 1
-  <ShouldCauseRicochet>k__BackingField: 1
-  <ShouldReceiveRicochet>k__BackingField: 1
-  <ShouldProcessCollisions>k__BackingField: 1
+  _damage: 0
+  _affiliation: 0
+  _durability: 0
+  _shouldCauseRicochet: 0
+  _shouldReceiveRicochet: 1
+  _shouldProcessCollisions: 1
 --- !u!114 &-9028290898076873946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62a66307319b84c498b19fd16f58e663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Firepoints>k__BackingField:
+  _firepoints:
   - {fileID: 6543112666176940347}
 --- !u!50 &391024719330168895
 Rigidbody2D:

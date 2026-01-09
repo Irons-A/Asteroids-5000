@@ -16,6 +16,9 @@ namespace Gameplay.Systems
 {
     public class GameStateController : MonoBehaviour
     {
+        private const float DefaultTimeScale = 1f;
+        private const float PauseTimeScale = 0f;
+        
         [Header("Canvases")]
         [SerializeField] private Canvas _gameUICanvas;
         [SerializeField] private Canvas _menuCanvas;
@@ -73,7 +76,7 @@ namespace Gameplay.Systems
             if (_pauseCanvas.isActiveAndEnabled == false && _currentGameState == GameState.Game)
             {
                 _pauseCanvas.gameObject.SetActive(true);
-                Time.timeScale = 0;
+                PauseGame();
                 
                 _currentGameState = GameState.Pause;
             }
@@ -89,7 +92,7 @@ namespace Gameplay.Systems
             {
                 _pauseCanvas.gameObject.SetActive(false);
             
-                Time.timeScale = 1;
+                UnpauseGame();
                 _currentGameState = GameState.Game;
             }
         }
@@ -101,7 +104,7 @@ namespace Gameplay.Systems
 
         private void GoToMenu()
         {
-            Time.timeScale = 1;
+            UnpauseGame();
 
             StopGame();
             
@@ -171,6 +174,16 @@ namespace Gameplay.Systems
             _signalBus.TryFire(new StopEnemySpawningSignal());
             
             _currentGameState = GameState.Menu;
+        }
+
+        private void PauseGame()
+        {
+            Time.timeScale = PauseTimeScale;
+        }
+
+        private void UnpauseGame()
+        {
+            Time.timeScale = DefaultTimeScale;
         }
     }
 }
