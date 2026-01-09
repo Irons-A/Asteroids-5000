@@ -92,7 +92,6 @@ namespace Player.Logic.Weapons
             }
             catch (OperationCanceledException)
             {
-                Debug.Log("Reload cancelled");
             }
             finally
             {

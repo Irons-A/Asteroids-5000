@@ -52,6 +52,9 @@ namespace Player.Logic
 
                 IsUncontrollable = false;
             }
+            catch (OperationCanceledException)
+            {
+            }
             finally
             {
                 StopUncontrollabilityPeriod();

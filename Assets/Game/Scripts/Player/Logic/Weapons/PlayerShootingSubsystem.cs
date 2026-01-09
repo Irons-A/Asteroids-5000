@@ -144,6 +144,9 @@ namespace Player.Logic.Weapons
                     await UniTask.Delay(TimeSpan.FromSeconds(_config.FireRateInterval), cancellationToken: token);
                 }
             }
+            catch (OperationCanceledException)
+            {
+            }
             finally
             {
                 if (_weaponState == WeaponState.Shooting)

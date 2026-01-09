@@ -24,11 +24,11 @@ namespace Advertisement
 #if UNITY_ANDROID
             _currentBannerId = AndroidBannerId;
 #elif UNITY_IOS
-            _currentBannerId = _iosBannerId;
+            _currentBannerId = IosBannerId;
 #else
             Debug.LogWarning("Unsupported platform for AdMob");
             
-            _currentBannerId = _androidBannerId;
+            _currentBannerId = AndroidBannerId;
 #endif
         }
         

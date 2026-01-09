@@ -31,11 +31,11 @@ namespace Advertisement
 #if UNITY_ANDROID
             _currentInterstitialId = AndroidInterstitialId;
 #elif UNITY_IOS
-            _currentInterstitialId = _iosInterstitialId;
+            _currentInterstitialId = IosInterstitialId;
 #else
             Debug.LogWarning("Unsupported platform for AdMob");
             
-            _currentInterstitialId = _androidInterstitialId;
+            _currentInterstitialId = AndroidInterstitialId;
 #endif
         }
         
