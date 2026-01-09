@@ -2,7 +2,8 @@
 
 This Unity project demonstrates best coding practices and advanced architectural solutions.
 
-Key features
+Key features:
+
 -Game logic is extracted into plain C# classes and separated from monobehaviour presentations where applicable.
 -Assembly definitions for logic modules separation.
 -Zenject(Extenject) for dependency injection.
